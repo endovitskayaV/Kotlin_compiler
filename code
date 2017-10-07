@@ -1,0 +1,10 @@
+class Main {
+ fun main() {
+  var e:Array<Int>;
+  e=Array<Int>(3,{1});
+  var c: Int =3;
+  var q: Array<Int> = Array<Int>(3, {c.inc()});
+  val a: Int=w[0];
+  val t:Double=3.684;
+  }
+}

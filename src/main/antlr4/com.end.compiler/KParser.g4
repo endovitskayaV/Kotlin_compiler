@@ -12,16 +12,22 @@ options {tokenVocab=KLexer; }
 number: RBO* (INTEGER|DOUBLE) RBC*;
 boolean_var:  RBO* (KEYWORD_true|KEYWORD_false) RBC*;
 ident: RBO* NAME RBO* ;
-concrete_var: number| boolean_var;
-variable: concrete_var|ident;
+concrete_var:
+    number      #numberLit
+    | boolean_var   #booleabLit
+    ;
+variable:
+    concrete_var    #concreteVariable
+    |ident          #Identifier
+    ;
 
 //TODO: ПРИОРИРЕТ СКОБОК
-multiply: ( number|ident)((MUL|DIV) (number| ident))*;
-add: multiply((ADD|SUB) (multiply))*;
+//multiply: left=expr operator=(MUL|DIV) right=expr;
+//add: multiply((ADD|SUB) (multiply))*;
 
-arithExpr:add;
+//arithExpr:add;
 
-compare: arithExpr (GE|LE|NEQUALS|EQUALS|GT|LT)arithExpr;
+//compare: expr (GE|LE|NEQUALS|EQUALS|GT|LT)arithExpr;
 
 negation: NOT (boolean_var);
 
@@ -35,18 +41,13 @@ readLine_op:KEYWORD_readLine RBO RBC NNV;
 
 //могут быть записаны как expr;
 //                    так и при присвоении
-expr:  variable
-     | arithExpr
-     | compare
-     | readLine_op
-     | negation
-     | div_op
-     | rem_op
-     | inc_op
-     | dec_op
-     | arr_type_size_def_val
-     | array_access
-     | fun_call;
+expr: RBO expr RBC  #parenExpr
+     | variable     #var
+     | arr_type_size_def_val    #arrTypeSizeDefVal
+     | array_access     #arrayAccess
+     | left=expr operator=(MUL|DIV|ADD|SUB|GE|LE|NEQUALS|EQUALS|GT|LT) right=expr   #binaryExpr
+     | fun_call #funcCall
+     ;
 
 type:KEYWORD_int|KEYWORD_double|KEYWORD_boolean|KEYWORD_array '<'type'>';
 
@@ -68,11 +69,11 @@ expression:    assignment
 expressions: (SEMICOLON* expression SEMICOLON+)*;
 block:  CBO (  expressions | expression) CBC;
 
-if_else:KEYWORD_if RBO (compare|BOOLEAN) RBC (expression | block) (KEYWORD_else (expression | block ))?;
+if_else:KEYWORD_if RBO (expr) RBC (expression | block) (KEYWORD_else (expression | block ))?;
 
-loop:(KEYWORD_while  RBO (compare|BOOLEAN) RBC (expression | block) )
+loop:(KEYWORD_while  RBO (expr) RBC (expression | block) )
      |(KEYWORD_for  RBO ( ident KEYWORD_in ident) RBC  (expression | block) )
-     |(KEYWORD_do block  KEYWORD_while RBO (compare|BOOLEAN) RBC)
+     |(KEYWORD_do block  KEYWORD_while RBO (expr) RBC)
      ;
 
 //TODO:check it
@@ -84,8 +85,7 @@ loop:(KEYWORD_while  RBO (compare|BOOLEAN) RBC (expression | block) )
  class_body: CBO (declaration| fun_declaration)* CBC;
  class_declaration: KEYWORD_class NAME class_body;
 
- program: (class_declaration+ | fun_declaration+) EOF ;
-
+ program:  class_declaration+ EOF;
 
 
 
