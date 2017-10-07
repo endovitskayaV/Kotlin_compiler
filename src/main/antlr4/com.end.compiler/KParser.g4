@@ -4,7 +4,7 @@ parser grammar KParser;
 //* 0-..
 //+ 1-..
 
-//TODO: сhar????,  одномерные массивы, asc????, mod????
+//TODO: сhar
 
 options {tokenVocab=KLexer; }
 
@@ -12,15 +12,18 @@ options {tokenVocab=KLexer; }
 number: RBO* (INTEGER|DOUBLE) RBC*;
 boolean_var:  RBO* (KEYWORD_true|KEYWORD_false) RBC*;
 ident: RBO* NAME RBO* ;
-variable:number| boolean_var|ident;
+concrete_var: number| boolean_var;
+variable: concrete_var|ident;
 
 //TODO: ПРИОРИРЕТ СКОБОК
 multiply: ( number|ident)((MUL|DIV) (number| ident))*;
 add: multiply((ADD|SUB) (multiply))*;
 
-
 arithExpr:add;
+
 compare: arithExpr (GE|LE|NEQUALS|EQUALS|GT|LT)arithExpr;
+
+negation: NOT (boolean_var);
 
 div_op:(INTEGER|ident) DOT KEYWORD_div RBO (INTEGER|ident) RBC;
 rem_op:(INTEGER|ident) DOT KEYWORD_rem RBO (INTEGER|ident) RBC;
@@ -30,39 +33,41 @@ print_op: KEYWORD_print RBO expr RBC;
 println_op: KEYWORD_println RBO expr RBC;
 readLine_op:KEYWORD_readLine RBO RBC NNV;
 
-negation: NOT (boolean_var);
-
-expr: arithExpr
-     | number
-     | boolean_var
+//могут быть записаны как expr; но тогда не имеют смысла
+//                    так и при присвоении
+expr:  variable
+     | arithExpr
      | compare
-     | print_op
-     | println_op
      | readLine_op
      | negation
-     |div_op
-     |rem_op
-     |inc_op
-     |dec_op
-     | KEYWORD_null;
+     | div_op
+     | rem_op
+     | inc_op
+     | dec_op
+     | arr_type_size_def_val
+     | array_access;
 
+type:KEYWORD_int|KEYWORD_double|KEYWORD_boolean|KEYWORD_array '<'type'>';
 
-
-type:KEYWORD_int|KEYWORD_double|KEYWORD_boolean;
 declaration: (KEYWORD_val|KEYWORD_var) NAME COLON type  (ASSIGN expr)?;
 assignment: NAME ASSIGN expr;
-block:  CBO ( | expressions | expression) CBC;
 
-if_else:KEYWORD_if RBO (compare|BOOLEAN) RBC (expression | block) (KEYWORD_else (expression | block ))?;
+arr_type_size_def_val: KEYWORD_array '<'type'>' RBO INTEGER COMMA CBO expr CBC RBC;
+array_access: NAME SBO INTEGER SBC;
 
+//полноценные выражения, имеющие смысл
 expression:    assignment
              | declaration
              | if_else
              | loop
+             | print_op
+             | println_op
              | expr;
 
-//TODO:FIX THIS
-expressions: (expression ( (SEMICOLON* LINEBREAK) | SEMICOLON+) )*;
+expressions: (SEMICOLON* expression SEMICOLON*)*;
+block:  CBO (  expressions | expression) CBC;
+
+if_else:KEYWORD_if RBO (compare|BOOLEAN) RBC (expression | block) (KEYWORD_else (expression | block ))?;
 
 loop:(KEYWORD_while  RBO (compare|BOOLEAN) RBC (expression | block) )
      |(KEYWORD_for  RBO ( ident KEYWORD_in ident) RBC  (expression | block) )
@@ -70,12 +75,12 @@ loop:(KEYWORD_while  RBO (compare|BOOLEAN) RBC (expression | block) )
      ;
 
 //TODO:check it
- parameter: NAME COLON type;
- funParameter: parameter;
+ funParameter: NAME COLON type;
  funParameters: RBO (funParameter (COMMA funParameter)*)? RBC;
  funDeclaration: KEYWORD_fun NAME funParameters(COLON type)? block;
  classBody: CBO (declaration| funDeclaration)* CBC;
  classDeclaration: KEYWORD_class NAME classBody;
+ program: (classDeclaration+ | funDeclaration+) ;
 
 
 
