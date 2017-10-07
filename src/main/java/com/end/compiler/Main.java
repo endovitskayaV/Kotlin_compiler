@@ -16,15 +16,13 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String str="class Main {fun main(args : Array<String>) {\n   var e:Array<Int>\n" +
-                "    e=Array<Int>(3,{1})\n" +
-                "   var c: Int =3\n\n" +
-                "    var q: Array<Int> = Array<Int>(3, {c.inc()}) " +
-                "val a: Int=w[0]" +
-                "val t:Double=3.684" +
-                " for(a in b) { }" +
-                ";\n}}";
-
+        String str="class Main {fun main() {\n   var e:Array<Int>;\n" +
+                "    e=Array<Int>(3,{1});\n" +
+                "   var c: Int =3;\n\n" +
+                "    var q: Array<Int> = Array<Int>(3, {c.inc()});" +
+                "val a: Int=w[0];" +
+                "val t:Double=3.684;" +
+                "\n}}";
         CharStream stream = CharStreams.fromString(str);
         KLexer kLexer = new KLexer(stream);
         TokenStream tokenStream = new CommonTokenStream(kLexer);

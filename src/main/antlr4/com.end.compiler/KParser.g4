@@ -33,7 +33,7 @@ print_op: KEYWORD_print RBO expr RBC;
 println_op: KEYWORD_println RBO expr RBC;
 readLine_op:KEYWORD_readLine RBO RBC NNV;
 
-//могут быть записаны как expr; но тогда не имеют смысла
+//могут быть записаны как expr;
 //                    так и при присвоении
 expr:  variable
      | arithExpr
@@ -45,7 +45,8 @@ expr:  variable
      | inc_op
      | dec_op
      | arr_type_size_def_val
-     | array_access;
+     | array_access
+     | fun_call;
 
 type:KEYWORD_int|KEYWORD_double|KEYWORD_boolean|KEYWORD_array '<'type'>';
 
@@ -53,7 +54,7 @@ declaration: (KEYWORD_val|KEYWORD_var) NAME COLON type  (ASSIGN expr)?;
 assignment: NAME ASSIGN expr;
 
 arr_type_size_def_val: KEYWORD_array '<'type'>' RBO INTEGER COMMA CBO expr CBC RBC;
-array_access: NAME SBO INTEGER SBC;
+array_access: NAME SBO (INTEGER | ident) SBC;
 
 //полноценные выражения, имеющие смысл
 expression:    assignment
@@ -64,7 +65,7 @@ expression:    assignment
              | println_op
              | expr;
 
-expressions: (SEMICOLON* expression SEMICOLON*)*;
+expressions: (SEMICOLON* expression SEMICOLON+)*;
 block:  CBO (  expressions | expression) CBC;
 
 if_else:KEYWORD_if RBO (compare|BOOLEAN) RBC (expression | block) (KEYWORD_else (expression | block ))?;
@@ -75,12 +76,15 @@ loop:(KEYWORD_while  RBO (compare|BOOLEAN) RBC (expression | block) )
      ;
 
 //TODO:check it
- funParameter: NAME COLON type;
- funParameters: RBO (funParameter (COMMA funParameter)*)? RBC;
- funDeclaration: KEYWORD_fun NAME funParameters(COLON type)? block;
- classBody: CBO (declaration| funDeclaration)* CBC;
- classDeclaration: KEYWORD_class NAME classBody;
- program: (classDeclaration+ | funDeclaration+) ;
+ fun_parameter: NAME COLON type;
+ fun_parameters: RBO (fun_parameter (COMMA fun_parameter)*)? RBC;
+ fun_declaration: KEYWORD_fun NAME fun_parameters(COLON type)? block;
+ fun_call: NAME RBO (variable (COMMA variable)* )? RBC;
+
+ class_body: CBO (declaration| fun_declaration)* CBC;
+ class_declaration: KEYWORD_class NAME class_body;
+
+ program: (class_declaration+ | fun_declaration+) EOF ;
 
 
 
