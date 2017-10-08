@@ -3,17 +3,15 @@ parser grammar KParser;
 //? 0 1
 //* 0-..
 //+ 1-..
-
 //TODO: сhar
 
 options {tokenVocab=KLexer; }
-
 
 number: RBO* (INTEGER|DOUBLE) RBC*;
 boolean_var:  RBO* (KEYWORD_true|KEYWORD_false) RBC*;
 ident: RBO* NAME RBO* ;
 concrete_var:
-    number      #numberLit
+      number        #numberLit
     | boolean_var   #booleabLit
     ;
 variable:
@@ -21,32 +19,17 @@ variable:
     |ident          #Identifier
     ;
 
-//TODO: ПРИОРИРЕТ СКОБОК
-//multiply: left=expr operator=(MUL|DIV) right=expr;
-//add: multiply((ADD|SUB) (multiply))*;
-
-//arithExpr:add;
-
-//compare: expr (GE|LE|NEQUALS|EQUALS|GT|LT)arithExpr;
-
-negation: NOT (boolean_var);
-
-div_op:(INTEGER|ident) DOT KEYWORD_div RBO (INTEGER|ident) RBC;
-rem_op:(INTEGER|ident) DOT KEYWORD_rem RBO (INTEGER|ident) RBC;
-inc_op:(INTEGER|ident) DOT KEYWORD_inc RBO RBC;
-dec_op:(INTEGER|ident) DOT KEYWORD_dec RBO RBC;
-print_op: KEYWORD_print RBO expr RBC;
-println_op: KEYWORD_println RBO expr RBC;
-readLine_op:KEYWORD_readLine RBO RBC NNV;
+negation: NOT (expr);
 
 //могут быть записаны как expr;
 //                    так и при присвоении
-expr: RBO expr RBC  #parenExpr
-     | variable     #var
+expr: RBO expr RBC              #parenExpr
+     | variable                 #var
      | arr_type_size_def_val    #arrTypeSizeDefVal
-     | array_access     #arrayAccess
+     | array_access             #arrayAccess
      | left=expr operator=(MUL|DIV|ADD|SUB|GE|LE|NEQUALS|EQUALS|GT|LT) right=expr   #binaryExpr
-     | fun_call #funcCall
+     | fun_call                 #funcCall
+     | negation                 #neg
      ;
 
 type:KEYWORD_int|KEYWORD_double|KEYWORD_boolean|KEYWORD_array '<'type'>';
@@ -62,8 +45,6 @@ expression:    assignment
              | declaration
              | if_else
              | loop
-             | print_op
-             | println_op
              | expr;
 
 expressions: (SEMICOLON* expression SEMICOLON+)*;
