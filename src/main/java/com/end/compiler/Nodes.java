@@ -144,13 +144,14 @@ class WhileLoop implements Statement{
 @AllArgsConstructor
 @NoArgsConstructor
 class Declaration implements Statement{
+    private String varVal;
     private VariableReference variableName;
     private Type type;
     private Expression expression;
 
     @Override
     public String name() {
-        String returnStr= variableName.name()+":"+type.name();
+        String returnStr= varVal+" "+variableName.name()+":"+type.name();
         if (expression!=new ArrayList<>()) returnStr+="="+ expression.name();
         return returnStr;
     }
@@ -248,19 +249,98 @@ class Variable implements Expression {
     }
 }
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class Negation implements Expression{
+    private Expression expr;
+    @Override
+    public String name() {
+        return "!"+expr.name();
+    }
 
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        return Arrays.asList(expr);
+    }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class FunCall implements Expression{
+    private  String name;
+    private List<Expression> parameters;
+
+    @Override
+    public String name() {
+        return name+"("+parameters.toString()+")";
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        children.addAll(0,parameters);
+        return children;
+    }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class  ArrayAccess implements  Expression{
+
+    private String name;
+    private Expression expression;
+    @Override
+    public String name() {
+        return name+"["+expression.name()+"]";
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        children.add(expression);
+        return children;
+    }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class ArrTypeSizeDefVal implements Expression{
+    private Type type;
+    private List<Expression> expressionList;
+    @Override
+    public String name() {
+        return "Array<"+type.name()+"> ("+expressionList.get(0)+", {"+expressionList.get(1)+"})";
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        return expressionList;
+    }
+}
+
+
+
+@NoArgsConstructor
 class Integer extends Type {
     @Override
     public String name() {
         return super.name();
     }
 }
+
+@NoArgsConstructor
 class Double extends Type {
     @Override
     public String name() {
         return super.name();
     }
 }
+
+@NoArgsConstructor
 class Boolean extends Type {
     @Override
     public String name() {
@@ -268,6 +348,7 @@ class Boolean extends Type {
     }
 
 }
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
