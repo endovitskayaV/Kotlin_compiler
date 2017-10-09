@@ -96,22 +96,76 @@ public class ToAst{
            return toAst(((KParser.AssigContext) expression).assignment().expr());
        else if(expression instanceof KParser.DeclContext)
            return toAst(((KParser.DeclContext) expression).declaration().expr());
-       //else if (expression instanceof KParser.IfElseContext)
-         //  return  to
+       else if (expression instanceof KParser.IfElseContext)
+           return  toAst(((KParser.IfElseContext) expression).if_else());
        else if (expression instanceof KParser.ExprExpContext)
            return toAst(((KParser.ExprExpContext) expression).expr());
-       //else if (expression instanceof KParser.LoopExpContext)
-         //  return toAst()
+       else if (expression instanceof KParser.LoopExpContext)
+         return toAst(((KParser.LoopExpContext) expression).loop());
        else throw new UnsupportedOperationException();
    }
 
+
+   public  static Statement toAst(KParser.LoopContext loop){
+       if (loop instanceof KParser.WhileLoopContext)
+           return toAst(((KParser.WhileLoopContext) loop).while_loop());
+       else  if (loop instanceof KParser.ForLoopContext)
+           return  toAst(((KParser.ForLoopContext) loop).for_loop());
+       else if (loop instanceof KParser.DoWhileLoopContext)
+           return  toAst(((KParser.DoWhileLoopContext) loop).do_while_loop());
+       else throw new UnsupportedOperationException();
+   }
 
    public static Expression toAst (KParser.ExpressionsContext expressions){
        return toAst(expressions.exp);
    }
 
-   public static Expression toAst (KParser.BlockContext block){
+   public static Statement toAst (KParser.BlockContext block){
        return toAst(block.expressions());
    }
-    public static
+
+   public static  Expression toAst(KParser.If_elseContext if_elseContext){
+      return new IfElse(if_elseContext.
+   }
+
+   public  static  Statement toAst(KParser.While_loopContext while_loop){
+       if (while_loop instanceof KParser.ExpressionContext)
+           return new WhileLoop(while_loop.expr(), while_loop.expression());
+       else  if (while_loop instanceof KParser.BlockContext)
+       return  new WhileLoop(while_loop.expr(), while_loop.block())
+       else throw new UnsupportedOperationException();
+   }
+
+   public static Statement toAst (KParser.For_loopContext forLoop){
+       return  new ForLoop(forLoop.)
+   }
+
+   public  static  Statement toAst (KParser.Do_while_loopContext do_while_loop){
+       return  new DoWhileLoop(do_while_loop.expr(), toAst(do_while_loop.block()));
+   }
+
+   public static Node toAst (KParser.Fun_parameterContext fun_parameter){
+       return new FunParameter(toAst(fun_parameter.ident()), toAst(fun_parameter.type()));
+    }
+
+    public  static Node toAst(KParser.Fun_parametersContext fun_parameters) {
+       return
+    }
+
+    public  static Node toAst(KParser.Fun_declarationContext fun_declaration){
+       return  new FunDeclaration(toAst(fun_declaration.ident(), toAst(fun_declaration.type(),
+               toAst(), toAst(fun_declaration.block()))));
+    }
+
+    public  static  Expression toAst(KParser.Fun_callContext fun_call){
+        return  new FunCall(toAst(fun_call.ident(), ));
+    }
+
+    public  static Node toAst(KParser.Class_declarationContext class_declaration){
+        return new ClassDeclaration(toAst(class_declaration.ident()), );
+    }
+
+    public static  Node toAst(KParser.ProgramContext program){
+        return new Program(toAst());
+    }
 }

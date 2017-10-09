@@ -1,5 +1,6 @@
 package com.end.compiler;
 import  io.bretty.console.tree.PrintableTreeNode;
+import jdk.nashorn.internal.ir.Block;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,25 +12,6 @@ import java.util.List;
 interface Node extends PrintableTreeNode {}
 interface Statement extends Node {}
 interface Expression extends Node, Statement {}
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class BinaryExpression implements Expression{
-    private Expression left;
-    private Expression right;
-    private String sign;
-
-    @Override
-    public String name() {
-        return sign;
-    }
-
-    @Override
-    public List<? extends PrintableTreeNode> children() {
-        return Arrays.asList(left, right);
-    }
-}
 
 abstract class Type implements  Node {
     public List<PrintableTreeNode> children(){
@@ -67,6 +49,7 @@ class FunDeclaration implements Node{
     private List<FunParameter> funParametersList;
     private List<Statement> statementList;
     @Override
+    //проверить не равен ли тип null??
     public String name() {
         return "fun"+variableName.name()+"("+funParametersList.toString()+") :"+returnType.name();
     }
@@ -88,17 +71,40 @@ class FunDeclaration implements Node{
 class ClassDeclaration implements Node{
 
     private VariableReference name;
-   // private
+    private List<Declaration> propertiesDecls;
+    private List<FunDeclaration> funDeclarations;
     @Override
     public String name() {
-        return name.name();
+        return "class "+name.name();
     }
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        return new ArrayList<>();
+        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        children.addAll(propertiesDecls);
+        children.addAll(funDeclarations);
+        return children;
     }
 }
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class Program implements Node{
+
+    private List<ClassDeclaration> classDeclarations;
+    @Override
+    public String name() {
+        return "program";
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        return classDeclarations;
+    }
+}
+
+
 
 @Data
 @AllArgsConstructor
@@ -143,6 +149,49 @@ class WhileLoop implements Statement{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+class ForLoop implements Statement{
+    private List<VariableReference> idents;
+    private Expression expression;
+    private List <Statement> block;
+    @Override
+    public String name() {
+        return "for";
+    }
+
+    @Override
+    public ArrayList<PrintableTreeNode> children() {
+        ArrayList<PrintableTreeNode> childrenList=new ArrayList<PrintableTreeNode>();
+        childrenList.addAll(idents);
+        childrenList.add(idents.size(),expression);
+        childrenList.addAll(idents.size()+1, block);
+        return  childrenList;
+    }
+}
+
+//как оформить?
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class DoWhileLoop implements Statement{
+    private Expression expression;
+    private Statement block;
+    @Override
+    public String name() {
+        return "do";
+    }
+
+    @Override
+    public ArrayList<PrintableTreeNode> children() {
+        ArrayList<PrintableTreeNode> childrenList=new ArrayList<PrintableTreeNode>();
+        childrenList.add(expression);
+        childrenList.add( block);
+        return  childrenList;
+    }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 class Declaration implements Statement{
     private String varVal;
     private VariableReference variableName;
@@ -169,6 +218,46 @@ class Declaration implements Statement{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+class IfElse implements  Statement{
+    private  List<Expression> expressions;
+    private List<Expression> blocks;
+    @Override
+    public String name() {
+        return "if";
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        children.addAll(expressions);
+        children.addAll(blocks);
+        return children;
+    }
+}
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class BinaryExpression implements Expression{
+    private Expression left;
+    private Expression right;
+    private String sign;
+
+    @Override
+    public String name() {
+        return sign;
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        return Arrays.asList(left, right);
+    }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 class VariableReference implements Expression{
     private String variableName;
     @Override
@@ -181,7 +270,6 @@ class VariableReference implements Expression{
         return new ArrayList<>();
     }
 }
-
 
 @Data
 @AllArgsConstructor
@@ -232,6 +320,7 @@ class BooleanVar implements Expression {
     }
 }
 
+/*
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -248,6 +337,7 @@ class Variable implements Expression {
         return new ArrayList<>();
     }
 }
+*/
 
 @Data
 @AllArgsConstructor

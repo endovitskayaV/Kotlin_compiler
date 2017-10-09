@@ -21,7 +21,6 @@ variable:
     concrete_var    #concreteVariable
     |ident          #Identifier
     ;
-
 //могут быть записаны как expr;
 //                    так и при присвоении
 expr: RBO expr RBC              #parenExpr
