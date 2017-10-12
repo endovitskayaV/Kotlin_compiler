@@ -1,0 +1,20 @@
+ ── program
+    └── class Test
+        ├── fun test(param:Double, param2:Integer) :Double
+        │   ├── =
+        │   │   ├── a
+        │   │   └── 3
+        │   └── return a
+        │       └── a
+        ├── fun test2() :Boolean
+        │   ├── var arr:Array<Integer>
+        │   └── return true
+        │       └── true
+        └── fun test3(p:Integer) :Unit
+            ├── =
+            │   ├── p
+            │   └── 2
+            └── return +
+                └── +
+                    ├── 2
+                    └── 4
