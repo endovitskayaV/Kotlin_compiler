@@ -447,7 +447,7 @@ class ReturnExpr implements Expr{
     private Expr expr;
     @Override
     public String name() {
-        return "return "+expr.name();
+        return "return";
     }
 
     @Override
