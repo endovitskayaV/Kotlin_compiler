@@ -62,7 +62,7 @@ class Test {
                   }
       return true
     }
-*/
+
   fun test3 (p:Int):Unit{
      p=2
      do{
@@ -70,5 +70,25 @@ class Test {
      a=3
      }
      while (a<>23)
-     }
-   }
+     }*/
+
+     fun test3 (p:Int):Unit{
+        if (a>0) p=i+1
+        if (c==3) i=fun1(12,qw)
+        else a=9
+
+        if (isGood){
+          a=0
+          var t:Double=9
+        }
+
+         if (isGood){
+            e=8-9
+            var t:Double=fun6(e,t)
+         }
+         else {
+            c=9;
+            a=e*7
+         }
+         }
+ }

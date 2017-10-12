@@ -114,8 +114,8 @@ public class ToAst{
            return toAst(((KParser.AssigContext) expression).assignment());
        else if(expression instanceof KParser.DeclContext)
            return toAst(((KParser.DeclContext) expression).declaration());
-      // else if (expression instanceof KParser.IfElseContext)
-        //   return  toAst(((KParser.IfElseContext) expression).if_else());
+      else if (expression instanceof KParser.IfElseContext)
+          return  toAst(((KParser.IfElseContext) expression).if_else());
        else if (expression instanceof KParser.ExprExpContext)
            return toAst(((KParser.ExprExpContext) expression).expr());
        else if (expression instanceof KParser.LoopExpContext)
@@ -144,11 +144,22 @@ public class ToAst{
        return toAst(block.expressions());
    }
 
-  /* public static Expr toAst(KParser.If_elseContext if_elseContext){
-       if (if_elseContext.)
-      return new IfElse(if_elseContext.expression()
+   public static Expression toAst(KParser.If_elseContext if_elseContext){
+       if (if_elseContext.firstExpression!=null && if_elseContext.secondExpression!=null)
+           return new IfElse(toAst(if_elseContext.expr()), Arrays.asList(toAst(if_elseContext.firstExpression)),new ElseBlock(Arrays.asList(toAst(if_elseContext.secondExpression))));
+      else if (if_elseContext.firstBlock!=null && if_elseContext.secondBlock!=null)
+           return new IfElse(toAst(if_elseContext.expr()), toAst(if_elseContext.firstBlock),new ElseBlock(toAst(if_elseContext.secondBlock)));
+      else if (if_elseContext.firstExpression!=null && if_elseContext.secondBlock!=null)
+           return new IfElse(toAst(if_elseContext.expr()), Arrays.asList(toAst(if_elseContext.firstExpression)),new ElseBlock(toAst(if_elseContext.secondBlock)));
+      else if (if_elseContext.firstBlock!=null && if_elseContext.secondExpression!=null)
+           return new IfElse(toAst(if_elseContext.expr()), toAst(if_elseContext.firstBlock),new ElseBlock(toAst(if_elseContext.secondBlock)));
+      else if (if_elseContext.firstBlock!=null)// && if_elseContext.secondExpression==null && if_elseContext.secondBlock==null
+           return new IfElse(toAst(if_elseContext.expr()), toAst(if_elseContext.firstBlock),null);
+       else if (if_elseContext.firstExpression!=null)// && if_elseContext.secondExpression==null && if_elseContext.secondBlock==null
+           return new IfElse(toAst(if_elseContext.expr()), Arrays.asList(toAst(if_elseContext.firstExpression)),null);
+       else throw new UnsupportedOperationException();
    }
-*/
+
    public  static Expression toAst(KParser.While_loopContext while_loop){
        if (while_loop.expression()==null)
            return new WhileLoop(toAst(while_loop.expr()), while_loop.block().expressions().expression().stream().map(x->toAst(x)).collect(Collectors.toList()));

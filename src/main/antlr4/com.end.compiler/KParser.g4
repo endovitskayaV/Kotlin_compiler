@@ -29,7 +29,6 @@ expr: RBO expr RBC              #parenExpr
      | left=expr operator=(MUL|DIV) right=expr    #binaryExpr
      | left=expr operator=(ADD|SUB) right=expr      #binaryExpr
      | left=expr operator=(GE|LE|NEQUALS|EQUALS|GT|LT) right=expr #binaryExpr
-    // | left=expr operator=(MUL|DIV|ADD|SUB|GE|LE|NEQUALS|EQUALS|GT|LT) right=expr   #binaryExpr
      | fun_call                 #funcCall
      | NOT (expr)                 #neg
      ;

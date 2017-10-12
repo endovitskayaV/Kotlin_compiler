@@ -240,23 +240,42 @@ class Declaration implements Expression {
 @AllArgsConstructor
 @NoArgsConstructor
 class IfElse implements Expression {
-    private  List<Expression> then;
-    private List<Expression> elseExp;
+    private  Expr condition;
+    private  List<Expression> thenExpression;
+    private ElseBlock elseExpression;
     @Override
     public String name() {
-        return "if-else";
+        return "if";
     }
 
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
-        children.addAll(then);
-        if(elseExp!=null)
-        children.addAll(elseExp);
+        children.add(condition);
+        children.addAll(thenExpression);
+        if(elseExpression !=null)
+        children.add(elseExpression);
         return children;
     }
 }
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class ElseBlock implements Expression{
+    private List<Expression> expressions;
+    @Override
+    public String name() {
+        return "else";
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        children.addAll(expressions);
+        return children;
+    }
+}
 
 @Data
 @AllArgsConstructor
