@@ -431,7 +431,7 @@ class ArrTypeSizeDefVal implements Expr {
     private List<Expr> exprList;
     @Override
     public String name() {
-        return "Array<"+type.name()+"> ("+ exprList.get(0).name()+", {"+ exprList.get(1).name()+"})";
+        return "Array<"+type.name()+"> (  "+", {  })";
     }
 
     @Override

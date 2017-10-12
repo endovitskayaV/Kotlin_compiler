@@ -65,7 +65,7 @@
         │   │   └── fun1(w)
         │   ├── =
         │   │   ├── var arr:Array<Integer>
-        │   │   └── Array<Integer> (5, {-})
+        │   │   └── Array<Integer> (  , {  })
         │   │       ├── 5
         │   │       └── -
         │   │           ├── 3
