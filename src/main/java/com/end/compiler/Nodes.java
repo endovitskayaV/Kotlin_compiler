@@ -1,6 +1,5 @@
 package com.end.compiler;
 import  io.bretty.console.tree.PrintableTreeNode;
-import jdk.nashorn.internal.ir.Block;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,15 +9,15 @@ import java.util.Arrays;
 import java.util.List;
 
 interface Node extends PrintableTreeNode {}
-interface Statement extends Node {}
-interface Expression extends Node, Statement {}
+interface Expression extends Node {}
+interface Expr extends Node, Expression {}
 
 abstract class Type implements  Node {
     public List<PrintableTreeNode> children(){
         return new ArrayList<>();
     }
     public String name(){
-        return toString();
+        return getClass().getName();
     }
 }
 
@@ -40,27 +39,53 @@ class FunParameter implements Node{
     }
 }
 
+/*
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class FunParameters implements Node{
+    private  List<Node> funParameters;
+    @Override
+    public String name(){
+        return funParameters.toString();
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        return new ArrayList<>();
+    }
+}
+*/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 class FunDeclaration implements Node{
-    private VariableReference variableName;
+    private VariableReference funName;
     private Type returnType;
-    private List<FunParameter> funParametersList;
-    private List<Statement> statementList;
+    private List<Node> funParametersList;
+    private List<Expression> expressionList;
+    private  ReturnExpr returnExpr;
     @Override
-    //проверить не равен ли тип null??
+
     public String name() {
-        return "fun"+variableName.name()+"("+funParametersList.toString()+") :"+returnType.name();
+        String returnStr="fun "+ funName.name()+"(";
+        if (funParametersList.size()>0) {
+            for (Node funParam : funParametersList)
+                returnStr += funParam.name() + ", ";
+            returnStr = returnStr.substring(0, returnStr.length() - 2);
+        }
+        returnStr+=") :";
+        if (returnType!=null)returnStr+=returnType.name();
+        else returnStr+="Unit";
+        return returnStr;
     }
 
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
-        children.add(variableName);
-        children.add(returnType);
-        children.addAll(2, funParametersList);
-        children.addAll(2+funParametersList.size(), statementList);
+        children.addAll(0, expressionList);
+        if (returnExpr!=null)
+            children.add(returnExpr);
         return children;
     }
 }
@@ -71,8 +96,8 @@ class FunDeclaration implements Node{
 class ClassDeclaration implements Node{
 
     private VariableReference name;
-    private List<Declaration> propertiesDecls;
-    private List<FunDeclaration> funDeclarations;
+    private List<Node> propertiesDecls;
+    private List<Node> funDeclarations;
     @Override
     public String name() {
         return "class "+name.name();
@@ -81,8 +106,8 @@ class ClassDeclaration implements Node{
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
-        children.addAll(propertiesDecls);
-        children.addAll(funDeclarations);
+        if(propertiesDecls!=null) children.addAll(propertiesDecls);
+        if(funDeclarations!=null) children.addAll(funDeclarations);
         return children;
     }
 }
@@ -92,7 +117,7 @@ class ClassDeclaration implements Node{
 @NoArgsConstructor
 class Program implements Node{
 
-    private List<ClassDeclaration> classDeclarations;
+    private List<Node> classDeclarations;
     @Override
     public String name() {
         return "program";
@@ -109,9 +134,9 @@ class Program implements Node{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class Assignment implements Statement{
-    private  VariableReference variableName;
-    private  Expression value;
+class Assignment implements Expression {
+    private  Expr left;
+    private Expr value;
     @Override
     public String name() {
         return "=";
@@ -120,8 +145,8 @@ class Assignment implements Statement{
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> childrenList=new ArrayList<PrintableTreeNode>();
+        childrenList.add(left);
         childrenList.add(value);
-        childrenList.add(variableName);
         return childrenList;
     }
 }
@@ -129,9 +154,9 @@ class Assignment implements Statement{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class WhileLoop implements Statement{
-    private Expression condition;
-    private List<Statement> statements;
+class WhileLoop implements Expression {
+    private Expr condition;
+    private List<Expression> expressions;
     @Override
     public String name() {
         return "while";
@@ -141,7 +166,7 @@ class WhileLoop implements Statement{
     public ArrayList<PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> childrenList=new ArrayList<PrintableTreeNode>();
         childrenList.add(condition);
-        childrenList.addAll(1,statements);
+        childrenList.addAll(1, expressions);
         return  childrenList;
     }
 }
@@ -149,10 +174,9 @@ class WhileLoop implements Statement{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class ForLoop implements Statement{
+class ForLoop implements Expression {
     private List<VariableReference> idents;
-    private Expression expression;
-    private List <Statement> block;
+    private List <Expression> block;
     @Override
     public String name() {
         return "for";
@@ -162,28 +186,26 @@ class ForLoop implements Statement{
     public ArrayList<PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> childrenList=new ArrayList<PrintableTreeNode>();
         childrenList.addAll(idents);
-        childrenList.add(idents.size(),expression);
-        childrenList.addAll(idents.size()+1, block);
+        childrenList.addAll(idents.size(), block);
         return  childrenList;
     }
 }
 
-//как оформить?
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class DoWhileLoop implements Statement{
-    private Expression expression;
-    private Statement block;
+class DoWhileLoop implements Expression {
+    private Expr expr;
+    private Expression block;
     @Override
     public String name() {
-        return "do";
+        return "do-while";
     }
 
     @Override
     public ArrayList<PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> childrenList=new ArrayList<PrintableTreeNode>();
-        childrenList.add(expression);
+        childrenList.add(expr);
         childrenList.add( block);
         return  childrenList;
     }
@@ -192,25 +214,24 @@ class DoWhileLoop implements Statement{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class Declaration implements Statement{
-    private String varVal;
-    private VariableReference variableName;
+class Declaration implements Expression {
+    private  String varVal;
+    private VariableReference variable;
     private Type type;
-    private Expression expression;
+    private Expr expr;
 
     @Override
     public String name() {
-        String returnStr= varVal+" "+variableName.name()+":"+type.name();
-        if (expression!=new ArrayList<>()) returnStr+="="+ expression.name();
-        return returnStr;
+        return "=";
     }
 
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
-        children.add(variableName);
-        children.add(type);
-        children.add(expression);
+        NewVariable newVariable=new NewVariable(varVal,variable,type);
+        children.add(newVariable);
+       // children.add(type);
+        children.add(expr);
         return children;
     }
 }
@@ -218,19 +239,20 @@ class Declaration implements Statement{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class IfElse implements  Statement{
-    private  List<Expression> expressions;
-    private List<Expression> blocks;
+class IfElse implements Expression {
+    private  List<Expression> then;
+    private List<Expression> elseExp;
     @Override
     public String name() {
-        return "if";
+        return "if-else";
     }
 
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
-        children.addAll(expressions);
-        children.addAll(blocks);
+        children.addAll(then);
+        if(elseExp!=null)
+        children.addAll(elseExp);
         return children;
     }
 }
@@ -239,9 +261,9 @@ class IfElse implements  Statement{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class BinaryExpression implements Expression{
-    private Expression left;
-    private Expression right;
+class BinaryExpr implements Expr {
+    private Expr left;
+    private Expr right;
     private String sign;
 
     @Override
@@ -258,7 +280,25 @@ class BinaryExpression implements Expression{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class VariableReference implements Expression{
+class NewVariable implements Expr {
+   private  String varVal;
+   private VariableReference variable;
+   private Type type;
+    @Override
+    public String name() {
+        return varVal+" "+variable.name()+":"+type.name();
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        return new ArrayList<>();
+    }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class VariableReference implements Expr {
     private String variableName;
     @Override
     public String name() {
@@ -274,7 +314,7 @@ class VariableReference implements Expression{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class IntegerVar implements Expression {
+class IntegerVar implements Expr {
     private  String value;
     @Override
     public String name() {
@@ -290,7 +330,7 @@ class IntegerVar implements Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class DoubleVar implements Expression {
+class DoubleVar implements Expr {
     private  String value;
     @Override
     public String name() {
@@ -306,7 +346,7 @@ class DoubleVar implements Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class BooleanVar implements Expression {
+class BooleanVar implements Expr {
     private  String value;
 
     @Override
@@ -320,33 +360,14 @@ class BooleanVar implements Expression {
     }
 }
 
-/*
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class Variable implements Expression {
-    private String value;
-
+class Negation implements Expr {
+    private Expr expr;
     @Override
     public String name() {
-        return value;
-    }
-
-    @Override
-    public List<? extends PrintableTreeNode> children() {
-        return new ArrayList<>();
-    }
-}
-*/
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class Negation implements Expression{
-    private Expression expr;
-    @Override
-    public String name() {
-        return "!"+expr.name();
+        return "!";
     }
 
     @Override
@@ -358,39 +379,46 @@ class Negation implements Expression{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class FunCall implements Expression{
+class FunCall implements Expr {
     private  String name;
-    private List<Expression> parameters;
+    private List<Expr> parameters;
 
     @Override
     public String name() {
-        return name+"("+parameters.toString()+")";
+        String returnStr=name+"(";
+
+        if (parameters!=null && parameters.size()>0) {
+            for (Expr param : parameters) {
+                returnStr += param.name() + ", ";
+            }
+
+            returnStr = returnStr.substring(0, returnStr.length() - 2);
+        }
+            returnStr+=")";
+        return returnStr;
     }
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
-        children.addAll(0,parameters);
-        return children;
+        return new ArrayList<>();
     }
 }
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class  ArrayAccess implements  Expression{
-
+class  ArrayAccess implements Expr {
     private String name;
-    private Expression expression;
+    private Expr expr;
     @Override
     public String name() {
-        return name+"["+expression.name()+"]";
+        return name+"[ ]";
     }
 
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
-        children.add(expression);
+        children.add(expr);
         return children;
     }
 }
@@ -398,27 +426,43 @@ class  ArrayAccess implements  Expression{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class ArrTypeSizeDefVal implements Expression{
+class ArrTypeSizeDefVal implements Expr {
     private Type type;
-    private List<Expression> expressionList;
+    private List<Expr> exprList;
     @Override
     public String name() {
-        return "Array<"+type.name()+"> ("+expressionList.get(0)+", {"+expressionList.get(1)+"})";
+        return "Array<"+type.name()+"> ("+ exprList.get(0).name()+", {"+ exprList.get(1).name()+"})";
     }
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        return expressionList;
+        return exprList;
     }
 }
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class ReturnExpr implements Expr{
+    private Expr expr;
+    @Override
+    public String name() {
+        return "return "+expr.name();
+    }
 
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        children.add(expr);
+        return children;
+    }
+}
 
 @NoArgsConstructor
 class Integer extends Type {
     @Override
     public String name() {
-        return super.name();
+        return "Integer";
     }
 }
 
@@ -426,7 +470,7 @@ class Integer extends Type {
 class Double extends Type {
     @Override
     public String name() {
-        return super.name();
+        return "Double";
     }
 }
 
@@ -434,7 +478,7 @@ class Double extends Type {
 class Boolean extends Type {
     @Override
     public String name() {
-        return super.name();
+        return "Boolean";
     }
 
 }

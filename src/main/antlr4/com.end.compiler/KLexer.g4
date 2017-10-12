@@ -9,6 +9,8 @@ KEYWORD_val: 'val';
 
 KEYWORD_class: 'class';
 KEYWORD_fun: 'fun';
+KEYWORD_Unit: 'Unit';
+KEYWORD_return: 'return';
 
 KEYWORD_int: 'Int';
 KEYWORD_double: 'Double';

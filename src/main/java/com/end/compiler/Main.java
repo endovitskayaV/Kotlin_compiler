@@ -9,21 +9,9 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.Tree;
-
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.gui.*;
-
-import org.antlr.v4.gui.TreeViewer;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.Tree;
-import java.io.File;
-import java.nio.file.Files;
-import javax.swing.JFileChooser;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import javax.swing.JFrame;
-
-import javax.swing.*;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -36,20 +24,25 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         KLexer kLexer = new KLexer(stream);
         TokenStream tokenStream = new CommonTokenStream(kLexer);
         KParser kParser = new KParser(tokenStream);
-        Tree tree = kParser.expr();
-
-
+        Tree tree = kParser.program();
 
         showSyntaxTree(tree,kParser);
 
-       System.out.println(TreePrinter.toString(ToAst.toAst((KParser.ExprContext) tree)));
+        Node program = ToAst.toAst((KParser.ProgramContext) tree);
+        String outputStr=TreePrinter.toString(program);
 
-        //root
-        //((KParser.MultiplyContext)tree).left
+        String fileName="astTree.txt";
+        try(PrintWriter printWriter=new PrintWriter(fileName)) {
+            printWriter.write(outputStr);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
+        System.out.println("Printed in " + fileName + ":\n" + outputStr);
 
     }
 
@@ -62,3 +55,17 @@ public class Main {
         frame.setVisible(true);
 }
 }
+
+
+/* foo1=2.34;
+    //var foo2:Boolean=true;
+    //foo1=a+b*3/4
+    //test3(foo)
+    //foo2= !foo2
+
+    //var wrong: Boolean = true
+    //var arithm: Double = 1 + 3 - 2 + 5 * 2
+     var arr: Array<Int> = Array<Int>(5,{4})
+     while (true) {
+                arr[0] = 1;
+            }*/

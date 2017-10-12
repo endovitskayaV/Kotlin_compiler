@@ -1,1 +1,66 @@
-7+4
+class Test {
+ fun test(param: Double, param2: Int): Double {
+    /*var foo: Double=2.34;
+    foo=2.35;
+    var foo1: Int=234;
+    var foo2: Boolean=true;
+    val foo3:Int;
+    foo2=9<=6;
+    val foo4:Int=fun3();
+    foo5=fun4(as,1);
+   foo1=2.34;
+    foo1=2.34;
+    var foo2:Boolean=true;
+   // test3(1);
+    test4(qw,3);
+    test6(1,3,4);
+    test7(qw,qe,wer);
+    foo2=!foo1;
+    variable=var1;
+     foo1=a+b*(3/4);
+    arr[7+3];
+    arr[a*3];
+    arr[fun1(w)];
+    var arr: Array<Int> = Array<Int>(5, {3-c});
+    arr[4]=12;
+    arr[4-5]=fun5(sger);
+
+    while(c<10){
+        e=4-7
+        test4(qw,3)
+        test6(1,3,4)
+        test7(qw,qe,wer);
+        foo2=!foo1
+        variable=var1
+    }
+    var foo1: Int
+    foo1=56-7/5
+    b=!o
+    for (param in params){
+        val isName:Boolean
+        isName=1==2
+    }
+    a=3
+
+    fun1()
+    fun4(2,3)
+    fun5(dd,e)
+    fun2(e) //bad
+    fun3(1) //bad
+    fun6(fun1(e))//awful
+    */
+    a=3
+    return a
+ }
+
+  fun test2():Boolean {
+      var arr: Array<Int>
+      return true
+    }
+
+  fun test3 (p:Int):Unit{
+     p=2
+     return 2+4;
+   }
+ }
+}
