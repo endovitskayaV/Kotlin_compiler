@@ -53,19 +53,5 @@ public class Main {
         frame.add(treeViewer);
         frame.setSize(640, 480);
         frame.setVisible(true);
+    }
 }
-}
-
-
-/* foo1=2.34;
-    //var foo2:Boolean=true;
-    //foo1=a+b*3/4
-    //test3(foo)
-    //foo2= !foo2
-
-    //var wrong: Boolean = true
-    //var arithm: Double = 1 + 3 - 2 + 5 * 2
-     var arr: Array<Int> = Array<Int>(5,{4})
-     while (true) {
-                arr[0] = 1;
-            }*/

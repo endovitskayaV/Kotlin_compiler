@@ -129,8 +129,8 @@ public class ToAst{
            return toAst(((KParser.WhileLoopContext) loop).while_loop());
        else  if (loop instanceof KParser.ForLoopContext)
            return  toAst(((KParser.ForLoopContext) loop).for_loop());
-    //   else if (loop instanceof KParser.DoWhileLoopContext)
-      //     return  toAst(((KParser.DoWhileLoopContext) loop).do_while_loop());
+     else if (loop instanceof KParser.DoWhileLoopContext)
+         return  toAst(((KParser.DoWhileLoopContext) loop).do_while_loop());
        else throw new UnsupportedOperationException();
    }
 
@@ -164,10 +164,10 @@ public class ToAst{
            return  new ForLoop(forLoop.ident().stream().map(x->toAst(x)).collect(Collectors.toList()), Arrays.asList(toAst(forLoop.expression())));
        else throw new UnsupportedOperationException();
    }
-/*
+
    public  static Expression toAst (KParser.Do_while_loopContext do_while_loop){
-       return  new DoWhileLoop(do_while_loop.expr()., toAst(do_while_loop.block()));
-   }*/
+       return  new DoWhileLoop(toAst(do_while_loop.expr()), toAst(do_while_loop.block()));
+   }
 
    public static Node toAst (KParser.Fun_parameterContext fun_parameter){
        return new FunParameter(toAst(fun_parameter.ident()), toAst(fun_parameter.type()));

@@ -196,7 +196,7 @@ class ForLoop implements Expression {
 @NoArgsConstructor
 class DoWhileLoop implements Expression {
     private Expr expr;
-    private Expression block;
+    private List<Expression> block;
     @Override
     public String name() {
         return "do-while";
@@ -206,7 +206,7 @@ class DoWhileLoop implements Expression {
     public ArrayList<PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> childrenList=new ArrayList<PrintableTreeNode>();
         childrenList.add(expr);
-        childrenList.add( block);
+        childrenList.addAll(1,block);
         return  childrenList;
     }
 }
