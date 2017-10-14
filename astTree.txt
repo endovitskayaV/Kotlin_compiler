@@ -1,6 +1,4 @@
  ── program
-    └── class Test
-        └── fun test3(p:Integer) :Unit
-            └── =
-                ├── var c:Char
-                └── erg
+    └── fun test100500(param:Char) :Char
+        └── return
+            └── 'r'

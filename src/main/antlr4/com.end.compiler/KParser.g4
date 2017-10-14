@@ -79,7 +79,8 @@ do_while_loop:KEYWORD_do block  NL* KEYWORD_while RBO expr RBC;
  class_body: CBO (declaration| fun_declaration)*  CBC;
  class_declaration: KEYWORD_class ident class_body;
 
- program:  class_declaration+  ;
+ topLevelObject: class_declaration | fun_declaration;
+ program: topLevelObject+;
 
 
 

@@ -1,5 +1,5 @@
-class Test {
- /*fun test(param: Double, param2: Int): Double {
+/*class Test {
+ fun test(param: Double, param2: Int): Double {
     var foo: Double=2.34
     foo=2.35;   var foo1: Int=234
     var foo2: Boolean=true
@@ -91,7 +91,7 @@ class Test {
             c=9;
             a=e*7
          }
-         }*/
+         }
 
   fun test3 (p:Int):Unit{
  // var c:Char='"'
@@ -100,4 +100,10 @@ class Test {
   //var c:Char='\u000A'
   }
   }
-  }
+
+  fun fun1 ():Unit{}
+  fun fun3(): Int{y=0}
+  class foo{}
+
+*/
+fun test100500 (param:Char):Char{ return 'r'}

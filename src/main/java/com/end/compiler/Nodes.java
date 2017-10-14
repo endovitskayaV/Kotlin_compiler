@@ -82,7 +82,7 @@ class FunDeclaration implements Node{
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        ArrayList<PrintableTreeNode> children=new ArrayList<>();
         children.addAll(0, expressionList);
         if (returnExpr!=null)
             children.add(returnExpr);
@@ -105,7 +105,7 @@ class ClassDeclaration implements Node{
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        ArrayList<PrintableTreeNode> children=new ArrayList<>();
         if(propertiesDecls!=null) children.addAll(propertiesDecls);
         if(funDeclarations!=null) children.addAll(funDeclarations);
         return children;
@@ -117,7 +117,7 @@ class ClassDeclaration implements Node{
 @NoArgsConstructor
 class Program implements Node{
 
-    private List<Node> classDeclarations;
+    private List<Node> topLevelObjs;
     @Override
     public String name() {
         return "program";
@@ -125,7 +125,7 @@ class Program implements Node{
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        return classDeclarations;
+        return topLevelObjs;
     }
 }
 
@@ -144,7 +144,7 @@ class Assignment implements Expression {
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> childrenList=new ArrayList<PrintableTreeNode>();
+        ArrayList<PrintableTreeNode> childrenList=new ArrayList<>();
         childrenList.add(left);
         childrenList.add(value);
         return childrenList;
@@ -164,7 +164,7 @@ class WhileLoop implements Expression {
 
     @Override
     public ArrayList<PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> childrenList=new ArrayList<PrintableTreeNode>();
+        ArrayList<PrintableTreeNode> childrenList=new ArrayList<>();
         childrenList.add(condition);
         childrenList.addAll(1, expressions);
         return  childrenList;
@@ -184,7 +184,7 @@ class ForLoop implements Expression {
 
     @Override
     public ArrayList<PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> childrenList=new ArrayList<PrintableTreeNode>();
+        ArrayList<PrintableTreeNode> childrenList=new ArrayList<>();
         childrenList.addAll(idents);
         childrenList.addAll(idents.size(), block);
         return  childrenList;
@@ -204,7 +204,7 @@ class DoWhileLoop implements Expression {
 
     @Override
     public ArrayList<PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> childrenList=new ArrayList<PrintableTreeNode>();
+        ArrayList<PrintableTreeNode> childrenList=new ArrayList<>();
         childrenList.add(expr);
         childrenList.addAll(1,block);
         return  childrenList;
@@ -227,7 +227,7 @@ class Declaration implements Expression {
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        ArrayList<PrintableTreeNode> children=new ArrayList<>();
         NewVariable newVariable=new NewVariable(varVal,variable,type);
         children.add(newVariable);
        // children.add(type);
@@ -250,7 +250,7 @@ class IfElse implements Expression {
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        ArrayList<PrintableTreeNode> children=new ArrayList<>();
         children.add(condition);
         children.addAll(thenExpression);
         if(elseExpression !=null)
@@ -271,7 +271,7 @@ class ElseBlock implements Expression{
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        ArrayList<PrintableTreeNode> children=new ArrayList<>();
         children.addAll(expressions);
         return children;
     }
@@ -452,7 +452,7 @@ class  ArrayAccess implements Expr {
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        ArrayList<PrintableTreeNode> children=new ArrayList<>();
         children.add(expr);
         return children;
     }
@@ -487,7 +487,7 @@ class ReturnExpr implements Expr{
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        ArrayList<PrintableTreeNode> children=new ArrayList<PrintableTreeNode>();
+        ArrayList<PrintableTreeNode> children=new ArrayList<>();
         children.add(expr);
         return children;
     }
@@ -527,10 +527,18 @@ class Char extends Type {
 
 }
 
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
 class Array extends Type {
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
     private Type type;
     @Override
     public String name() {

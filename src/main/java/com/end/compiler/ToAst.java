@@ -229,7 +229,15 @@ public class ToAst{
                 class_declaration.class_body().declaration().stream().map(x->toAst(x)).collect(Collectors.toList()));
     }
 
+
+    public static  Node toAst (KParser.TopLevelObjectContext topLevelObject){
+        if (topLevelObject.fun_declaration()!=null)
+            return toAst(topLevelObject.fun_declaration());
+        if (topLevelObject.class_declaration()!=null)
+            return toAst(topLevelObject.class_declaration());
+        else throw new UnsupportedOperationException();
+    }
     public static  Node toAst(KParser.ProgramContext program){
-        return new Program(program.class_declaration().stream().map(x->toAst(x)).collect(Collectors.toList()));
+        return new Program(program.topLevelObject().stream().map(x->toAst(x)).collect(Collectors.toList()));
     }
 }
