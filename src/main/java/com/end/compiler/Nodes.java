@@ -21,6 +21,10 @@ abstract class Type implements  Node {
     }
 }
 
+
+//TODO: code clean
+
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -39,23 +43,6 @@ class FunParameter implements Node{
     }
 }
 
-/*
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class FunParameters implements Node{
-    private  List<Node> funParameters;
-    @Override
-    public String name(){
-        return funParameters.toString();
-    }
-
-    @Override
-    public List<? extends PrintableTreeNode> children() {
-        return new ArrayList<>();
-    }
-}
-*/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -531,14 +518,6 @@ class Char extends Type {
 @AllArgsConstructor
 @NoArgsConstructor
 class Array extends Type {
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
     private Type type;
     @Override
     public String name() {

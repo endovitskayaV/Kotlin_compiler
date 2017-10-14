@@ -3,7 +3,12 @@ parser grammar KParser;
 //? 0 1
 //* 0-..
 //+ 1-..
-//TODO: сhar
+
+
+//TODO: think of better way of semicolon
+//TODO: code clean
+//TODO: String, Reference parameters
+
 
 options {tokenVocab=KLexer; }
 
@@ -70,7 +75,7 @@ while_loop: KEYWORD_while  RBO (expr) RBC (expression | block);
 for_loop:KEYWORD_for  RBO ( ident KEYWORD_in ident) RBC  (expression | block);
 do_while_loop:KEYWORD_do block  NL* KEYWORD_while RBO expr RBC;
 
-//TODO:check it
+
  fun_parameter: ident COLON type;
  fun_parameters: RBO (fun_parameter (COMMA fun_parameter)*)? RBC;
  fun_declaration: KEYWORD_fun ident fun_parameters COLON (type|KEYWORD_Unit) CBO expressions (KEYWORD_return expr)? CBC;

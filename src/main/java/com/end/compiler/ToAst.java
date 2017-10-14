@@ -3,30 +3,40 @@ package com.end.compiler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
 import com.end.compiler.KParser;
+import  org.jetbrains.annotations.*;
 
-public class ToAst{
+class ToAst{
 
-    public static VariableReference toAst(KParser.IdentContext ident) {
+    @NotNull
+    private static VariableReference toAst(KParser.IdentContext ident) {
         return new VariableReference(ident.getText());
     }
-    public static Expr toAst(KParser.NumberContext number){
+
+    @NotNull
+    @Contract("null -> fail")
+    private static Expr toAst(KParser.NumberContext number){
         if (number instanceof KParser.IntegerLitContext)
             return new IntegerVar(number.getText());
         else if (number instanceof KParser.DoubleLitContext)
             return new DoubleVar(number.getText());
         else throw new UnsupportedOperationException();
     }
-    public static Expr toAst(KParser.Char_varContext char_var){
+
+    @NotNull
+    private static Expr toAst(KParser.Char_varContext char_var){
         return  new CharVar(char_var.getText());
     }
-    public static Expr toAst(KParser.Boolean_varContext boolean_var){
+
+    @NotNull
+    private static Expr toAst(KParser.Boolean_varContext boolean_var){
         return  new BooleanVar(boolean_var.getText());
     }
-    public  static Expr toAst (KParser.Concrete_varContext concrete_var){
+
+    @NotNull
+    @Contract("null -> fail")
+    private static Expr toAst (KParser.Concrete_varContext concrete_var){
         if (concrete_var instanceof KParser.NumberLitContext)
             return toAst(((KParser.NumberLitContext) concrete_var).number());
         else if (concrete_var instanceof KParser.BooleanLitContext)
@@ -36,7 +46,9 @@ public class ToAst{
             else throw new UnsupportedOperationException();
     }
 
-    public static Expr toAst(KParser.VariableContext variable) {
+    @NotNull
+    @Contract("null -> fail")
+    private static Expr toAst(KParser.VariableContext variable) {
         if (variable instanceof KParser.ConcreteVariableContext)
             return toAst(((KParser.ConcreteVariableContext) variable).concrete_var());
         else if (variable instanceof KParser.IdentifierContext)
@@ -44,7 +56,8 @@ public class ToAst{
         else throw new UnsupportedOperationException();
     }
 
-    public static Expr toAst(KParser.ExprContext expr) {
+    @Contract("null -> fail")
+    private static Expr toAst(KParser.ExprContext expr) {
         if (expr instanceof KParser.BinaryExprContext)
             return new BinaryExpr(ToAst.toAst(((KParser.BinaryExprContext) expr).left), ToAst.toAst(((KParser.BinaryExprContext) expr).right), ((KParser.BinaryExprContext)expr).operator.getText());
         else if (expr instanceof KParser.VarContext)
@@ -62,21 +75,26 @@ public class ToAst{
         else throw new UnsupportedOperationException();
     }
 
-    public  static Expr toAst(KParser.Fun_callContext fun_call){
+    @NotNull
+    private static Expr toAst(KParser.Fun_callContext fun_call){
         if (fun_call.expr() != null)
             return new FunCall(fun_call.ident().getText(), fun_call.expr().stream().map(x -> toAst(x)).collect(Collectors.toList()));
         else return new FunCall(fun_call.ident().getText(), new ArrayList<>());
     }
 
-    public static Expr toAst(KParser.Array_accessContext array_access){
+    @NotNull
+    private static Expr toAst(KParser.Array_accessContext array_access){
         return new ArrayAccess(array_access.ident().getText(), toAst(array_access.expr()));
     }
 
-    public static Expr toAst(KParser.Arr_type_size_def_valContext expr){
+    @NotNull
+    private static Expr toAst(KParser.Arr_type_size_def_valContext expr){
         return new ArrTypeSizeDefVal(toAst(expr.type()), expr.expr().stream().map(x->toAst(x)).collect(Collectors.toList()));
     }
 
-    public static  Type toAst (KParser.TypeContext type){
+    @NotNull
+    @Contract("null -> fail")
+    private static  Type toAst (KParser.TypeContext type){
         if (type instanceof KParser.IntTypeContext)
             return  new Integer();
         else if(type instanceof KParser.DoubleTypeContext)
@@ -90,7 +108,8 @@ public class ToAst{
         else throw new UnsupportedOperationException();
     }
 
-   public static Expression toAst(KParser.DeclarationContext statement){
+   @NotNull
+   private static Expression toAst(KParser.DeclarationContext statement){
         if (statement.expr()!=null) {
             if (statement.KEYWORD_val() != null)
                 return new Declaration(statement.KEYWORD_val().toString(), toAst(statement.ident()), toAst(statement.type()), toAst(statement.expr()));
@@ -107,7 +126,8 @@ public class ToAst{
         }
     }
 
-   public static Expression toAst (KParser.AssignmentContext assignment){
+   @NotNull
+   private static Expression toAst (KParser.AssignmentContext assignment){
        if (assignment.ident()!=null)
        return new Assignment(toAst(assignment.ident()), toAst(assignment.expr()));
        else if (assignment.array_access()!=null)
@@ -116,7 +136,8 @@ public class ToAst{
    }
 
 
-   public static Expression toAst(KParser.ExpressionContext expression){
+   @Contract("null -> fail")
+   private static Expression toAst(KParser.ExpressionContext expression){
        if (expression instanceof KParser.AssigContext)
            return toAst(((KParser.AssigContext) expression).assignment());
        else if(expression instanceof KParser.DeclContext)
@@ -131,7 +152,9 @@ public class ToAst{
    }
 
 
-   public  static Expression toAst(KParser.LoopContext loop){
+   @NotNull
+   @Contract("null -> fail")
+   private static Expression toAst(KParser.LoopContext loop){
        if (loop instanceof KParser.WhileLoopContext)
            return toAst(((KParser.WhileLoopContext) loop).while_loop());
        else  if (loop instanceof KParser.ForLoopContext)
@@ -141,17 +164,18 @@ public class ToAst{
        else throw new UnsupportedOperationException();
    }
 
-   public static List<Expression> toAst (KParser.ExpressionsContext expressions){
+    private static List<Expression> toAst (KParser.ExpressionsContext expressions){
       if (expressions.expression()!=null)
           return  expressions.expression().stream().map(x->toAst(x)).collect(Collectors.toList());
       else return  new ArrayList<>();
    }
 
-   public static List<Expression> toAst (KParser.BlockContext block){
+    private  static List<Expression> toAst (KParser.BlockContext block){
        return toAst(block.expressions());
    }
 
-   public static Expression toAst(KParser.If_elseContext if_elseContext){
+   @NotNull
+   private static Expression toAst(KParser.If_elseContext if_elseContext){
        if (if_elseContext.firstExpression!=null && if_elseContext.secondExpression!=null)
            return new IfElse(toAst(if_elseContext.expr()), Arrays.asList(toAst(if_elseContext.firstExpression)),new ElseBlock(Arrays.asList(toAst(if_elseContext.secondExpression))));
       else if (if_elseContext.firstBlock!=null && if_elseContext.secondBlock!=null)
@@ -167,7 +191,8 @@ public class ToAst{
        else throw new UnsupportedOperationException();
    }
 
-   public  static Expression toAst(KParser.While_loopContext while_loop){
+   @NotNull
+   private  static Expression toAst(KParser.While_loopContext while_loop){
        if (while_loop.expression()==null)
            return new WhileLoop(toAst(while_loop.expr()), while_loop.block().expressions().expression().stream().map(x->toAst(x)).collect(Collectors.toList()));
        else  if (while_loop.block()==null)
@@ -175,7 +200,8 @@ public class ToAst{
        else throw new UnsupportedOperationException();
    }
 
-   public static Expression toAst (KParser.For_loopContext forLoop){
+   @NotNull
+   private  static Expression toAst (KParser.For_loopContext forLoop){
        if (forLoop.expression()==null)
            return new ForLoop(forLoop.ident().stream().map(x->toAst(x)).collect(Collectors.toList()), forLoop.block().expressions().expression().stream().map(x->toAst(x)).collect(Collectors.toList()));
        else  if (forLoop.block()==null)
@@ -183,21 +209,18 @@ public class ToAst{
        else throw new UnsupportedOperationException();
    }
 
-   public  static Expression toAst (KParser.Do_while_loopContext do_while_loop){
+   @NotNull
+   private  static Expression toAst (KParser.Do_while_loopContext do_while_loop){
        return  new DoWhileLoop(toAst(do_while_loop.expr()), toAst(do_while_loop.block()));
    }
 
-   public static Node toAst (KParser.Fun_parameterContext fun_parameter){
+   @NotNull
+   private  static Node toAst (KParser.Fun_parameterContext fun_parameter){
        return new FunParameter(toAst(fun_parameter.ident()), toAst(fun_parameter.type()));
     }
 
-    /*public  static Node toAst(KParser.Fun_parametersContext fun_parameters) {
-       if (fun_parameters.fun_parameter()!=null)
-           return new FunParameters(fun_parameters.fun_parameter().stream().map(x->toAst(x)).collect(Collectors.toList()));
-       else return new FunParameters();
-    }*/
-
-    public  static Node toAst(KParser.Fun_declarationContext fun_declaration){
+    @NotNull
+    private  static Node toAst(KParser.Fun_declarationContext fun_declaration){
        if (fun_declaration.type()!=null && fun_declaration.KEYWORD_return()!=null)
        return  new FunDeclaration(toAst(fun_declaration.ident()), toAst(fun_declaration.type()),
                fun_declaration.fun_parameters().fun_parameter().stream().map(x->toAst(x)).collect(Collectors.toList()),
@@ -220,7 +243,8 @@ public class ToAst{
     }
 
 
-    public  static Node toAst(KParser.Class_declarationContext class_declaration){
+   @NotNull
+   private static Node toAst(KParser.Class_declarationContext class_declaration){
         if(class_declaration.class_body().declaration()!=null)
         return new ClassDeclaration(toAst(class_declaration.ident()),
                 class_declaration.class_body().fun_declaration().stream().map(x->toAst(x)).collect(Collectors.toList()),
@@ -230,14 +254,17 @@ public class ToAst{
     }
 
 
-    public static  Node toAst (KParser.TopLevelObjectContext topLevelObject){
+    @NotNull
+    private static  Node toAst (KParser.TopLevelObjectContext topLevelObject){
         if (topLevelObject.fun_declaration()!=null)
             return toAst(topLevelObject.fun_declaration());
         if (topLevelObject.class_declaration()!=null)
             return toAst(topLevelObject.class_declaration());
         else throw new UnsupportedOperationException();
     }
-    public static  Node toAst(KParser.ProgramContext program){
+
+    @NotNull
+    static  Node toAst(KParser.ProgramContext program){
         return new Program(program.topLevelObject().stream().map(x->toAst(x)).collect(Collectors.toList()));
     }
 }
