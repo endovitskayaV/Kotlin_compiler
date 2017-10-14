@@ -42,10 +42,9 @@ NNV:'!!';
 DOT:'.';
 SQ:'\'';
 
-WHITESPACE: [\t\n\r\f ]+ ->channel(HIDDEN);
+WHITESPACE: [\t\r\n\f ]+ ->channel(HIDDEN);
 MULTILINE_COMMENT : '/*' .*? '*/' -> channel(HIDDEN);
 SINGLELINE_COMMENT: '//' .*? '\n' -> channel(HIDDEN);
-LINEBREAK:'\n';
 
 fragment
 //цифра будет распрознаваться только в совокупности с другими цифрами
@@ -53,6 +52,21 @@ DIGIT: '0'..'9';
 
 INTEGER: ('0'| ('1'..'9' DIGIT*));
 DOUBLE : DIGIT+ (DOT DIGIT+)?;
+CHAR
+    : '\'' (EscapeSeq | .) '\''
+    ;
+
+fragment
+EscapeSeq: UniCharacterLiteral | EscapedIdentifier;
+
+fragment
+ UniCharacterLiteral: '\\' 'u' HexDigit HexDigit HexDigit HexDigit;
+
+fragment
+HexDigit: [0-9a-fA-F];
+
+fragment
+EscapedIdentifier: '\\' ('t' | 'b' | 'r' | 'n');
 
 fragment
 LETTER: 'a' .. 'z' | 'A' .. 'Z' | '_';

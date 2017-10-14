@@ -20,6 +20,9 @@ public class ToAst{
             return new DoubleVar(number.getText());
         else throw new UnsupportedOperationException();
     }
+    public static Expr toAst(KParser.Char_varContext char_var){
+        return  new CharVar(char_var.getText());
+    }
     public static Expr toAst(KParser.Boolean_varContext boolean_var){
         return  new BooleanVar(boolean_var.getText());
     }
@@ -28,6 +31,8 @@ public class ToAst{
             return toAst(((KParser.NumberLitContext) concrete_var).number());
         else if (concrete_var instanceof KParser.BooleanLitContext)
             return toAst(((KParser.BooleanLitContext) concrete_var).boolean_var());
+        else if (concrete_var instanceof KParser.CharLitContext)
+            return toAst(((KParser.CharLitContext) concrete_var).char_var());
             else throw new UnsupportedOperationException();
     }
 
@@ -78,6 +83,8 @@ public class ToAst{
             return new Double();
         else if (type instanceof KParser.BooleanTypeContext)
             return new Boolean();
+        else if (type instanceof KParser.CharTypeContext)
+            return new Char();
         else if (type instanceof KParser.ArrayTypeContext)
             return new Array((toAst(((KParser.ArrayTypeContext) type).type())));
         else throw new UnsupportedOperationException();

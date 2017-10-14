@@ -349,6 +349,22 @@ class IntegerVar implements Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+class CharVar implements Expr {
+    private  String value;
+    @Override
+    public String name() {
+        return value;
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        return new ArrayList<>();
+    }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 class DoubleVar implements Expr {
     private  String value;
     @Override
@@ -498,6 +514,15 @@ class Boolean extends Type {
     @Override
     public String name() {
         return "Boolean";
+    }
+
+}
+
+@NoArgsConstructor
+class Char extends Type {
+    @Override
+    public String name() {
+        return "Char";
     }
 
 }

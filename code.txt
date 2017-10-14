@@ -1,10 +1,9 @@
 class Test {
  /*fun test(param: Double, param2: Int): Double {
-    var foo: Double=2.34;
-    foo=2.35;
-    var foo1: Int=234;
-    var foo2: Boolean=true;
-    val foo3:Int;
+    var foo: Double=2.34
+    foo=2.35;   var foo1: Int=234
+    var foo2: Boolean=true
+    val foo3:Int
     foo2=9<=6;
     val foo4:Int=fun3();
     foo5=fun4(as,1);
@@ -44,9 +43,10 @@ class Test {
     fun1()
     fun4(2,3)
     fun5(dd,e)
-    fun2(e) //bad
+    fun2(e); //bad
     fun3(1) //bad
     fun6(fun1(e))//awful
+
 
     a=3
     return a
@@ -70,10 +70,11 @@ class Test {
      a=3
      }
      while (a<>23)
-     }*/
+     }
 
      fun test3 (p:Int):Unit{
-        if (a>0) p=i+1
+        if (a>0)
+        p=i+1
         if (c==3) i=fun1(12,qw)
         else a=9
 
@@ -90,5 +91,13 @@ class Test {
             c=9;
             a=e*7
          }
-         }
- }
+         }*/
+
+  fun test3 (p:Int):Unit{
+ // var c:Char='"'
+  //var c:Char='\'
+  //var c:Char='$'
+  //var c:Char='\u000A'
+  }
+  }
+  }
