@@ -5,20 +5,31 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.end.compiler.KParser;
+
+import com.sun.xml.internal.bind.v2.TODO;
 import  org.jetbrains.annotations.*;
 
 class ToAst{
-
+//TODO: set position for all nodes
+// TODO: set childrens parents for all nodes
     @NotNull
     private static VariableReference toAst(KParser.IdentContext ident) {
-        return new VariableReference(ident.getText());
+        VariableReference variableReference=
+                new VariableReference(ident.getText());
+        Utils.setPosition(variableReference,ident);
+        Utils.setChildrensParent(variableReference);
+        return variableReference;
     }
 
     @NotNull
     @Contract("null -> fail")
     private static Expr toAst(KParser.NumberContext number){
-        if (number instanceof KParser.IntegerLitContext)
+        if (number instanceof KParser.IntegerLitContext) {
+            IntegerVar inregerVar
+            Utils.setPosition(variableReference,ident);
+            Utils.setChildrensParent(variableReference);
             return new IntegerVar(number.getText());
+        }
         else if (number instanceof KParser.DoubleLitContext)
             return new DoubleVar(number.getText());
         else throw new UnsupportedOperationException();
@@ -250,7 +261,7 @@ class ToAst{
                 class_declaration.class_body().fun_declaration().stream().map(x->toAst(x)).collect(Collectors.toList()),
                 null);
         else  return new ClassDeclaration(toAst(class_declaration.ident()),null,
-                class_declaration.class_body().declaration().stream().map(x->toAst(x)).collect(Collectors.toList()));
+                class_declaration.class_body().declaration().stream().map(ToAst::toAst).collect(Collectors.toList()));
     }
 
 

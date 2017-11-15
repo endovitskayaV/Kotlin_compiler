@@ -80,7 +80,7 @@ DIV:    '/';
 
 GE:       '>=';
 LE:       '<=';
-NEQUALS:  '<>';
+NEQUALS:  '!=';
 EQUALS:   '==';
 GT:       '>';
 LT:       '<';

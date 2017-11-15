@@ -4,11 +4,9 @@ parser grammar KParser;
 //* 0-..
 //+ 1-..
 
-
 //TODO: think of better way of semicolon
 //TODO: code clean
 //TODO: String, Reference parameters
-
 
 options {tokenVocab=KLexer; }
 
@@ -27,8 +25,8 @@ variable:
     concrete_var    #concreteVariable
     |ident          #Identifier
     ;
-//могут быть записаны как exp, так и при присвоении
-expr: RBO+ expr RBO+            #parenExpr
+//могут быть записаны как expr, так и при присвоении
+expr: RBO+ expr RBC+            #parenExpr
      | fun_call                 #funcCall
      | variable                 #var
      | arr_type_size_def_val    #arrTypeSizeDefVal
