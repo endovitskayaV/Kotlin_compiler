@@ -34,7 +34,6 @@ expr: RBO+ expr RBC+            #parenExpr
      |  left=expr operator=(MUL|DIV) right=expr     #binaryExpr
      | left=expr operator=(ADD|SUB) right=expr      #binaryExpr
      | left=expr operator=(GE|LE|NEQUALS|EQUALS|GT|LT) right=expr #binaryExpr
-     | NOT (expr)                 #neg
      ;
 
 type: KEYWORD_int               #intType
@@ -82,8 +81,7 @@ do_while_loop:KEYWORD_do block  NL* KEYWORD_while RBO expr RBC;
  class_body: CBO (declaration| fun_declaration)*  CBC;
  class_declaration: KEYWORD_class ident class_body;
 
- topLevelObject: class_declaration | fun_declaration;
- program: topLevelObject+;
+ program: (class_declaration | fun_declaration)*;
 
 
 

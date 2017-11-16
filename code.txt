@@ -16,7 +16,7 @@ class Test {
     test4(qw,3)
     test6(1,3,4)
     test7(qw,qe,wer)
-    foo2=!foo1
+
     variable=var1
      foo1=a+b*(3/4)
     arr[7+3]
@@ -31,12 +31,11 @@ class Test {
         test4(qw,3)
         test6(1,3,4)
         test7(qw,qe,wer)
-        foo2=!foo1
         variable=var1
     }
     var foo1: Int
     foo1=56-7/5
-    b=!o
+
     for (param in params){
         val isName:Boolean
         isName=1==2
@@ -111,3 +110,5 @@ fun test100500 (param:Char):Char{
 fun34()
 fun56546(4,5)
 }
+class Test1 {}
+fun QQ():Unit{}

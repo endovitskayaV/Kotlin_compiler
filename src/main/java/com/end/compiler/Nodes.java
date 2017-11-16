@@ -19,7 +19,6 @@ abstract class Node implements PrintableTreeNode {
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 abstract class Expression extends Node {
 }
 
@@ -49,6 +48,8 @@ abstract class Expr extends Expression {
     }
 }
 
+@Data
+@AllArgsConstructor
 abstract class Type extends Node {
     public List<PrintableTreeNode> children() {
         return new ArrayList<>();
@@ -118,13 +119,13 @@ class FunDeclaration extends Node {
 @NoArgsConstructor
 class ClassDeclaration extends Node {
 
-    private VariableReference name;
+    private VariableReference className;
     private List<Node> propertiesDecls;
     private List<Node> funDeclarations;
 
     @Override
     public String name() {
-        return "class " + name.name();
+        return "class " + className.name();
     }
 
     @Override
@@ -141,7 +142,8 @@ class ClassDeclaration extends Node {
 @NoArgsConstructor
 class Program extends Node {
 
-    private List<Node> topLevelObjs;
+    private List<ClassDeclaration> classDeclarationList;
+    private List<FunDeclaration> funDeclarationList;
 
     @Override
     public String name() {
@@ -150,10 +152,12 @@ class Program extends Node {
 
     @Override
     public List<? extends PrintableTreeNode> children() {
-        return topLevelObjs;
+        ArrayList<PrintableTreeNode> children = new ArrayList<>();
+        if (classDeclarationList != null) children.addAll(classDeclarationList);
+        if (funDeclarationList != null) children.addAll(funDeclarationList);
+        return children;
     }
 }
-
 
 @Data
 @AllArgsConstructor
@@ -432,23 +436,6 @@ class BooleanVar extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class Negation extends Expr {
-    private Expr expr;
-
-    @Override
-    public String name() {
-        return "!" + typeOrNull() + castToIfNeed();
-    }
-
-    @Override
-    public List<? extends PrintableTreeNode> children() {
-        return Arrays.asList(expr);
-    }
-}
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 class FunCall extends Expr {
     private String name;
     private List<Expr> parameters;
@@ -456,11 +443,11 @@ class FunCall extends Expr {
 
     @Override
     public String name() {
-//        String returnStr=name+"(";
+//        String returnStr=className+"(";
 //
 //        if (parameters!=null && parameters.size()>0) {
 //            for (Expr param : parameters) {
-//                returnStr += param.name() + ", ";
+//                returnStr += param.className() + ", ";
 //            }
 //
 //            returnStr = returnStr.substring(0, returnStr.length() - 2);

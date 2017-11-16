@@ -8,18 +8,23 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class Utils {
-    public static Position definePosition(ParserRuleContext parserRuleContext){
+
+    public  static void setChildrensParent(Node node){
+        node.children().forEach(x -> ((Node)x).setParent(node));
+    }
+    public static Node getClosestParent(Node node) {
+        return node.getParent();
+    }
+
+    public  static void  setPosition(Node node, ParserRuleContext ruleContext){
+        node.setPosition(definePosition(ruleContext));
+    }
+    private static Position definePosition(ParserRuleContext parserRuleContext){
         return new Position(
                 parserRuleContext.start.getLine(),
                 parserRuleContext.start.getCharPositionInLine(),
                 parserRuleContext.stop.getLine(),
                 parserRuleContext.stop.getCharPositionInLine());
-    }
-    public  static void setChildrensParent(Node node){
-        node.children().forEach(x -> ((Node)x).setParent(node));
-    }
-    public  static void  setPosition(Node node, ParserRuleContext ruleContext){
-        node.setPosition(definePosition(ruleContext));
     }
 
     /**
