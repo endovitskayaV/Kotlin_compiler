@@ -49,7 +49,7 @@ public class Main {
 
         Program astTree = ToAst.toAst((KParser.ProgramContext) tree);
 
-        // Analysis.analyze(astTree);
+         Analysis.analyze(astTree);
 
         String outputStr=TreePrinter.toString(astTree);
 

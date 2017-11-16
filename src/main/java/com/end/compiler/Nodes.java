@@ -60,7 +60,6 @@ abstract class Type extends Node {
     }
 }
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -85,7 +84,7 @@ class FunParameter extends Node {
 class FunDeclaration extends Node {
     private VariableReference funName;
     private Type returnType;
-    private List<Node> funParametersList;
+    private List<FunParameter> funParametersList;
     private List<Expression> expressionList;
     private ReturnExpr returnExpr;
 

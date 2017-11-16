@@ -5,40 +5,161 @@ import java.util.*;
 
 public class Analysis {
 
+    //---------------------------------NODE analysis---------------------------------------//
     public static void analyze(Program program) {
         //fill types for all expr
         Utils.getAllChildren(program, Expr.class).forEach(x -> x.fillType(getType(x)));
 
-        ArrayList<ClassDeclaration> classDeclarations=new ArrayList<>();
-        classDeclarations.addAll(  Utils.getAllChildren(program, ClassDeclaration.class));
-        //dublictations?
+        List<ClassDeclaration> classDeclarations = new ArrayList<>();
+        classDeclarations.addAll(Utils.getAllChildren(program, ClassDeclaration.class));
+        //dublictations
         classDeclarations.stream().filter
-                (x-> Collections.frequency(classDeclarations,x)>1)
-                .forEach(x->PrintableErrors.printDublicatesError("class "+x.getClassName().name(),x.position));
+                (x -> Collections.frequency(classDeclarations, x) > 1)
+                .forEach(x -> PrintableErrors.printDublicatesError("class " + x.getClassName().name(), x.position));
         classDeclarations.forEach(Analysis::analyze);
 
-        ArrayList<FunDeclaration> funDeclarations=new ArrayList<>();
-        funDeclarations.addAll(  Utils.getAllChildren(program, FunDeclaration.class));
-        //dublictations?
+        List<FunDeclaration> funDeclarations = new ArrayList<>();
+        funDeclarations.addAll(Utils.getAllChildren(program, FunDeclaration.class));
+        //dublictations
         funDeclarations.stream().filter
-                (x-> Collections.frequency(funDeclarations,x)>1)
-                .forEach(x->PrintableErrors.printDublicatesError("function "+x.getFunName().name(),x.position));
+                (x -> Collections.frequency(funDeclarations, x) > 1)
+                .forEach(x -> PrintableErrors.printDublicatesError("function " + x.getFunName().name(), x.position));
         funDeclarations.forEach(Analysis::analyze);
     }
 
-//    private static <T extends Node> boolean hasDublicate(Program program, Class<T> clazz) {
-//        HashSet<ClassDeclaration> set=new HashSet<>();
-//        if (Utils.getAllChildren(program, clazz) == null) return true;
-//        else {
-//            for (ClassDeclaration classDecl : Utils.getAllChildren(program, ClassDeclaration.class)) {
-//                if (!set.add(classDecl)) return true;
-//            }
-//        }
-//        return false;
-//    }
+    private static void analyze(ClassDeclaration classDeclaration) {
+        ArrayList<FunDeclaration> funDeclarations = new ArrayList<>();
+        funDeclarations.addAll(Utils.getAllChildren(classDeclaration, FunDeclaration.class));
+        //dublictations
+        funDeclarations.stream().filter
+                (x -> Collections.frequency(funDeclarations, x) > 1)
+                .forEach(x -> PrintableErrors.printDublicatesError("function " + x.getFunName().name(), x.position));
+        funDeclarations.forEach(Analysis::analyze);
+    }
 
-    private static void analyze(ClassDeclaration classDeclaration){}
-    private static void analyze(FunDeclaration funDeclaration){}
+    private static void analyze(FunDeclaration funDeclaration) {
+        List<Expression> expressionList = new ArrayList<>();
+        expressionList.addAll(Utils.getAllChildren(funDeclaration, Expression.class));
+
+        //dublictations
+        expressionList.stream().filter
+                (x -> Collections.frequency(expressionList, x) > 1)
+                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
+        expressionList.forEach(Analysis::analyze);
+        analyze(funDeclaration.getReturnExpr());
+
+        Type returnExpressionType = getType(funDeclaration.getReturnExpr());
+        if (returnExpressionType == null && funDeclaration.getReturnType() != null)
+            PrintableErrors.printTypeMismatchError(funDeclaration.getPosition(),
+                    funDeclaration.getReturnType(),
+                    returnExpressionType);
+        else if ((funDeclaration.getReturnExpr() != null) &&
+                (!typesAreEqual(returnExpressionType, funDeclaration.getReturnType())))
+            PrintableErrors.printTypeMismatchError(funDeclaration.getReturnExpr().getPosition(),
+                    funDeclaration.getReturnType(),
+                    returnExpressionType);
+    }
+//------------------------------------------------------------------------------------------------------------------//
+
+    private static void analyze(Expression expression) {
+        if (expression.getClass().getSimpleName().equals(Assignment.class.getSimpleName()))
+            analyze((Assignment) expression);
+        else if (expression.getClass().getSimpleName().equals(WhileLoop.class.getSimpleName()))
+            analyze((WhileLoop) expression);
+        else if (expression.getClass().getSimpleName().equals(ForLoop.class.getSimpleName()))
+            analyze((ForLoop) expression);
+        else if (expression.getClass().getSimpleName().equals(DoWhileLoop.class.getSimpleName()))
+            analyze((DoWhileLoop) expression);
+        else if (expression.getClass().getSimpleName().equals(Declaration.class.getSimpleName()))
+            analyze((Declaration) expression);
+        else if (expression.getClass().getSimpleName().equals(IfElse.class.getSimpleName()))
+            analyze((IfElse) expression);
+        else if (expression.getClass().getSimpleName().equals(ElseBlock.class.getSimpleName()))
+            analyze((ElseBlock) expression);
+    }
+
+    private static void analyze(Expr expr) {
+        if (expr.getClass().getSimpleName().equals(BinaryExpr.class.getSimpleName()))
+            analyze((BinaryExpr) expr);
+        else if (expr.getClass().getSimpleName().equals(NewVariable.class.getSimpleName()))
+            analyze((NewVariable) expr);
+        else if (expr.getClass().getSimpleName().equals(VariableReference.class.getSimpleName()))
+            analyze((VariableReference) expr);
+        else if (expr.getClass().getSimpleName().equals(FunCall.class.getSimpleName()))
+            analyze((FunCall) expr);
+        else if (expr.getClass().getSimpleName().equals(ArrayAccess.class.getSimpleName()))
+            analyze((ArrayAccess) expr);
+        else if (expr.getClass().getSimpleName().equals(ArrTypeSizeDefVal.class.getSimpleName()))
+            analyze((ArrTypeSizeDefVal) expr);
+        //IntegerVar, BooleanVar, CharVar, DoubleVar->nothing to analyze
+    }
+
+    private static void analyze(Declaration declaration) {
+        analyze(declaration.getExpr());
+
+        Type foundType = getType(declaration.getExpr());
+        if (!typesAreEqual(foundType, declaration.getType()))
+            PrintableErrors.printTypeMismatchError(
+                    declaration.position,
+                    declaration.getType(),
+                    foundType);
+    }
+
+    private static void analyze(Assignment assignment) {
+    }
+
+    private static void analyze(WhileLoop whileLoop) {
+    }
+
+    private static void analyze(ForLoop forLoop) {
+    }
+
+    private static void analyze(DoWhileLoop doWhileLoop) {
+    }
+
+    private static void analyze(IfElse ifElse) {
+    }
+
+    private static void analyze(ElseBlock elseBlock) {
+    }
+
+    private static void analyze(BinaryExpr binaryExpr) {
+    }
+
+    private static void analyze(NewVariable newVariable) {
+    }
+
+    private static void analyze(VariableReference variableReference) {
+    }
+
+    private static void analyze(FunCall funCall) {
+        //была ли вызываемая функция объявлена
+        if (Utils.getAllVisibleNodes(funCall, FunDeclaration.class)
+                .stream().noneMatch(x ->
+                {
+                    return (x.getFunName().name().equals(funCall.getName())
+                            && (paramsListsAreEqual(x.getFunParametersList(), funCall.getParameters())));
+                })) PrintableErrors.noSuchFunctionError(funCall.position, funCall.getName());
+
+
+    }
+
+    private static boolean paramsListsAreEqual(List<FunParameter> list1, List<Expr> list2) {
+        return true;
+    }
+
+    private static void analyze(ArrayAccess arrayAccess) {
+    }
+
+    private static void analyze(ArrTypeSizeDefVal arrTypeSizeDefVal) {
+    }
+
+
+    private static void analyze(ReturnExpr returnExpr) {
+    }
+
+
+    //----------------------TYPE analysis--------------------------------------------------------------------//
     private static Type getType(Expr expr) {
         if (expr.getType() != null) {
             return expr.getType();
@@ -101,18 +222,18 @@ public class Analysis {
     }
 
     private static Type resolveType(Type type1, Type type2, Expr expr1, Expr expr2) {
-        if (equals(type1, type2)) return type1;
+        if (typesAreEqual(type1, type2)) return type1;
         else {
             Type autoCastType = AutoCastType(type1, type2);
             if (autoCastType != null) {
-                if (!equals(autoCastType, type1)) expr1.setCastTo(autoCastType);
-                if (!equals(autoCastType, type2)) expr2.setCastTo(autoCastType);
+                if (!typesAreEqual(autoCastType, type1)) expr1.setCastTo(autoCastType);
+                if (!typesAreEqual(autoCastType, type2)) expr2.setCastTo(autoCastType);
                 return autoCastType;
             } else return null;
         }
     }
 
-    private static boolean equals(Type type1, Type type2) {
+    private static boolean typesAreEqual(Type type1, Type type2) {
         return (type1 != null || type2 != null &&
                 (type1.getClass().getSimpleName().equals(type2.getClass().getSimpleName())));
     }

@@ -51,12 +51,12 @@ public class Utils {
     //все, что на этом уровне или выше можно по другому назвать видимые узлы. ты же в проге видишь переменные, если они в этой же функции или выше
     //map умеет преобразовывать поток одних типов в поток других типов. здесь мы кастим все узлы в нужный класс
     //зачем. ну он опять ругается, что лист из T, а мы ему Node суем...почему-то
-    public  static <T extends Node> List<T> getAllVisibleNodes(Node node, Class<T> clazz){
+    public  static <T extends Node> List<T> getAllVisibleNodes(Node node, Class<T> targetNodesClass){
         List<T> result = new ArrayList<>();
         Node parent=node.getParent();
         while (parent!=null){
             result.addAll(parent.children().stream()
-                    .filter(clazz::isInstance).map(clazz::cast).collect(Collectors.toList()));
+                    .filter(targetNodesClass::isInstance).map(targetNodesClass::cast).collect(Collectors.toList()));
             parent=parent.getParent();
         }
         return  result;
