@@ -1,8 +1,5 @@
 package com.end.compiler;
 
-
-import org.antlr.v4.runtime.ParserRuleContext;
-
 import java.util.*;
 
 public class Analysis {
@@ -120,7 +117,7 @@ public class Analysis {
 
         Type actualType = whileLoop.getCondition().getType();
         if (actualType != new Boolean())
-            PrintableErrors.printTypeMismatchError( new Boolean(), actualType,  whileLoop.getCondition().position);
+            PrintableErrors.printTypeMismatchError(new Boolean(), actualType, whileLoop.getCondition().position);
 
         List<Expression> expressionList = new ArrayList<>();
         expressionList.addAll(Utils.getAllChildren(whileLoop, Expression.class));
@@ -137,7 +134,7 @@ public class Analysis {
 
         Type actualType = doWhileLoop.getCondition().getType();
         if (actualType != new Boolean())
-            PrintableErrors.printTypeMismatchError( new Boolean(), actualType,  doWhileLoop.getCondition().position);
+            PrintableErrors.printTypeMismatchError(new Boolean(), actualType, doWhileLoop.getCondition().position);
 
         List<Expression> expressionList = new ArrayList<>();
         expressionList.addAll(Utils.getAllChildren(doWhileLoop, Expression.class));
@@ -151,12 +148,9 @@ public class Analysis {
 
     private static void analyze(ForLoop forLoop) {
 
-        if(typesAreEqual(forLoop.getIterable().getType(),new Array()))
+        if (typesAreEqual(forLoop.getIterable().getType(), new Array()))
             PrintableErrors.printIsNotIterableError(forLoop.getIterable().position);
 
-        //TODO: сравнить тип iterator и тип массива iterable
-        //TODO: or typesAreEqualOrCanCast?
-       // if(typesAreEqual(forLoop.getIterator().getType(), forLoop.))
         analyze(forLoop.getIterator());
         analyze(forLoop.getIterable());
         List<Expression> expressionList = new ArrayList<>();
@@ -175,7 +169,7 @@ public class Analysis {
 
         Type actualType = ifElse.getCondition().getType();
         if (actualType != new Boolean())
-            PrintableErrors.printTypeMismatchError( new Boolean(), actualType,  ifElse.getCondition().position);
+            PrintableErrors.printTypeMismatchError(new Boolean(), actualType, ifElse.getCondition().position);
 
         List<Expression> expressionList = new ArrayList<>();
         expressionList.addAll(Utils.getAllChildren(ifElse, Expression.class));
@@ -335,13 +329,14 @@ public class Analysis {
 
     private static Type exploreType(Expr expr) {
         if (expr.getType().getClass().getSimpleName().equals(BinaryExpr.class.getSimpleName()))
-            return exploreType((BinaryExpr) expr);
+            return resolveType(((BinaryExpr) expr).getLeft().getType(), ((BinaryExpr) expr).getRight().getType(),
+                    ((BinaryExpr) expr).getLeft(), ((BinaryExpr) expr).getRight());
         else if (expr.getType().getClass().getSimpleName().equals(NewVariable.class.getSimpleName()))
             return exploreType((NewVariable) expr);
         else if (expr.getType().getClass().getSimpleName().equals(VariableReference.class.getSimpleName()))
             return exploreType((VariableReference) expr);
         else if (expr.getType().getClass().getSimpleName().equals(IntegerVar.class.getSimpleName()))
-            return new Integer(); //TODO: check if it is correct
+            return new Integer();
         else if (expr.getType().getClass().getSimpleName().equals(CharVar.class.getSimpleName()))
             return new Char();
         else if (expr.getType().getClass().getSimpleName().equals(DoubleVar.class.getSimpleName()))
@@ -361,28 +356,31 @@ public class Analysis {
     }
 
     private static Type exploreType(NewVariable newVariable) {
-        return null;
-        //TODO: write code here
+        return newVariable.getType();
     }
 
     private static Type exploreType(ArrTypeSizeDefVal arrTypeSizeDefVal) {
-        return null;
-        //TODO: write code here
+        return new Array(arrTypeSizeDefVal.getType());
     }
 
     private static Type exploreType(ArrayAccess arrayAccess) {
+        Optional<Declaration> declaration = Utils.getAllVisibleNodes(arrayAccess, Declaration.class).stream()
+                .filter(x -> (x.getVariable().getName().equals(arrayAccess.getName())
+                        && (typesAreEqual(x.getType(), new Array())))).findFirst();
+        if (declaration.isPresent()) return declaration.get().getType();//.getNrstedType();
         return null;
-        //TODO: write code here
+        //TODO: write code here!!!!!!!!!!!!!!!!!!!!
     }
 
     private static Type exploreType(FunCall funCall) {
+        Optional<FunDeclaration> funDeclaration =
+                Utils.getAllVisibleNodes(funCall, FunDeclaration.class).stream()
+                        .filter(x ->
+                                (x.getFunName().name().equals(funCall.getName())
+                                        && (paramsListsAreEqual(x.getFunParametersList(), funCall.getParameters())))).
+                        findFirst();
+        if (funDeclaration.isPresent()) return funDeclaration.get().getReturnType();
         return null;
-        //TODO: write code here
-    }
-
-    private static Type exploreType(BinaryExpr binaryExpr) {
-        return null;
-        //TODO: write code here
     }
 
     private static Type resolveType(Type type1, Type type2, Expr expr1, Expr expr2) {
@@ -398,23 +396,63 @@ public class Analysis {
     }
 
     private static boolean typesAreEqualOrAutoCastPossible(Type type1, Type type2) {
-        return ((type1 != null || type2 != null &&
-                (type1.getClass().getSimpleName().equals(type2.getClass().getSimpleName())))
-                || (isAutoCastPossible(type1, type2)));
+        return (typesAreEqual(type1, type2)) || (isAutoCastPossible(type1, type2));
     }
 
     private static boolean typesAreEqual(Type type1, Type type2) {
-        return (type1 != null || type2 != null &&
-                (type1.getClass().getSimpleName().equals(type2.getClass().getSimpleName())));
+        if (type1 != null || type2 != null) return false;
+        else return (type1.getClass().getSimpleName().equals(type2.getClass().getSimpleName()));
     }
 
     private static boolean isAutoCastPossible(Type type1, Type type2) {
+        //TODO: write code here
         return false;
     }
 
     private static Type AutoCastType(Type type1, Type type2) {
+        if (type1 == null || type2 == null) return null;
+        if (type1.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return resolveByInt(type2);
+        if (type1.getClass().getSimpleName().equals(Double.class.getSimpleName())) return resolveByDouble(type2);
+        if (type1.getClass().getSimpleName().equals(Char.class.getSimpleName())) return resolveByChar(type2);
+        if (type1.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return resolveByBoolean(type2);
+        if (type1.getClass().getSimpleName().equals(Array.class.getSimpleName()))
+            if (type1.getClass().getSimpleName().equals(type2.getClass().getSimpleName()))
+                return type1;
+            else return null;
         return null;
-        //TODO: write code here
+    }
+
+    //TODO: check resolve methods
+    private static Type resolveByInt(Type type) {
+        if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return new Integer();
+        if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return new Double();
+        if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Integer();
+        if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
+        return null;
+    }
+
+    private static Type resolveByDouble(Type type) {
+        if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return new Double();
+        if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return new Double();
+        if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Double();
+        if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
+        return null;
+    }
+
+    private static Type resolveByChar(Type type) {
+        if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return new Integer();
+        if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return new Double();
+        if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Char();
+        if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
+        return null;
+    }
+
+    private static Type resolveByBoolean(Type type) {
+        if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Char();
+        if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return new Boolean();
+        return null;
     }
 
     //это тип узлов, которые мы ищем. чтобы узнать тип переменной, надо найти ее объявление

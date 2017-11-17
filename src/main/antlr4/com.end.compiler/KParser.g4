@@ -5,7 +5,6 @@ parser grammar KParser;
 //+ 1-..
 
 //TODO: think of better way of semicolon
-//TODO: code clean
 //TODO: String, Reference parameters
 
 options {tokenVocab=KLexer; }
