@@ -50,17 +50,20 @@ public class Analysis {
 
         Type returnExpressionType = getType(funDeclaration.getReturnExpr());
         if (returnExpressionType == null && funDeclaration.getReturnType() != null)
-            PrintableErrors.printTypeMismatchError(funDeclaration.getPosition(),
+            PrintableErrors.printTypeMismatchError(
                     funDeclaration.getReturnType(),
-                    returnExpressionType);
+                    returnExpressionType,
+                    funDeclaration.getPosition());
         else if ((funDeclaration.getReturnExpr() != null) &&
-                (!typesAreEqual(returnExpressionType, funDeclaration.getReturnType())))
-            PrintableErrors.printTypeMismatchError(funDeclaration.getReturnExpr().getPosition(),
+                (!typesAreEqualOrAutoCastPossible(returnExpressionType, funDeclaration.getReturnType())))
+            PrintableErrors.printTypeMismatchError(
                     funDeclaration.getReturnType(),
-                    returnExpressionType);
+                    returnExpressionType,
+                    funDeclaration.getReturnExpr().getPosition());
     }
-//------------------------------------------------------------------------------------------------------------------//
+    //-------------------------------------------------------------------------------------------------------------//
 
+    //------------------------EXPRESSION analysis-----------------------------------------------------------------//
     private static void analyze(Expression expression) {
         if (expression.getClass().getSimpleName().equals(Assignment.class.getSimpleName()))
             analyze((Assignment) expression);
@@ -78,31 +81,15 @@ public class Analysis {
             analyze((ElseBlock) expression);
     }
 
-    private static void analyze(Expr expr) {
-        if (expr.getClass().getSimpleName().equals(BinaryExpr.class.getSimpleName()))
-            analyze((BinaryExpr) expr);
-        else if (expr.getClass().getSimpleName().equals(NewVariable.class.getSimpleName()))
-            analyze((NewVariable) expr);
-        else if (expr.getClass().getSimpleName().equals(VariableReference.class.getSimpleName()))
-            analyze((VariableReference) expr);
-        else if (expr.getClass().getSimpleName().equals(FunCall.class.getSimpleName()))
-            analyze((FunCall) expr);
-        else if (expr.getClass().getSimpleName().equals(ArrayAccess.class.getSimpleName()))
-            analyze((ArrayAccess) expr);
-        else if (expr.getClass().getSimpleName().equals(ArrTypeSizeDefVal.class.getSimpleName()))
-            analyze((ArrTypeSizeDefVal) expr);
-        //IntegerVar, BooleanVar, CharVar, DoubleVar->nothing to analyze
-    }
-
     private static void analyze(Declaration declaration) {
         analyze(declaration.getExpr());
 
         Type foundType = getType(declaration.getExpr());
-        if (!typesAreEqual(foundType, declaration.getType()))
+        if (!typesAreEqualOrAutoCastPossible(foundType, declaration.getType()))
             PrintableErrors.printTypeMismatchError(
-                    declaration.position,
                     declaration.getType(),
-                    foundType);
+                    foundType,
+                    declaration.position);
     }
 
     private static void analyze(Assignment assignment) {
@@ -122,14 +109,61 @@ public class Analysis {
 
     private static void analyze(ElseBlock elseBlock) {
     }
+//----------------------------------------------------------------------------------------------------------------//
+
+    //-----------------------------EXPR analysis--------------------------------------------------------------------//
+    private static void analyze(Expr expr) {
+        if (expr.getClass().getSimpleName().equals(BinaryExpr.class.getSimpleName()))
+            analyze((BinaryExpr) expr);
+        else if (expr.getClass().getSimpleName().equals(NewVariable.class.getSimpleName()))
+            analyze((NewVariable) expr);
+        else if (expr.getClass().getSimpleName().equals(VariableReference.class.getSimpleName()))
+            analyze((VariableReference) expr);
+        else if (expr.getClass().getSimpleName().equals(FunCall.class.getSimpleName()))
+            analyze((FunCall) expr);
+        else if (expr.getClass().getSimpleName().equals(ArrayAccess.class.getSimpleName()))
+            analyze((ArrayAccess) expr);
+        else if (expr.getClass().getSimpleName().equals(ArrTypeSizeDefVal.class.getSimpleName()))
+            analyze((ArrTypeSizeDefVal) expr);
+        //IntegerVar, BooleanVar, CharVar, DoubleVar->nothing to analyze
+    }
 
     private static void analyze(BinaryExpr binaryExpr) {
+        Type resolvedType = resolveType(
+                binaryExpr.getLeft().getType(), binaryExpr.getRight().getType(),
+                binaryExpr.getLeft(), binaryExpr.getRight());
+        if (resolvedType == null)
+            PrintableErrors.printIncompatibleTypesError(
+                    binaryExpr.getLeft().getType(),
+                    binaryExpr.getRight().getType(),
+                    binaryExpr.position);
+        else analyzeOperation(binaryExpr, resolvedType);
     }
 
-    private static void analyze(NewVariable newVariable) {
+    private static void analyzeOperation(BinaryExpr binaryExpr, Type resolvedType) {
+
+//        switch (binaryExpr.getSign()){
+//            case ">=":
+//            case "<=":
+//            case "<":
+//            case ">":
+//            case "==":
+//            case "!=":
+//
+        //Char подерживает все операции
+        if (typesAreEqual(resolvedType, new Array()) || typesAreEqual(resolvedType, new Boolean()))
+            PrintableErrors.printOperationDoesNotSupportError
+                    (binaryExpr.getSign(), resolvedType, binaryExpr.position);
     }
 
-    private static void analyze(VariableReference variableReference) {
+    private static void analyze(NewVariable newVariable) { //TODO: check it
+        //была ли такая уже
+        if (Utils.getAllVisibleNodes(newVariable, NewVariable.class)
+                .stream().anyMatch(x ->
+                {
+                    return (x.name()).equals(newVariable.name());
+                }))
+            PrintableErrors.printDublicatesError("variable", newVariable.position);
     }
 
     private static void analyze(FunCall funCall) {
@@ -139,23 +173,58 @@ public class Analysis {
                 {
                     return (x.getFunName().name().equals(funCall.getName())
                             && (paramsListsAreEqual(x.getFunParametersList(), funCall.getParameters())));
-                })) PrintableErrors.noSuchFunctionError(funCall.position, funCall.getName());
+                })) PrintableErrors.printNoSuchFunctionError(funCall, funCall.position);
+    }
 
-
+    private static void analyze(VariableReference variableReference) {
+        //была ли переменная объявлена
+        if (Utils.getAllVisibleNodes(variableReference, NewVariable.class)
+                .stream().anyMatch(x ->
+                {
+                    return (x.name()).equals(variableReference.getName());
+                })
+                &&
+                Utils.getAllVisibleNodes(variableReference, ForLoop.class)
+                        .stream().anyMatch(x ->
+                {
+                    return (x.getIdents().get(0).name()).equals(variableReference.getName());
+                }))
+            PrintableErrors.printUnresolvedReferenceError(variableReference.getName(), variableReference.position);
     }
 
     private static boolean paramsListsAreEqual(List<FunParameter> list1, List<Expr> list2) {
+        if (list1 == null && list2 == null) return true;
+        if (list1 != null && list2 != null) {
+            if (list1.size() != list2.size()) return false;
+            for (int i = 0; i < list1.size(); i++) {
+                if (!typesAreEqualOrAutoCastPossible(list1.get(i).getType(), list2.get(i).getType())) return false;
+            }
+        } else return false;
         return true;
     }
 
     private static void analyze(ArrayAccess arrayAccess) {
+        analyze(arrayAccess.getExpr());
+        Optional<Declaration> declaration = Utils.getAllVisibleNodes(arrayAccess, Declaration.class).stream()
+                .filter(x -> arrayAccess.getName().equals(x.name())).findFirst();
+        if (!declaration.isPresent())
+            PrintableErrors.printUnresolvedReferenceError(arrayAccess.name(), arrayAccess.position);
+        else {
+            //TODO: or typesAreEqualOrCanCast?
+            if (!typesAreEqual(declaration.get().getType(), arrayAccess.getType()))
+                PrintableErrors.printTypeMismatchError(
+                        declaration.get().getType(),
+                        arrayAccess.getType(),
+                        arrayAccess.position);
+        }
     }
 
     private static void analyze(ArrTypeSizeDefVal arrTypeSizeDefVal) {
+        Utils.getAllChildren(arrTypeSizeDefVal, Expr.class).forEach(Analysis::analyze);
     }
 
-
     private static void analyze(ReturnExpr returnExpr) {
+        analyze(returnExpr.getExpr());
     }
 
 
@@ -233,9 +302,19 @@ public class Analysis {
         }
     }
 
+    private static boolean typesAreEqualOrAutoCastPossible(Type type1, Type type2) {
+        return ((type1 != null || type2 != null &&
+                (type1.getClass().getSimpleName().equals(type2.getClass().getSimpleName())))
+                || (isAutoCastPossible(type1, type2)));
+    }
+
     private static boolean typesAreEqual(Type type1, Type type2) {
         return (type1 != null || type2 != null &&
                 (type1.getClass().getSimpleName().equals(type2.getClass().getSimpleName())));
+    }
+
+    private static boolean isAutoCastPossible(Type type1, Type type2) {
+        return false;
     }
 
     private static Type AutoCastType(Type type1, Type type2) {
