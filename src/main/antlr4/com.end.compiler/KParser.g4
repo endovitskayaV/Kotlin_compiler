@@ -25,7 +25,7 @@ variable:
     concrete_var    #concreteVariable
     |ident          #Identifier
     ;
-//могут быть записаны как expr, так и при присвоении
+//могут быть записаны как condition, так и при присвоении
 expr: RBO+ expr RBC+            #parenExpr
      | fun_call                 #funcCall
      | variable                 #var
@@ -69,7 +69,7 @@ loop:  while_loop     #whileLoop
      ;
 
 while_loop: KEYWORD_while  RBO (expr) RBC (expression | block);
-for_loop:KEYWORD_for  RBO ( ident KEYWORD_in ident) RBC  (expression | block);
+for_loop:KEYWORD_for  RBO (variable KEYWORD_in expr) RBC  (expression | block);
 do_while_loop:KEYWORD_do block  NL* KEYWORD_while RBO expr RBC;
 
 

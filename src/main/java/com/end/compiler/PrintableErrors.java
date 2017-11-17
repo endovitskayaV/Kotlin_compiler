@@ -25,7 +25,7 @@ public class PrintableErrors {
     }
 
     public static void printTypeMismatchError(Type expectedType, Type foundType,Position position){
-        printError("type mismatch at: "+ position.startLine+":"+ position.startIndexInLine
+        printError("Type mismatch at: "+ position.startLine+":"+ position.startIndexInLine
                  +". Expected: "+expectedType.name()+" but found: "+foundType);
     }
 
@@ -49,5 +49,9 @@ public class PrintableErrors {
     public static void printOperationDoesNotSupportError(String operation, Type unsupportedType,Position position){
         printError("Operation '"+operation+"' does not support "+unsupportedType.name()+
                 "at: "+position.startLine+": "+position.startIndexInLine);
+    }
+
+    public  static void  printIsNotIterableError(Position position) {
+        printError("Expected iterable at: "+position.startLine+": "+position.startIndexInLine);
     }
 }

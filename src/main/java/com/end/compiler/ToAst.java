@@ -334,9 +334,14 @@ class ToAst {
     //TODO: solve Arrays.AsList warnings
     @NotNull
     private static Expression toAst(KParser.For_loopContext forLoopContext) {
+        VariableReference variableReference =
+                new VariableReference(forLoopContext.variable().getText());
+        Utils.setPosition(variableReference, forLoopContext.variable());
+        Utils.setChildrensParent(variableReference);
         if (forLoopContext.expression() == null) {
             ForLoop forLoop = new ForLoop(
-                    forLoopContext.ident().stream().map(ToAst::toAst).collect(Collectors.toList()),
+                    variableReference,
+                    toAst(forLoopContext.expr()),
                     forLoopContext.block().expressions().expression()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()));
             Utils.setPosition(forLoop, forLoopContext);
@@ -344,7 +349,8 @@ class ToAst {
             return forLoop;
         } else if (forLoopContext.block() == null) {
             ForLoop forLoop = new ForLoop(
-                    forLoopContext.ident().stream().map(ToAst::toAst).collect(Collectors.toList()),
+                    variableReference,
+                    toAst(forLoopContext.expr()),
                     Arrays.asList(toAst(forLoopContext.expression())));
             Utils.setPosition(forLoop, forLoopContext);
             Utils.setChildrensParent(forLoop);

@@ -1,13 +1,15 @@
 package com.end.compiler;
 
 
+import org.antlr.v4.runtime.ParserRuleContext;
+
 import java.util.*;
 
 public class Analysis {
 
     //---------------------------------NODE analysis---------------------------------------//
     public static void analyze(Program program) {
-        //fill types for all expr
+        //fill types for all condition
         Utils.getAllChildren(program, Expr.class).forEach(x -> x.fillType(getType(x)));
 
         List<ClassDeclaration> classDeclarations = new ArrayList<>();
@@ -93,21 +95,114 @@ public class Analysis {
     }
 
     private static void analyze(Assignment assignment) {
+        analyze(assignment.getValue());
+        analyze(assignment.getLeft());
+
+        Optional<Declaration> declaration = Utils.getAllVisibleNodes(assignment, Declaration.class).stream()
+                .filter(x -> assignment.getLeft().name().equals(x.name())).findFirst();
+        if (!declaration.isPresent())
+            PrintableErrors.printUnresolvedReferenceError(assignment.name(), assignment.position);
+        else {
+            Type expectedType = declaration.get().getType();
+            Type actualType = assignment.getValue().getType();
+
+            //TODO: or typesAreEqualOrCanCast?
+            if (!typesAreEqual(declaration.get().getType(), assignment.getLeft().getType()))
+                PrintableErrors.printTypeMismatchError(
+                        expectedType,
+                        actualType,
+                        assignment.position);
+        }
     }
 
     private static void analyze(WhileLoop whileLoop) {
-    }
+        analyze(whileLoop.getCondition());
 
-    private static void analyze(ForLoop forLoop) {
+        Type actualType = whileLoop.getCondition().getType();
+        if (actualType != new Boolean())
+            PrintableErrors.printTypeMismatchError( new Boolean(), actualType,  whileLoop.getCondition().position);
+
+        List<Expression> expressionList = new ArrayList<>();
+        expressionList.addAll(Utils.getAllChildren(whileLoop, Expression.class));
+
+        //dublictations
+        expressionList.stream().filter
+                (x -> Collections.frequency(expressionList, x) > 1)
+                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
+        expressionList.forEach(Analysis::analyze);
     }
 
     private static void analyze(DoWhileLoop doWhileLoop) {
+        analyze(doWhileLoop.getCondition());
+
+        Type actualType = doWhileLoop.getCondition().getType();
+        if (actualType != new Boolean())
+            PrintableErrors.printTypeMismatchError( new Boolean(), actualType,  doWhileLoop.getCondition().position);
+
+        List<Expression> expressionList = new ArrayList<>();
+        expressionList.addAll(Utils.getAllChildren(doWhileLoop, Expression.class));
+
+        //dublictations
+        expressionList.stream().filter
+                (x -> Collections.frequency(expressionList, x) > 1)
+                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
+        expressionList.forEach(Analysis::analyze);
+    }
+
+    private static void analyze(ForLoop forLoop) {
+
+        if(typesAreEqual(forLoop.getIterable().getType(),new Array()))
+            PrintableErrors.printIsNotIterableError(forLoop.getIterable().position);
+
+        //TODO: сравнить тип iterator и тип массива iterable
+        //TODO: or typesAreEqualOrCanCast?
+       // if(typesAreEqual(forLoop.getIterator().getType(), forLoop.))
+        analyze(forLoop.getIterator());
+        analyze(forLoop.getIterable());
+        List<Expression> expressionList = new ArrayList<>();
+        expressionList.addAll(Utils.getAllChildren(forLoop, Expression.class));
+
+        //dublictations
+        expressionList.stream().filter
+                (x -> Collections.frequency(expressionList, x) > 1)
+                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
+        expressionList.forEach(Analysis::analyze);
     }
 
     private static void analyze(IfElse ifElse) {
+
+        analyze(ifElse.getCondition());
+
+        Type actualType = ifElse.getCondition().getType();
+        if (actualType != new Boolean())
+            PrintableErrors.printTypeMismatchError( new Boolean(), actualType,  ifElse.getCondition().position);
+
+        List<Expression> expressionList = new ArrayList<>();
+        expressionList.addAll(Utils.getAllChildren(ifElse, Expression.class));
+
+        //dublictations
+        expressionList.stream().filter
+                (x -> Collections.frequency(expressionList, x) > 1)
+                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
+        expressionList.forEach(Analysis::analyze);
+
+        analyze(ifElse.getElseBlock());
+
     }
 
     private static void analyze(ElseBlock elseBlock) {
+
+        List<Expression> expressionList = new ArrayList<>();
+        expressionList.addAll(Utils.getAllChildren(elseBlock, Expression.class));
+
+        //dublictations
+        expressionList.stream().filter
+                (x -> Collections.frequency(expressionList, x) > 1)
+                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
+
+        expressionList.forEach(Analysis::analyze);
+
+
     }
 //----------------------------------------------------------------------------------------------------------------//
 
@@ -187,7 +282,7 @@ public class Analysis {
                 Utils.getAllVisibleNodes(variableReference, ForLoop.class)
                         .stream().anyMatch(x ->
                 {
-                    return (x.getIdents().get(0).name()).equals(variableReference.getName());
+                    return (x.getIterator().getName()).equals(variableReference.getName());
                 }))
             PrintableErrors.printUnresolvedReferenceError(variableReference.getName(), variableReference.position);
     }
@@ -226,7 +321,7 @@ public class Analysis {
     private static void analyze(ReturnExpr returnExpr) {
         analyze(returnExpr.getExpr());
     }
-
+    //----------------------------------------------------------------------------------------------------//
 
     //----------------------TYPE analysis--------------------------------------------------------------------//
     private static Type getType(Expr expr) {
@@ -333,13 +428,13 @@ public class Analysis {
         else {
             // нужно сначала найти нужный for
             Optional<ForLoop> forLoop = Utils.getAllVisibleNodes(variableReference, ForLoop.class)
-                    .stream().filter(iterable -> iterable.getIdents().get(0).getName()
+                    .stream().filter(x -> x.getIterator().getName()
                             .equals(variableReference.getName()))
                     .findFirst();
             if (forLoop.isPresent()) {
-                if (forLoop.get().getIdents().get(1).getType() instanceof Array) {//перебираемая переменная - массив?
+                if (forLoop.get().getIterable().getType() instanceof Array) {//перебираемая переменная - массив?
                     //тип переменной - это тип элемента массива
-                    return ((Array) forLoop.get().getIdents().get(1).getType()).getType();
+                    return ((Array) forLoop.get().getIterable().getType()).getType();
                 }
             }
             //мы нашли все видимые циклы. но мы не знаем, в каком из них нужная нам переменная. ищем именно тот, в

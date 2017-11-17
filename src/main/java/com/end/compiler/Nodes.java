@@ -204,8 +204,9 @@ class WhileLoop extends Expression {
 @AllArgsConstructor
 @NoArgsConstructor
 class ForLoop extends Expression {
-    private List<VariableReference> idents;
-    private List<Expression> block;
+    private VariableReference iterator;
+    private Expr iterable;
+    private List<Expression> expressions;
 
     @Override
     public String name() {
@@ -215,8 +216,9 @@ class ForLoop extends Expression {
     @Override
     public ArrayList<PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> childrenList = new ArrayList<>();
-        childrenList.addAll(idents);
-        childrenList.addAll(idents.size(), block);
+        childrenList.add(iterator);
+        childrenList.add(iterable);
+        childrenList.addAll(2, expressions);
         return childrenList;
     }
 }
@@ -225,8 +227,8 @@ class ForLoop extends Expression {
 @AllArgsConstructor
 @NoArgsConstructor
 class DoWhileLoop extends Expression {
-    private Expr expr;
-    private List<Expression> block;
+    private Expr condition;
+    private List<Expression> expressions;
 
     @Override
     public String name() {
@@ -236,8 +238,8 @@ class DoWhileLoop extends Expression {
     @Override
     public ArrayList<PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> childrenList = new ArrayList<>();
-        childrenList.add(expr);
-        childrenList.addAll(1, block);
+        childrenList.add(condition);
+        childrenList.addAll(1, expressions);
         return childrenList;
     }
 }
@@ -273,7 +275,7 @@ class Declaration extends Expression {
 class IfElse extends Expression {
     private Expr condition;
     private List<Expression> thenExpression;
-    private ElseBlock elseExpression;
+    private ElseBlock elseBlock;
 
     @Override
     public String name() {
@@ -285,8 +287,8 @@ class IfElse extends Expression {
         ArrayList<PrintableTreeNode> children = new ArrayList<>();
         children.add(condition);
         children.addAll(thenExpression);
-        if (elseExpression != null)
-            children.add(elseExpression);
+        if (elseBlock != null)
+            children.add(elseBlock);
         return children;
     }
 }
