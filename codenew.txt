@@ -1,0 +1,53 @@
+
+
+  fun fun1() :Int
+    {
+        return 2
+    }
+    fun fun1() : Double
+    {
+        return 5.7
+    }
+
+    fun fun1() :Boolean
+    {
+        return true
+    }
+
+    fun fun1(s:Int) : Boolean
+    {
+
+        return true
+    }
+
+    fun fun1(A:Int):Int{
+        return 1
+    }
+
+
+
+
+
+
+
+
+
+
+/*class Test{}
+class Test{
+fun fun4() : Boolean{
+              c=9
+              a=0
+              c=9
+              a=e*7
+              return 6
+           }
+           }
+
+fun fun1():Unit{
+            var wrong: Boolean = true
+              var wrong: Boolean = false
+              val i:Int
+           return true
+           }
+*/

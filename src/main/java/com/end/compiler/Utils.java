@@ -3,6 +3,7 @@ package com.end.compiler;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
@@ -22,8 +23,8 @@ public class Utils {
     private static Position definePosition(ParserRuleContext parserRuleContext){
         return new Position(
                 parserRuleContext.start.getLine(),
-                parserRuleContext.start.getCharPositionInLine(),
                 parserRuleContext.stop.getLine(),
+                parserRuleContext.start.getCharPositionInLine(),
                 parserRuleContext.stop.getCharPositionInLine());
     }
 
@@ -44,6 +45,7 @@ public class Utils {
             if (clazz.isInstance(child)) result.add(clazz.cast(child));
             child.children().forEach(it -> childrenStack.push((Node)it));
         }
+         Collections.reverse(result);
         return result;
     }
 

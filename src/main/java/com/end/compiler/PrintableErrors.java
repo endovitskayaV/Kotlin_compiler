@@ -17,16 +17,16 @@ public class PrintableErrors {
 
     private static  void printError(String message){
         isErrorOccurred =true;
-        System.out.println(message);
+        System.out.println(ANSI_RED+message+ANSI_RESET);
     }
     public static void printDublicatesError(String name, Position position){
         printError("Dublicate '"+name+"' at: "
                 +position.startLine+": "+position.startIndexInLine+", ");
     }
 
-    public static void printTypeMismatchError(Type expectedType, Type foundType,Position position){
+    public static void  printTypeMismatchError(Type expectedType, Type foundType,Position position){
         printError("Type mismatch at: "+ position.startLine+":"+ position.startIndexInLine
-                 +". Expected: "+expectedType.name()+" but found: "+foundType);
+                 +". Expected: "+expectedType.name()+" but found: "+foundType.name());
     }
 
     public static void printNoSuchFunctionError(FunCall funCall,Position position){
@@ -54,4 +54,14 @@ public class PrintableErrors {
     public  static void  printIsNotIterableError(Position position) {
         printError("Expected iterable at: "+position.startLine+": "+position.startIndexInLine);
     }
+    public static void printNoReturnStatement(Position funDeclPosition){
+        printError("No return statement at function at:"+funDeclPosition.startLine+": "+funDeclPosition.startIndexInLine);
+
+    }
+
+    public  static  void printConflict(Position position, Node node1, Node node2){
+        printError("Conflict: " +node1.toString()+", "+node2.toString()+
+                " at: "+position.startLine+": "+position.startIndexInLine);
+    }
+
 }

@@ -82,7 +82,7 @@ class Test {
 
         if (isGood){
           a=0
-          var t:Double=9
+          var t:Double=9.0
         }
 
          if (isGood){
@@ -90,25 +90,8 @@ class Test {
             var t:Double=fun6(e,t)
          }
          else {
-            c=9;
+            c=9
             a=e*7
          }
-         }
-
-  fun test3 (p:Int):Unit{
-  var c:Char='о'
+     }
   }
-  }
-
-  fun fun1 ():Unit{}
-  fun fun3(): Int{y=0}
-  class foo{}
-
-fun test100500 (param:Char):Char{
-// foo1=a+b*(3/4)
-//return 'r'
-fun34()
-fun56546(4,5)
-}
-class Test1 {}
-fun QQ():Unit{}

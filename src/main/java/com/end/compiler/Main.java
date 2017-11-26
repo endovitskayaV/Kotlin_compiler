@@ -23,19 +23,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-//        ArrayList<Integer> list=new ArrayList<>();
-//        list.add(1);
-//        list.add(3);
-//        list.add(4);
-//        list.add(5);
-//        list.add(1);list.add(5);
-//        list.stream().filter
-//                (x-> Collections.frequency(list,x)>1).sorted();
-//               // .forEach(System.out::println);
-//
         CharStream stream = null;
         try {
-            stream = CharStreams.fromFileName("code.txt");
+            stream = CharStreams.fromFileName("codenew.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }

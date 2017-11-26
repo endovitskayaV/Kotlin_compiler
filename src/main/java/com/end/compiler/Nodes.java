@@ -3,6 +3,7 @@ package com.end.compiler;
 import io.bretty.console.tree.PrintableTreeNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 abstract class Node implements PrintableTreeNode {
     protected Node parent;
     protected Position position;
@@ -19,12 +21,14 @@ abstract class Node implements PrintableTreeNode {
 
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode
 abstract class Expression extends Node {
 }
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 abstract class Expr extends Expression {
     private Type castTo;
     private Type type;
@@ -50,6 +54,7 @@ abstract class Expr extends Expression {
 
 @Data
 @AllArgsConstructor
+@EqualsAndHashCode
 abstract class Type extends Node {
     public List<PrintableTreeNode> children() {
         return new ArrayList<>();
@@ -63,6 +68,7 @@ abstract class Type extends Node {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class FunParameter extends Node {
     private VariableReference variableName;
     private Type type;
@@ -81,6 +87,7 @@ class FunParameter extends Node {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class FunDeclaration extends Node {
     private VariableReference funName;
     private Type returnType;
@@ -89,7 +96,6 @@ class FunDeclaration extends Node {
     private ReturnExpr returnExpr;
 
     @Override
-
     public String name() {
         String returnStr = "fun " + funName.name() + "(";
         if (funParametersList.size() > 0) {
@@ -111,11 +117,17 @@ class FunDeclaration extends Node {
             children.add(returnExpr);
         return children;
     }
+    @Override
+    public String toString(){
+        return "fun "+funName.getName()+": "+getReturnType().name();
+
+    }
 }
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class ClassDeclaration extends Node {
 
     private VariableReference className;
@@ -134,11 +146,16 @@ class ClassDeclaration extends Node {
         if (funDeclarations != null) children.addAll(funDeclarations);
         return children;
     }
+    @Override
+    public String toString(){
+        return  name();
+    }
 }
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class Program extends Node {
 
     private List<ClassDeclaration> classDeclarationList;
@@ -161,6 +178,7 @@ class Program extends Node {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class Assignment extends Expression {
     private Expr left;
     private Expr value;
@@ -182,6 +200,7 @@ class Assignment extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class WhileLoop extends Expression {
     private Expr condition;
     private List<Expression> expressions;
@@ -203,6 +222,7 @@ class WhileLoop extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class ForLoop extends Expression {
     private VariableReference iterator;
     private Expr iterable;
@@ -226,6 +246,7 @@ class ForLoop extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class DoWhileLoop extends Expression {
     private Expr condition;
     private List<Expression> expressions;
@@ -247,6 +268,7 @@ class DoWhileLoop extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class Declaration extends Expression {
     private String varVal;
     private VariableReference variable;
@@ -263,15 +285,21 @@ class Declaration extends Expression {
         ArrayList<PrintableTreeNode> children = new ArrayList<>();
         NewVariable newVariable = new NewVariable(varVal, variable, type);
         children.add(newVariable);
-        // children.add(type);
+        // children.add(nestedType);
         children.add(expr);
         return children;
+    }
+
+    @Override
+    public String toString(){
+        return varVal+" "+variable.getName()+":"+type.name();
     }
 }
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class IfElse extends Expression {
     private Expr condition;
     private List<Expression> thenExpression;
@@ -296,6 +324,7 @@ class IfElse extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class ElseBlock extends Expression {
     private List<Expression> expressions;
 
@@ -315,6 +344,7 @@ class ElseBlock extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class BinaryExpr extends Expr {
     private Expr left;
     private Expr right;
@@ -334,6 +364,7 @@ class BinaryExpr extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class NewVariable extends Expr {
     private String varVal;
     private VariableReference variable;
@@ -353,6 +384,7 @@ class NewVariable extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class VariableReference extends Expr {
     private String name;
     @Override
@@ -369,6 +401,7 @@ class VariableReference extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class IntegerVar extends Expr {
     private String value;
 
@@ -386,6 +419,7 @@ class IntegerVar extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class CharVar extends Expr {
     private String value;
 
@@ -403,6 +437,7 @@ class CharVar extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class DoubleVar extends Expr {
     private String value;
 
@@ -420,6 +455,7 @@ class DoubleVar extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class BooleanVar extends Expr {
     private String value;
 
@@ -437,6 +473,7 @@ class BooleanVar extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class FunCall extends Expr {
     private String name;
     private List<Expr> parameters;
@@ -468,6 +505,7 @@ class FunCall extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class ArrayAccess extends Expr {
     private String name;
     private Expr expr;
@@ -488,13 +526,14 @@ class ArrayAccess extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class ArrTypeSizeDefVal extends Expr {
-    private Type type;
+    private Type nestedType;
     private List<Expr> exprList;
 
     @Override
     public String name() {
-        return "Array<" + type.name() + "> (  " + ", {  })" + typeOrNull() + castToIfNeed();
+        return "Array<" + nestedType.name() + "> (  " + ", {  })" + typeOrNull() + castToIfNeed();
     }
 
     @Override
@@ -506,6 +545,7 @@ class ArrTypeSizeDefVal extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class ReturnExpr extends Expr {
     private Expr expr;
 
@@ -559,11 +599,21 @@ class Char extends Type {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 class Array extends Type {
     private Type type;
 
     @Override
     public String name() {
         return "Array<" + type.name() + ">";
+    }
+}
+
+
+@NoArgsConstructor
+class Unit extends Type {
+    @Override
+    public String name() {
+        return "Unit";
     }
 }

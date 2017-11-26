@@ -6,58 +6,62 @@ public class Analysis {
 
     //---------------------------------NODE analysis---------------------------------------//
     public static void analyze(Program program) {
-        //fill types for all condition
         Utils.getAllChildren(program, Expr.class).forEach(x -> x.fillType(getType(x)));
 
-        List<ClassDeclaration> classDeclarations = new ArrayList<>();
-        classDeclarations.addAll(Utils.getAllChildren(program, ClassDeclaration.class));
-        //dublictations
-        classDeclarations.stream().filter
-                (x -> Collections.frequency(classDeclarations, x) > 1)
-                .forEach(x -> PrintableErrors.printDublicatesError("class " + x.getClassName().name(), x.position));
-        classDeclarations.forEach(Analysis::analyze);
-
-        List<FunDeclaration> funDeclarations = new ArrayList<>();
-        funDeclarations.addAll(Utils.getAllChildren(program, FunDeclaration.class));
-        //dublictations
-        funDeclarations.stream().filter
-                (x -> Collections.frequency(funDeclarations, x) > 1)
-                .forEach(x -> PrintableErrors.printDublicatesError("function " + x.getFunName().name(), x.position));
-        funDeclarations.forEach(Analysis::analyze);
+        program.getClassDeclarationList().forEach(Analysis::analyze);
+        program.getFunDeclarationList().forEach(Analysis::analyze);
     }
 
     private static void analyze(ClassDeclaration classDeclaration) {
-        ArrayList<FunDeclaration> funDeclarations = new ArrayList<>();
-        funDeclarations.addAll(Utils.getAllChildren(classDeclaration, FunDeclaration.class));
-        //dublictations
-        funDeclarations.stream().filter
-                (x -> Collections.frequency(funDeclarations, x) > 1)
-                .forEach(x -> PrintableErrors.printDublicatesError("function " + x.getFunName().name(), x.position));
-        funDeclarations.forEach(Analysis::analyze);
+        List<ClassDeclaration> classList = new ArrayList<>();
+        classList.addAll(Utils.getAllVisibleNodes(classDeclaration, ClassDeclaration.class));
+        if (classList.size() > 0) {
+            classList.remove(classDeclaration);
+            classList.stream().forEach(x -> {
+                if (x.name().equals(classDeclaration.name()))
+                    PrintableErrors.printConflict(classDeclaration.position,
+                            classDeclaration, x);
+            });
+        }
+        Utils.getAllChildren(classDeclaration, FunDeclaration.class).forEach(Analysis::analyze);
     }
 
+
     private static void analyze(FunDeclaration funDeclaration) {
-        List<Expression> expressionList = new ArrayList<>();
-        expressionList.addAll(Utils.getAllChildren(funDeclaration, Expression.class));
+        List<FunDeclaration> funList = new ArrayList<>();
+        funList.addAll(Utils.getAllVisibleNodes(funDeclaration, FunDeclaration.class));
+        if (funList.size() > 0) {
+            funList.remove(funDeclaration);
+            funList.stream().forEach(x -> {
+                if ((x.getFunName().equals(funDeclaration.getFunName())) &&
+                        (areParamsListsEqual(funDeclaration.getFunParametersList(),x.getFunParametersList())))
+                    PrintableErrors.printConflict(funDeclaration.position,
+                            funDeclaration, x);
+            });
+        }
+        Utils.getAllChildren(funDeclaration, Expression.class).stream()
+                .forEach(Analysis::analyze);
 
-        //dublictations
-        expressionList.stream().filter
-                (x -> Collections.frequency(expressionList, x) > 1)
-                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
-        expressionList.forEach(Analysis::analyze);
-        analyze(funDeclaration.getReturnExpr());
-
-        Type returnExpressionType = getType(funDeclaration.getReturnExpr());
-        if (returnExpressionType == null && funDeclaration.getReturnType() != null)
-            PrintableErrors.printTypeMismatchError(
-                    funDeclaration.getReturnType(),
-                    returnExpressionType,
-                    funDeclaration.getPosition());
-        else if ((funDeclaration.getReturnExpr() != null) &&
-                (!typesAreEqualOrAutoCastPossible(returnExpressionType, funDeclaration.getReturnType())))
-            PrintableErrors.printTypeMismatchError(
-                    funDeclaration.getReturnType(),
-                    returnExpressionType,
+        if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() != null) {
+           Type returnExpressionType = getType(funDeclaration.getReturnExpr());
+//            if (returnExpressionType == null && funDeclaration.getReturnType() != null) {
+//                analyze(funDeclaration.getReturnExpr());
+//                PrintableErrors.printTypeMismatchError(
+//                        funDeclaration.getReturnType(),
+//                        returnExpressionType,
+//                        funDeclaration.getPosition());
+//            }
+//            else
+            if (returnExpressionType!=null &&
+                    !typesAreEqual(funDeclaration.getReturnType(), getType(funDeclaration.getReturnExpr())))
+                PrintableErrors.printTypeMismatchError(
+                        funDeclaration.getReturnType(),
+                        returnExpressionType,
+                        funDeclaration.getReturnExpr().getPosition());
+        } else if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() == null)
+            PrintableErrors.printNoReturnStatement(funDeclaration.position);
+        else if (funDeclaration.getReturnType() == null && funDeclaration.getReturnExpr() != null)
+            PrintableErrors.printTypeMismatchError(new Unit(), getType(funDeclaration.getReturnExpr()),
                     funDeclaration.getReturnExpr().getPosition());
     }
     //-------------------------------------------------------------------------------------------------------------//
@@ -81,10 +85,19 @@ public class Analysis {
     }
 
     private static void analyze(Declaration declaration) {
+        List<Declaration> declList = new ArrayList<>();
+        declList.addAll(Utils.getAllVisibleNodes(declaration, Declaration.class));
+        declList.remove(declaration);
+        declList.stream().forEach(x -> {
+            if (x.getVariable().getName().equals(declaration.getVariable().getName()))
+                PrintableErrors.printConflict(declaration.position,
+                        declaration, x);
+        });
+
         analyze(declaration.getExpr());
 
         Type foundType = getType(declaration.getExpr());
-        if (!typesAreEqualOrAutoCastPossible(foundType, declaration.getType()))
+        if (!typesAreEqual(foundType, declaration.getType()))
             PrintableErrors.printTypeMismatchError(
                     declaration.getType(),
                     foundType,
@@ -93,18 +106,18 @@ public class Analysis {
 
     private static void analyze(Assignment assignment) {
         analyze(assignment.getValue());
-        analyze(assignment.getLeft());
+        //analyze(assignment.getLeft());
 
         Optional<Declaration> declaration = Utils.getAllVisibleNodes(assignment, Declaration.class).stream()
                 .filter(x -> assignment.getLeft().name().equals(x.name())).findFirst();
         if (!declaration.isPresent())
-            PrintableErrors.printUnresolvedReferenceError(assignment.name(), assignment.position);
+            PrintableErrors.printUnresolvedReferenceError(assignment.getLeft().name(), assignment.position);
         else {
             Type expectedType = declaration.get().getType();
-            Type actualType = assignment.getValue().getType();
+            Type actualType = getType(assignment.getValue());
 
             //TODO: or typesAreEqualOrCanCast?
-            if (!typesAreEqual(declaration.get().getType(), assignment.getLeft().getType()))
+            if (!typesAreEqual(expectedType, actualType))
                 PrintableErrors.printTypeMismatchError(
                         expectedType,
                         actualType,
@@ -115,7 +128,7 @@ public class Analysis {
     private static void analyze(WhileLoop whileLoop) {
         analyze(whileLoop.getCondition());
 
-        Type actualType = whileLoop.getCondition().getType();
+        Type actualType = getType(whileLoop.getCondition());
         if (actualType != new Boolean())
             PrintableErrors.printTypeMismatchError(new Boolean(), actualType, whileLoop.getCondition().position);
 
@@ -132,7 +145,7 @@ public class Analysis {
     private static void analyze(DoWhileLoop doWhileLoop) {
         analyze(doWhileLoop.getCondition());
 
-        Type actualType = doWhileLoop.getCondition().getType();
+        Type actualType = getType(doWhileLoop.getCondition());
         if (actualType != new Boolean())
             PrintableErrors.printTypeMismatchError(new Boolean(), actualType, doWhileLoop.getCondition().position);
 
@@ -148,7 +161,7 @@ public class Analysis {
 
     private static void analyze(ForLoop forLoop) {
 
-        if (typesAreEqual(forLoop.getIterable().getType(), new Array()))
+        if (typesAreEqual(getType(forLoop.getIterable()), new Array()))
             PrintableErrors.printIsNotIterableError(forLoop.getIterable().position);
 
         analyze(forLoop.getIterator());
@@ -167,7 +180,7 @@ public class Analysis {
 
         analyze(ifElse.getCondition());
 
-        Type actualType = ifElse.getCondition().getType();
+        Type actualType = getType(ifElse.getCondition());
         if (actualType != new Boolean())
             PrintableErrors.printTypeMismatchError(new Boolean(), actualType, ifElse.getCondition().position);
 
@@ -218,15 +231,18 @@ public class Analysis {
     }
 
     private static void analyze(BinaryExpr binaryExpr) {
+        analyze(binaryExpr.getLeft());
+        analyze(binaryExpr.getRight());
         Type resolvedType = resolveType(
-                binaryExpr.getLeft().getType(), binaryExpr.getRight().getType(),
+                getType(binaryExpr.getLeft()), getType(binaryExpr.getRight()),
                 binaryExpr.getLeft(), binaryExpr.getRight());
         if (resolvedType == null)
-            PrintableErrors.printIncompatibleTypesError(
-                    binaryExpr.getLeft().getType(),
-                    binaryExpr.getRight().getType(),
-                    binaryExpr.position);
-        else analyzeOperation(binaryExpr, resolvedType);
+            if (getType(binaryExpr.getRight()) != null && getType(binaryExpr.getLeft()) != null)
+                PrintableErrors.printIncompatibleTypesError(
+                        getType(binaryExpr.getLeft()),
+                        getType(binaryExpr.getRight()),
+                        binaryExpr.position);
+            else analyzeOperation(binaryExpr, resolvedType);
     }
 
     private static void analyzeOperation(BinaryExpr binaryExpr, Type resolvedType) {
@@ -267,29 +283,46 @@ public class Analysis {
 
     private static void analyze(VariableReference variableReference) {
         //была ли переменная объявлена
-        if (Utils.getAllVisibleNodes(variableReference, NewVariable.class)
-                .stream().anyMatch(x ->
-                {
-                    return (x.name()).equals(variableReference.getName());
-                })
+        if (!(Utils.getAllVisibleNodes(variableReference, NewVariable.class)
+                .stream().anyMatch(x -> (x.name()).equals(variableReference.getName()))
                 &&
                 Utils.getAllVisibleNodes(variableReference, ForLoop.class)
                         .stream().anyMatch(x ->
-                {
-                    return (x.getIterator().getName()).equals(variableReference.getName());
-                }))
+                        (x.getIterator().getName()).equals(variableReference.getName()))))
             PrintableErrors.printUnresolvedReferenceError(variableReference.getName(), variableReference.position);
     }
 
     private static boolean paramsListsAreEqual(List<FunParameter> list1, List<Expr> list2) {
+        if (list1 == null || list2 == null) return true;
+        else {
+            if (list1.size() != list2.size()) return false;
+            for (int i = 0; i < list1.size(); i++) {
+                if (typesAreEqual(list1.get(i).getType(), list2.get(i).getType())) return false;
+            }
+        }
+        return true;
+    }
+    private static boolean areParamsListsEqual(List<FunParameter> list1, List<FunParameter> list2) {
         if (list1 == null && list2 == null) return true;
         if (list1 != null && list2 != null) {
             if (list1.size() != list2.size()) return false;
             for (int i = 0; i < list1.size(); i++) {
-                if (!typesAreEqualOrAutoCastPossible(list1.get(i).getType(), list2.get(i).getType())) return false;
+                if (typesAreEqual(list1.get(i).getType(), list2.get(i).getType())) return false;
             }
         } else return false;
         return true;
+    }
+
+
+    private static boolean funDeclAreEqual(FunDeclaration funDeclaration, List<FunDeclaration> list2) {
+//        if (funDeclaration == null && list2 == null) return true;
+//        if (funDeclaration != null && list2 != null) {
+//            for (int i = 0; i < list2.size(); i++) {
+//                if (typesAreEqual(funDeclaration., list2.get(i).getType())) return false;
+//            }
+//        } else return false;
+        return true;
+
     }
 
     private static void analyze(ArrayAccess arrayAccess) {
@@ -300,10 +333,10 @@ public class Analysis {
             PrintableErrors.printUnresolvedReferenceError(arrayAccess.name(), arrayAccess.position);
         else {
             //TODO: or typesAreEqualOrCanCast?
-            if (!typesAreEqual(declaration.get().getType(), arrayAccess.getType()))
+            if (!typesAreEqual(declaration.get().getType(), getType(arrayAccess.getExpr())))
                 PrintableErrors.printTypeMismatchError(
                         declaration.get().getType(),
-                        arrayAccess.getType(),
+                        getType(arrayAccess.getExpr()),
                         arrayAccess.position);
         }
     }
@@ -328,29 +361,29 @@ public class Analysis {
     }
 
     private static Type exploreType(Expr expr) {
-        if (expr.getType().getClass().getSimpleName().equals(BinaryExpr.class.getSimpleName()))
-            return resolveType(((BinaryExpr) expr).getLeft().getType(), ((BinaryExpr) expr).getRight().getType(),
+        if (expr.getClass().getSimpleName().equals(BinaryExpr.class.getSimpleName()))
+            return resolveType(getType(((BinaryExpr) expr).getLeft()), getType(((BinaryExpr) expr).getRight()),
                     ((BinaryExpr) expr).getLeft(), ((BinaryExpr) expr).getRight());
-        else if (expr.getType().getClass().getSimpleName().equals(NewVariable.class.getSimpleName()))
+        else if (expr.getClass().getSimpleName().equals(NewVariable.class.getSimpleName()))
             return exploreType((NewVariable) expr);
-        else if (expr.getType().getClass().getSimpleName().equals(VariableReference.class.getSimpleName()))
+        else if (expr.getClass().getSimpleName().equals(VariableReference.class.getSimpleName()))
             return exploreType((VariableReference) expr);
-        else if (expr.getType().getClass().getSimpleName().equals(IntegerVar.class.getSimpleName()))
+        else if (expr.getClass().getSimpleName().equals(IntegerVar.class.getSimpleName()))
             return new Integer();
-        else if (expr.getType().getClass().getSimpleName().equals(CharVar.class.getSimpleName()))
+        else if (expr.getClass().getSimpleName().equals(CharVar.class.getSimpleName()))
             return new Char();
-        else if (expr.getType().getClass().getSimpleName().equals(DoubleVar.class.getSimpleName()))
+        else if (expr.getClass().getSimpleName().equals(DoubleVar.class.getSimpleName()))
             return new Double();
-        else if (expr.getType().getClass().getSimpleName().equals(BooleanVar.class.getSimpleName()))
+        else if (expr.getClass().getSimpleName().equals(BooleanVar.class.getSimpleName()))
             return new Boolean();
-        else if (expr.getType().getClass().getSimpleName().equals(FunCall.class.getSimpleName()))
+        else if (expr.getClass().getSimpleName().equals(FunCall.class.getSimpleName()))
             return exploreType((FunCall) expr);
-        else if (expr.getType().getClass().getSimpleName().equals(ArrayAccess.class.getSimpleName()))
+        else if (expr.getClass().getSimpleName().equals(ArrayAccess.class.getSimpleName()))
             return exploreType((ArrayAccess) expr);
-        else if (expr.getType().getClass().getSimpleName().equals(ArrTypeSizeDefVal.class.getSimpleName()))
+        else if (expr.getClass().getSimpleName().equals(ArrTypeSizeDefVal.class.getSimpleName()))
             return exploreType((ArrTypeSizeDefVal) expr);
-        else if (expr.getType().getClass().getSimpleName().equals(ReturnExpr.class.getSimpleName()))
-            return ((ReturnExpr) expr).getExpr().getType();
+        else if (expr.getClass().getSimpleName().equals(ReturnExpr.class.getSimpleName()))
+            return getType(((ReturnExpr) expr).getExpr());
         else throw new UnsupportedOperationException(expr.getClass().getCanonicalName());
 
     }
@@ -360,7 +393,7 @@ public class Analysis {
     }
 
     private static Type exploreType(ArrTypeSizeDefVal arrTypeSizeDefVal) {
-        return new Array(arrTypeSizeDefVal.getType());
+        return new Array(arrTypeSizeDefVal.getNestedType());
     }
 
     private static Type exploreType(ArrayAccess arrayAccess) {
@@ -395,18 +428,9 @@ public class Analysis {
         }
     }
 
-    private static boolean typesAreEqualOrAutoCastPossible(Type type1, Type type2) {
-        return (typesAreEqual(type1, type2)) || (isAutoCastPossible(type1, type2));
-    }
-
     private static boolean typesAreEqual(Type type1, Type type2) {
-        if (type1 != null || type2 != null) return false;
+        if (type1 == null || type2 == null) return false;
         else return (type1.getClass().getSimpleName().equals(type2.getClass().getSimpleName()));
-    }
-
-    private static boolean isAutoCastPossible(Type type1, Type type2) {
-        //TODO: write code here
-        return false;
     }
 
     private static Type AutoCastType(Type type1, Type type2) {
@@ -422,12 +446,12 @@ public class Analysis {
         return null;
     }
 
-    //TODO: check resolve methods
     private static Type resolveByInt(Type type) {
         if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return new Integer();
         if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return new Double();
         if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Integer();
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(Array.class.getSimpleName())) return null;
         return null;
     }
 
@@ -436,6 +460,7 @@ public class Analysis {
         if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return new Double();
         if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Double();
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(Array.class.getSimpleName())) return null;
         return null;
     }
 
@@ -444,6 +469,7 @@ public class Analysis {
         if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return new Double();
         if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Char();
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(Array.class.getSimpleName())) return null;
         return null;
     }
 
@@ -452,6 +478,8 @@ public class Analysis {
         if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Char();
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return new Boolean();
+        if (type.getClass().getSimpleName().equals(Array.class.getSimpleName())) return null;
+
         return null;
     }
 
@@ -470,9 +498,9 @@ public class Analysis {
                             .equals(variableReference.getName()))
                     .findFirst();
             if (forLoop.isPresent()) {
-                if (forLoop.get().getIterable().getType() instanceof Array) {//перебираемая переменная - массив?
+                if (getType(forLoop.get().getIterable()) instanceof Array) {//перебираемая переменная - массив?
                     //тип переменной - это тип элемента массива
-                    return ((Array) forLoop.get().getIterable().getType()).getType();
+                    return ((Array) getType(forLoop.get().getIterable())).getType();
                 }
             }
             //мы нашли все видимые циклы. но мы не знаем, в каком из них нужная нам переменная. ищем именно тот, в
