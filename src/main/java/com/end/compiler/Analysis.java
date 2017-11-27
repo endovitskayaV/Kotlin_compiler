@@ -13,6 +13,7 @@ public class Analysis {
     }
 
     private static void analyze(ClassDeclaration classDeclaration) {
+        //class varName dublications
         List<ClassDeclaration> classList = new ArrayList<>();
         classList.addAll(Utils.getAllVisibleNodes(classDeclaration, ClassDeclaration.class));
         if (classList.size() > 0) {
@@ -23,27 +24,31 @@ public class Analysis {
                             classDeclaration, x);
             });
         }
+
         Utils.getAllChildren(classDeclaration, FunDeclaration.class).forEach(Analysis::analyze);
     }
 
-
     private static void analyze(FunDeclaration funDeclaration) {
+        //fun dubliations
         List<FunDeclaration> funList = new ArrayList<>();
         funList.addAll(Utils.getAllVisibleNodes(funDeclaration, FunDeclaration.class));
         if (funList.size() > 0) {
             funList.remove(funDeclaration);
             funList.stream().forEach(x -> {
-                if ((x.getFunName().equals(funDeclaration.getFunName())) &&
-                        (areParamsListsEqual(funDeclaration.getFunParametersList(),x.getFunParametersList())))
+                if ((x.getFunName().getVarName().equals(funDeclaration.getFunName().getVarName())) &&
+                        (areParamsListsEqual(funDeclaration.getFunParametersList(), x.getFunParametersList())))
                     PrintableErrors.printConflict(funDeclaration.position,
                             funDeclaration, x);
             });
         }
-        Utils.getAllChildren(funDeclaration, Expression.class).stream()
-                .forEach(Analysis::analyze);
 
+        funDeclaration.getExpressionList().forEach(Analysis::analyze);
+//        Utils.getAllChildren(funDeclaration, Expression.class).stream()
+//                .forEach(Analysis::analyze);
+
+        //Type: retirnExpr and declared
         if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() != null) {
-           Type returnExpressionType = getType(funDeclaration.getReturnExpr());
+            Type returnExpressionType = getType(funDeclaration.getReturnExpr());
 //            if (returnExpressionType == null && funDeclaration.getReturnType() != null) {
 //                analyze(funDeclaration.getReturnExpr());
 //                PrintableErrors.printTypeMismatchError(
@@ -52,7 +57,7 @@ public class Analysis {
 //                        funDeclaration.getPosition());
 //            }
 //            else
-            if (returnExpressionType!=null &&
+            if (returnExpressionType != null &&
                     !typesAreEqual(funDeclaration.getReturnType(), getType(funDeclaration.getReturnExpr())))
                 PrintableErrors.printTypeMismatchError(
                         funDeclaration.getReturnType(),
@@ -85,11 +90,12 @@ public class Analysis {
     }
 
     private static void analyze(Declaration declaration) {
+        //variable was declared
         List<Declaration> declList = new ArrayList<>();
         declList.addAll(Utils.getAllVisibleNodes(declaration, Declaration.class));
         declList.remove(declaration);
         declList.stream().forEach(x -> {
-            if (x.getVariable().getName().equals(declaration.getVariable().getName()))
+            if (x.getVariable().getVarName().equals(declaration.getVariable().getVarName()))
                 PrintableErrors.printConflict(declaration.position,
                         declaration, x);
         });
@@ -106,17 +112,17 @@ public class Analysis {
 
     private static void analyze(Assignment assignment) {
         analyze(assignment.getValue());
-        //analyze(assignment.getLeft());
 
         Optional<Declaration> declaration = Utils.getAllVisibleNodes(assignment, Declaration.class).stream()
-                .filter(x -> assignment.getLeft().name().equals(x.name())).findFirst();
+                .filter(x -> ((VariableReference) assignment.getLeft()).getVarName().equals(x.getVariable().getVarName())).findFirst();
         if (!declaration.isPresent())
             PrintableErrors.printUnresolvedReferenceError(assignment.getLeft().name(), assignment.position);
-        else {
+        else { //if variable was declared check types
             Type expectedType = declaration.get().getType();
             Type actualType = getType(assignment.getValue());
 
-            //TODO: or typesAreEqualOrCanCast?
+            //именно eqals type, not castable
+            // нельзя var wrong: Double=9;
             if (!typesAreEqual(expectedType, actualType))
                 PrintableErrors.printTypeMismatchError(
                         expectedType,
@@ -129,51 +135,29 @@ public class Analysis {
         analyze(whileLoop.getCondition());
 
         Type actualType = getType(whileLoop.getCondition());
-        if (actualType != new Boolean())
-            PrintableErrors.printTypeMismatchError(new Boolean(), actualType, whileLoop.getCondition().position);
-
-        List<Expression> expressionList = new ArrayList<>();
-        expressionList.addAll(Utils.getAllChildren(whileLoop, Expression.class));
-
-        //dublictations
-        expressionList.stream().filter
-                (x -> Collections.frequency(expressionList, x) > 1)
-                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
-        expressionList.forEach(Analysis::analyze);
+        if (!typesAreEqual(actualType,new Boolean()))
+            PrintableErrors.printTypeMismatchError
+                    (new Boolean(), actualType, whileLoop.getCondition().position);
+        whileLoop.getExpressions().forEach(Analysis::analyze);
     }
 
     private static void analyze(DoWhileLoop doWhileLoop) {
         analyze(doWhileLoop.getCondition());
 
         Type actualType = getType(doWhileLoop.getCondition());
-        if (actualType != new Boolean())
-            PrintableErrors.printTypeMismatchError(new Boolean(), actualType, doWhileLoop.getCondition().position);
-
-        List<Expression> expressionList = new ArrayList<>();
-        expressionList.addAll(Utils.getAllChildren(doWhileLoop, Expression.class));
-
-        //dublictations
-        expressionList.stream().filter
-                (x -> Collections.frequency(expressionList, x) > 1)
-                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
-        expressionList.forEach(Analysis::analyze);
+        if (!typesAreEqual(actualType,new Boolean()))
+            PrintableErrors.printTypeMismatchError
+                    (new Boolean(), actualType, doWhileLoop.getCondition().position);
+        doWhileLoop.getExpressions().forEach(Analysis::analyze);
     }
 
     private static void analyze(ForLoop forLoop) {
-
         if (typesAreEqual(getType(forLoop.getIterable()), new Array()))
             PrintableErrors.printIsNotIterableError(forLoop.getIterable().position);
 
         analyze(forLoop.getIterator());
         analyze(forLoop.getIterable());
-        List<Expression> expressionList = new ArrayList<>();
-        expressionList.addAll(Utils.getAllChildren(forLoop, Expression.class));
-
-        //dublictations
-        expressionList.stream().filter
-                (x -> Collections.frequency(expressionList, x) > 1)
-                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
-        expressionList.forEach(Analysis::analyze);
+        forLoop.getExpressions().forEach(Analysis::analyze);
     }
 
     private static void analyze(IfElse ifElse) {
@@ -283,13 +267,17 @@ public class Analysis {
 
     private static void analyze(VariableReference variableReference) {
         //была ли переменная объявлена
-        if (!(Utils.getAllVisibleNodes(variableReference, NewVariable.class)
-                .stream().anyMatch(x -> (x.name()).equals(variableReference.getName()))
-                &&
+        if (!((Utils.getAllVisibleNodes(variableReference, NewVariable.class)
+                .stream().anyMatch(x -> (x.getVariable().getVarName()).equals(variableReference.getVarName()))
+                ||
                 Utils.getAllVisibleNodes(variableReference, ForLoop.class)
                         .stream().anyMatch(x ->
-                        (x.getIterator().getName()).equals(variableReference.getName()))))
-            PrintableErrors.printUnresolvedReferenceError(variableReference.getName(), variableReference.position);
+                        (x.getIterator().getVarName()).equals(variableReference.getVarName())))
+                ||
+                Utils.getAllVisibleNodes(variableReference, Declaration.class)
+                        .stream().anyMatch(x -> (x.getVariable().getVarName()).equals(variableReference.getVarName()))))
+
+            PrintableErrors.printUnresolvedReferenceError(variableReference.getVarName(), variableReference.position);
     }
 
     private static boolean paramsListsAreEqual(List<FunParameter> list1, List<Expr> list2) {
@@ -302,27 +290,16 @@ public class Analysis {
         }
         return true;
     }
+
     private static boolean areParamsListsEqual(List<FunParameter> list1, List<FunParameter> list2) {
         if (list1 == null && list2 == null) return true;
         if (list1 != null && list2 != null) {
             if (list1.size() != list2.size()) return false;
             for (int i = 0; i < list1.size(); i++) {
-                if (typesAreEqual(list1.get(i).getType(), list2.get(i).getType())) return false;
+                if (!typesAreEqual(list1.get(i).getType(), list2.get(i).getType())) return false;
             }
         } else return false;
         return true;
-    }
-
-
-    private static boolean funDeclAreEqual(FunDeclaration funDeclaration, List<FunDeclaration> list2) {
-//        if (funDeclaration == null && list2 == null) return true;
-//        if (funDeclaration != null && list2 != null) {
-//            for (int i = 0; i < list2.size(); i++) {
-//                if (typesAreEqual(funDeclaration., list2.get(i).getType())) return false;
-//            }
-//        } else return false;
-        return true;
-
     }
 
     private static void analyze(ArrayAccess arrayAccess) {
@@ -361,10 +338,14 @@ public class Analysis {
     }
 
     private static Type exploreType(Expr expr) {
-        if (expr.getClass().getSimpleName().equals(BinaryExpr.class.getSimpleName()))
-            return resolveType(getType(((BinaryExpr) expr).getLeft()), getType(((BinaryExpr) expr).getRight()),
+        if (expr.getClass().getSimpleName().equals(BinaryExpr.class.getSimpleName())) {
+            AutoCastType(getType(((BinaryExpr) expr).getLeft()), getType(((BinaryExpr) expr).getRight()));
+            if (Arrays.asList("!=", "==", ">=", "<=", ">", "<")
+                    .contains(((BinaryExpr) expr).getSign()))
+                return new Boolean();
+            else return resolveType(getType(((BinaryExpr) expr).getLeft()), getType(((BinaryExpr) expr).getRight()),
                     ((BinaryExpr) expr).getLeft(), ((BinaryExpr) expr).getRight());
-        else if (expr.getClass().getSimpleName().equals(NewVariable.class.getSimpleName()))
+        } else if (expr.getClass().getSimpleName().equals(NewVariable.class.getSimpleName()))
             return exploreType((NewVariable) expr);
         else if (expr.getClass().getSimpleName().equals(VariableReference.class.getSimpleName()))
             return exploreType((VariableReference) expr);
@@ -398,7 +379,7 @@ public class Analysis {
 
     private static Type exploreType(ArrayAccess arrayAccess) {
         Optional<Declaration> declaration = Utils.getAllVisibleNodes(arrayAccess, Declaration.class).stream()
-                .filter(x -> (x.getVariable().getName().equals(arrayAccess.getName())
+                .filter(x -> (x.getVariable().getVarName().equals(arrayAccess.getName())
                         && (typesAreEqual(x.getType(), new Array())))).findFirst();
         if (declaration.isPresent()) return declaration.get().getType();//.getNrstedType();
         return null;
@@ -488,14 +469,14 @@ public class Analysis {
     //если она используется как счетчик в for. поэтому иногда мы не найдем declaration
     private static Type exploreType(VariableReference variableReference) {
         Optional<Declaration> declaration = Utils.getAllVisibleNodes(variableReference, Declaration.class)
-                .stream().filter(decl -> decl.getVariable().getName().equals(variableReference.getName()))
+                .stream().filter(decl -> decl.getVariable().getVarName().equals(variableReference.getVarName()))
                 .findFirst();
         if (declaration.isPresent()) return declaration.get().getType();
         else {
             // нужно сначала найти нужный for
             Optional<ForLoop> forLoop = Utils.getAllVisibleNodes(variableReference, ForLoop.class)
-                    .stream().filter(x -> x.getIterator().getName()
-                            .equals(variableReference.getName()))
+                    .stream().filter(x -> x.getIterator().getVarName()
+                            .equals(variableReference.getVarName()))
                     .findFirst();
             if (forLoop.isPresent()) {
                 if (getType(forLoop.get().getIterable()) instanceof Array) {//перебираемая переменная - массив?

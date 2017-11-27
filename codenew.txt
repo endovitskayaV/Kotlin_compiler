@@ -1,6 +1,29 @@
+/*class Test{}
+class class1{
+    fun funTest():Unit{
+       var wrong: Double=9
+       wrong=8
+       c=true
+    }
+    }
+class Test{
+fun fun4() : Boolean{
+              c=9
+              a=0
+              c=9
+              a=e*7
+              return 6
+           }
+           }
 
+fun fun1():Unit{
+            var wrong: Boolean = true
+              var wrong: Boolean = false
+              val i:Int=5.6
+           return true
+           }
 
-  fun fun1() :Int
+fun fun1() :Int
     {
         return 2
     }
@@ -23,31 +46,12 @@
     fun fun1(A:Int):Int{
         return 1
     }
+    */
+    fun Test():Unit{
+     var a: Int=9;
+            while (a!=23){}
 
-
-
-
-
-
-
-
-
-
-/*class Test{}
-class Test{
-fun fun4() : Boolean{
-              c=9
-              a=0
-              c=9
-              a=e*7
-              return 6
-           }
-           }
-
-fun fun1():Unit{
-            var wrong: Boolean = true
-              var wrong: Boolean = false
-              val i:Int
-           return true
-           }
-*/
+            while(a-89){
+            b=6-5
+            }
+    }

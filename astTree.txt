@@ -1,16 +1,18 @@
  ── program
-    ├── fun fun1() :Integer
-    │   └── return type: Integer
-    │       └── 2 type: Integer
-    ├── fun fun1() :Double
-    │   └── return type: Double
-    │       └── 5.7 type: Double
-    ├── fun fun1() :Boolean
-    │   └── return type: Boolean
-    │       └── true type: Boolean
-    ├── fun fun1(s:Integer) :Boolean
-    │   └── return type: Boolean
-    │       └── true type: Boolean
-    └── fun fun1(A:Integer) :Integer
-        └── return type: Integer
-            └── 1 type: Integer
+    └── fun Test() :Unit
+        ├── =
+        │   ├── var a:Integer
+        │   └── 9 type: Integer
+        ├── while
+        │   └── != type: Boolean
+        │       ├── a type: Integer
+        │       └── 23 type: Integer
+        └── while
+            ├── - type: Integer
+            │   ├── a type: Integer
+            │   └── 89 type: Integer
+            └── =
+                ├── b
+                └── - type: Integer
+                    ├── 6 type: Integer
+                    └── 5 type: Integer

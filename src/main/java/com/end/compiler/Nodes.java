@@ -119,7 +119,7 @@ class FunDeclaration extends Node {
     }
     @Override
     public String toString(){
-        return "fun "+funName.getName()+": "+getReturnType().name();
+        return name();
 
     }
 }
@@ -292,7 +292,7 @@ class Declaration extends Expression {
 
     @Override
     public String toString(){
-        return varVal+" "+variable.getName()+":"+type.name();
+        return varVal+" "+variable.getVarName()+":"+type.name();
     }
 }
 
@@ -386,10 +386,10 @@ class NewVariable extends Expr {
 @NoArgsConstructor
 @EqualsAndHashCode
 class VariableReference extends Expr {
-    private String name;
+    private String varName;
     @Override
     public String name() {
-        return name + typeOrNull() + castToIfNeed();
+        return varName + typeOrNull() + castToIfNeed();
     }
 
     @Override
