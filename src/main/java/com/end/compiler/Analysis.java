@@ -42,9 +42,7 @@ public class Analysis {
             });
         }
 
-        funDeclaration.getExpressionList().forEach(Analysis::analyze);
-//        Utils.getAllChildren(funDeclaration, Expression.class).stream()
-//                .forEach(Analysis::analyze);
+        funDeclaration.getExpressionList().forEach(Analysis::analyze);;
 
         //Type: retirnExpr and declared
         if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() != null) {
@@ -87,6 +85,8 @@ public class Analysis {
             analyze((IfElse) expression);
         else if (expression.getClass().getSimpleName().equals(ElseBlock.class.getSimpleName()))
             analyze((ElseBlock) expression);
+        else if (expression instanceof Expr)
+            analyze((Expr) expression);
     }
 
     private static void analyze(Declaration declaration) {
@@ -152,7 +152,7 @@ public class Analysis {
     }
 
     private static void analyze(ForLoop forLoop) {
-        if (typesAreEqual(getType(forLoop.getIterable()), new Array()))
+        if (!(getType(forLoop.getIterable()) instanceof Array))
             PrintableErrors.printIsNotIterableError(forLoop.getIterable().position);
 
         analyze(forLoop.getIterator());
@@ -161,39 +161,19 @@ public class Analysis {
     }
 
     private static void analyze(IfElse ifElse) {
-
         analyze(ifElse.getCondition());
 
         Type actualType = getType(ifElse.getCondition());
-        if (actualType != new Boolean())
+        if (!typesAreEqual(actualType,new Boolean()))
             PrintableErrors.printTypeMismatchError(new Boolean(), actualType, ifElse.getCondition().position);
-
-        List<Expression> expressionList = new ArrayList<>();
-        expressionList.addAll(Utils.getAllChildren(ifElse, Expression.class));
-
-        //dublictations
-        expressionList.stream().filter
-                (x -> Collections.frequency(expressionList, x) > 1)
-                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
-        expressionList.forEach(Analysis::analyze);
 
         analyze(ifElse.getElseBlock());
 
     }
 
     private static void analyze(ElseBlock elseBlock) {
-
-        List<Expression> expressionList = new ArrayList<>();
-        expressionList.addAll(Utils.getAllChildren(elseBlock, Expression.class));
-
-        //dublictations
-        expressionList.stream().filter
-                (x -> Collections.frequency(expressionList, x) > 1)
-                .forEach(x -> PrintableErrors.printDublicatesError("expression " + x.name(), x.position));
-
-        expressionList.forEach(Analysis::analyze);
-
-
+        if (elseBlock!=null)
+        elseBlock.getExpressions().forEach(Analysis::analyze);
     }
 //----------------------------------------------------------------------------------------------------------------//
 
@@ -257,12 +237,17 @@ public class Analysis {
 
     private static void analyze(FunCall funCall) {
         //была ли вызываемая функция объявлена
-        if (Utils.getAllVisibleNodes(funCall, FunDeclaration.class)
-                .stream().noneMatch(x ->
-                {
-                    return (x.getFunName().name().equals(funCall.getName())
-                            && (paramsListsAreEqual(x.getFunParametersList(), funCall.getParameters())));
-                })) PrintableErrors.printNoSuchFunctionError(funCall, funCall.position);
+        if (!(Utils.getAllVisibleNodes(funCall, FunDeclaration.class)
+                .stream().filter(
+                        x->((x.getFunName().getVarName().equals(funCall.getName()))
+                        &&
+                                (!(paramsListsAreEqual(x.getFunParametersList(),funCall.getParameters()))))
+
+                ).findFirst().isPresent()))
+//                .stream().noneMatch(x -> (x.getFunName().name().equals(funCall.getName()))
+//                            ||
+//                        (!(paramsListsAreEqual(x.getFunParametersList(), funCall.getParameters())))))
+            PrintableErrors.printNoSuchFunctionError(funCall, funCall.position);
     }
 
     private static void analyze(VariableReference variableReference) {
@@ -285,7 +270,7 @@ public class Analysis {
         else {
             if (list1.size() != list2.size()) return false;
             for (int i = 0; i < list1.size(); i++) {
-                if (typesAreEqual(list1.get(i).getType(), list2.get(i).getType())) return false;
+                if (!typesAreEqual(list1.get(i).getType(), list2.get(i).getType())) return false;
             }
         }
         return true;
@@ -322,13 +307,13 @@ public class Analysis {
         Utils.getAllChildren(arrTypeSizeDefVal, Expr.class).forEach(Analysis::analyze);
     }
 
-    private static void analyze(ReturnExpr returnExpr) {
-        analyze(returnExpr.getExpr());
-    }
+//    private static void analyze(ReturnExpr returnExpr) {
+//        analyze(returnExpr.getExpr());
+//    }
     //----------------------------------------------------------------------------------------------------//
 
     //----------------------TYPE analysis--------------------------------------------------------------------//
-    private static Type getType(Expr expr) {
+    public static Type getType(Expr expr) {
         if (expr.getType() != null) {
             return expr.getType();
         } else {
