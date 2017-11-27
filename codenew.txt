@@ -1,4 +1,4 @@
-class Test{}
+/*class Test{}
   class class1{
       fun funTest():Unit{
          var wrong: Double=9+7.7
@@ -82,4 +82,18 @@ a=1
     funTest(we)
     a=b+funTest(we)
     fun1()
+     var arr: Array<Int> = Array<Int>(9, {1})
+      var arr1: Array<Int> = Array<Double>(9, {1})
+        arr[4]=1
+        arr[2]=1.5
     }
+
+    */
+
+
+    fun fun6():Unit{
+    var arr: Array<Int> = Array<Int>(9, {1})
+          var arr1: Array<Int> = Array<Double>(9, {1})
+            arr[4]=1
+            arr[2]=1.5
+            }

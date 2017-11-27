@@ -507,12 +507,12 @@ class FunCall extends Expr {
 @NoArgsConstructor
 @EqualsAndHashCode
 class ArrayAccess extends Expr {
-    private String name;
+    private VariableReference variableReference;
     private Expr expr;
 
     @Override
     public String name() {
-        return name + "[ ]" + typeOrNull() + castToIfNeed();
+        return variableReference + "[ ]" + typeOrNull() + castToIfNeed();
     }
 
     @Override

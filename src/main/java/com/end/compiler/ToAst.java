@@ -116,7 +116,7 @@ class ToAst {
     @NotNull
     private static Expr toAst(KParser.Array_accessContext arrayAccessContext) {
         ArrayAccess arrayAccess = new ArrayAccess(
-                arrayAccessContext.ident().getText(),
+                toAst(arrayAccessContext.ident()),
                 toAst(arrayAccessContext.expr()));
         Utils.setPosition(arrayAccess, arrayAccessContext);
         Utils.setChildrensParent(arrayAccess);
