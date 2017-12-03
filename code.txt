@@ -1,7 +1,7 @@
 class Test {
  fun test(param: Double, param2: Int): Double {
 
-    fun1(fun1(1,2,3))
+    fun1(funO(1,2,3))
     var foo: Double=2.34
     foo=2.35
      var foo1: Int=234

@@ -1,20 +1,212 @@
  ── program
-    └── fun fun6() :Unit
+    ├── class Test
+    ├── class class1
+    │   └── fun funTest() :Unit
+    │       ├── =
+    │       │   ├── var wrong:Double
+    │       │   └── + type: Double
+    │       │       ├── 9 type: Int cast to : Double
+    │       │       └── 7.7 type: Double
+    │       ├── =
+    │       │   ├── wrong type: Double
+    │       │   └── 8 type: Int
+    │       ├── =
+    │       │   ├── e
+    │       │   └── true type: Boolean
+    │       └── =
+    │           ├── var variable:Int
+    │           └── - type: Int
+    │               ├── + type: Int
+    │               │   ├── 1 type: Int
+    │               │   └── 3 type: Int
+    │               └── 0 type: Int
+    ├── class Test
+    │   └── fun fun4() :Boolean
+    │       ├── =
+    │       │   ├── c
+    │       │   └── 9 type: Int
+    │       ├── =
+    │       │   ├── a
+    │       │   └── 0 type: Int
+    │       ├── =
+    │       │   ├── c
+    │       │   └── 9 type: Int
+    │       ├── =
+    │       │   ├── a
+    │       │   └── *
+    │       │       ├── e
+    │       │       └── 7 type: Int
+    │       └── return type: Int
+    │           └── 6 type: Int
+    ├── fun fun1() :Unit
+    │   ├── =
+    │   │   ├── var wrong:Boolean
+    │   │   └── true type: Boolean
+    │   ├── =
+    │   │   ├── var wrong:Boolean
+    │   │   └── false type: Boolean
+    │   ├── =
+    │   │   ├── val i:Int
+    │   │   └── 5.6 type: Double
+    │   └── return type: Boolean
+    │       └── true type: Boolean
+    ├── fun fun1() :Int
+    │   └── return type: Int
+    │       └── 2 type: Int
+    ├── fun fun1() :Double
+    │   └── return type: Double
+    │       └── 5.7 type: Double
+    ├── fun fun1() :Boolean
+    │   └── return type: Boolean
+    │       └── true type: Boolean
+    ├── fun fun1(s:Int) :Boolean
+    │   └── return type: Boolean
+    │       └── true type: Boolean
+    ├── fun fun1(A:Int) :Int
+    │   └── return type: Int
+    │       └── 1 type: Int
+    ├── fun Test() :Unit
+    │   ├── =
+    │   │   ├── var a:Int
+    │   │   └── 9 type: Int
+    │   ├── while
+    │   │   └── != type: Boolean
+    │   │       ├── a type: Int
+    │   │       └── 23 type: Int
+    │   ├── while
+    │   │   ├── - type: Int
+    │   │   │   ├── a type: Int
+    │   │   │   └── 89 type: Int
+    │   │   └── =
+    │   │       ├── b
+    │   │       └── - type: Int
+    │   │           ├── 6 type: Int
+    │   │           └── 5 type: Int
+    │   ├── do-while
+    │   │   ├── true type: Boolean
+    │   │   └── =
+    │   │       ├── a type: Int
+    │   │       └── 12 type: Int
+    │   ├── for
+    │   │   ├── i type: Int
+    │   │   └── Array<Int> (  , {  }) type: Array<Int>
+    │   │       ├── 4 type: Int
+    │   │       └── 1 type: Int
+    │   ├── for
+    │   │   ├── i type: Int
+    │   │   ├── true type: Boolean
+    │   │   └── =
+    │   │       ├── c
+    │   │       └── 0 type: Int
+    │   ├── if
+    │   │   ├── true type: Boolean
+    │   │   └── =
+    │   │       ├── a type: Int
+    │   │       └── 1 type: Int
+    │   └── if
+    │       ├── a type: Int
+    │       ├── =
+    │       │   ├── b
+    │       │   └── 1 type: Int
+    │       └── else
+    │           └── =
+    │               ├── a
+    │               └── 1 type: Int
+    ├── fun finQ() :Unit
+    │   ├── =
+    │   │   ├── var a:Int
+    │   │   └── 9 type: Int
+    │   ├── =
+    │   │   ├── var b:Int
+    │   │   └── 5 type: Int
+    │   ├── =
+    │   │   ├── a type: Int
+    │   │   └── +
+    │   │       ├── b type: Int
+    │   │       └── funTest( )
+    │   │           └── we
+    │   ├── =
+    │   │   ├── a type: Int
+    │   │   └── - type: Double
+    │   │       ├── b type: Int cast to : Double
+    │   │       └── fun6( ) type: Double
+    │   ├── =
+    │   │   ├── var a1:Double
+    │   │   └── 9.9 type: Double
+    │   ├── =
+    │   │   ├── var b1:Double
+    │   │   └── 5.1 type: Double
+    │   ├── =
+    │   │   ├── a type: Int
+    │   │   └── * type: Double
+    │   │       ├── b1 type: Double
+    │   │       └── fun6( ) type: Double
+    │   ├── =
+    │   │   ├── a1 type: Double
+    │   │   └── - type: Double
+    │   │       ├── b1 type: Double
+    │   │       └── fun7( ) type: Int cast to : Double
+    │   ├── =
+    │   │   ├── a1 type: Double
+    │   │   └── -
+    │   │       ├── b1 type: Double
+    │   │       └── fun7( )
+    │   │           └── a type: Int
+    │   ├── =
+    │   │   ├── a1 type: Double
+    │   │   └── - type: Double
+    │   │       ├── b1 type: Double
+    │   │       └── fun8( ) type: Int cast to : Double
+    │   │           └── a type: Int
+    │   ├── =
+    │   │   ├── var arr:Array<Boolean>
+    │   │   └── Array<Boolean> (  , {  }) type: Array<Boolean>
+    │   │       ├── 9 type: Int
+    │   │       └── 1 type: Int
+    │   ├── =
+    │   │   ├── var arr1:Array<Int>
+    │   │   └── Array<Double> (  , {  }) type: Array<Double>
+    │   │       ├── 9 type: Int
+    │   │       └── 1 type: Int
+    │   ├── =
+    │   │   ├── arr3[ ]
+    │   │   │   └── 4 type: Int
+    │   │   └── 1 type: Int
+    │   ├── =
+    │   │   ├── arr[ ] type: Boolean
+    │   │   │   └── 2 type: Int
+    │   │   └── 1.5 type: Double
+    │   └── =
+    │       ├── arr[ ] type: Boolean
+    │       │   └── 3.4 type: Double
+    │       └── true type: Boolean
+    ├── fun fun6() :Double
+    │   └── return
+    │       └── noSuchFun( )
+    │           └── q
+    ├── fun fun6(a:Boolean) :Double
+    │   └── return type: Int
+    │       └── fun7( ) type: Int
+    ├── fun fun7() :Int
+    │   └── return
+    │       └── g
+    └── fun fun8(param:Int) :Int
+        ├── fun7( )
+        │   ├── 4 type: Int
+        │   ├── 5 type: Int
+        │   └── true type: Boolean
+        ├── fun8( )
+        │   └── fun7( )
+        │       └── 4 type: Int
         ├── =
-        │   ├── var arr:Array<Integer>
-        │   └── Array<Integer> (  , {  }) type: Array<Integer>
-        │       ├── 9 type: Integer
-        │       └── 1 type: Integer
+        │   ├── var arr:Array<Boolean>
+        │   └── Array<Boolean> (  , {  }) type: Array<Boolean>
+        │       ├── 9 type: Int
+        │       └── 1 type: Int
         ├── =
-        │   ├── var arr1:Array<Integer>
-        │   └── Array<Double> (  , {  }) type: Array<Double>
-        │       ├── 9 type: Integer
-        │       └── 1 type: Integer
-        ├── =
-        │   ├── VariableReference(varName=arr)[ ]
-        │   │   └── 4 type: Integer
-        │   └── 1 type: Integer
-        └── =
-            ├── VariableReference(varName=arr)[ ]
-            │   └── 2 type: Integer
-            └── 1.5 type: Double
+        │   ├── arr[ ] type: Boolean
+        │   │   └── 3 type: Int
+        │   └── true type: Boolean
+        └── return type: Boolean
+            └── arr[ ] type: Boolean
+                └── 3 type: Int

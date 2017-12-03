@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -50,6 +51,8 @@ abstract class Expr extends Expression {
         if (castTo != null) return " cast to : " + castTo.name();
         else return "";
     }
+
+    public String errorName(){return this.type.name();}
 }
 
 @Data
@@ -63,6 +66,7 @@ abstract class Type extends Node {
     public String name() {
         return getClass().getName();
     }
+    public String errorName(){return this.name();}
 }
 
 @Data
@@ -396,6 +400,11 @@ class VariableReference extends Expr {
     public List<? extends PrintableTreeNode> children() {
         return new ArrayList<>();
     }
+
+    @Override
+    public String errorName() {
+        return varName;
+    }
 }
 
 @Data
@@ -492,7 +501,6 @@ class FunCall extends Expr {
 //        }
 //            returnStr+=")";
 //        return returnStr;
-
         return name + "( )" + typeOrNull() + castToIfNeed();
     }
 
@@ -500,6 +508,18 @@ class FunCall extends Expr {
     public List<? extends PrintableTreeNode> children() {
         return parameters;
     }
+
+//    @Override
+//    public String errorName(){
+//        String returnStr=name+"(";
+//        if (this.parameters.size()>0){
+//            returnStr+=this.getParameters().stream()
+//                    .map(x->x.getType().name())
+//                    .collect(Collectors.joining(","));
+//        }
+//        returnStr+=")";
+//        return returnStr;
+//    }
 }
 
 @Data
@@ -512,7 +532,7 @@ class ArrayAccess extends Expr {
 
     @Override
     public String name() {
-        return variableReference + "[ ]" + typeOrNull() + castToIfNeed();
+        return variableReference.getVarName() + "[ ]" + typeOrNull() + castToIfNeed();
     }
 
     @Override
@@ -566,7 +586,7 @@ class ReturnExpr extends Expr {
 class Integer extends Type {
     @Override
     public String name() {
-        return "Integer";
+        return "Int";
     }
 }
 

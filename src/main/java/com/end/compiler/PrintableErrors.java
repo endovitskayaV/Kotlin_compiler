@@ -41,14 +41,13 @@ public class PrintableErrors {
     }
 
     public static void printNoSuchFunctionError(FunCall funCall, Position position) {
-        printError("Cannot find function " + funCall.getName() + "(");
-        if (funCall.getParameters() != null)
+        printError("Cannot find function " + funCall.getName()+"(");
+        if (funCall.getParameters().size()>0)
             printError(funCall.getParameters().stream()
-                    .map(x -> ((VariableReference) x).getVarName())
+                    .map(x->{if(Analysis.getType(x)!=null) return Analysis.getType(x).name(); else return "";})
                     .collect(Collectors.joining(",")));
         printlnError(") at: " + position.startLine + ": " + position.startIndexInLine);
     }
-
 
     public static void printUnresolvedReferenceError(String referenceName, Position position) {
         printlnError("Can't resolve reference " + referenceName + " at: "

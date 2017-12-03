@@ -1,4 +1,4 @@
-/*class Test{}
+class Test{}
   class class1{
       fun funTest():Unit{
          var wrong: Double=9+7.7
@@ -78,22 +78,30 @@
 fun finQ():Unit{
 var a:Int=9
 var b:Int=5
-a=1
-    funTest(we)
     a=b+funTest(we)
-    fun1()
-     var arr: Array<Int> = Array<Int>(9, {1})
-      var arr1: Array<Int> = Array<Double>(9, {1})
-        arr[4]=1
-        arr[2]=1.5
+    a=b-fun6()
+
+    var a1:Double=9.9
+    var b1:Double=5.1
+        a=b1*fun6()
+        a1=b1-fun7()
+        a1=b1-fun7(a)
+        a1=b1-fun8(a)
+
+
+     var arr: Array<Boolean> = Array<Boolean>(9, {1})
+     var arr1: Array<Int> = Array<Double>(9, {1})
+      arr3[4]=1
+      arr[2]=1.5
+      arr[3.4]=true
     }
-
-    */
-
-
-    fun fun6():Unit{
-    var arr: Array<Int> = Array<Int>(9, {1})
-          var arr1: Array<Int> = Array<Double>(9, {1})
-            arr[4]=1
-            arr[2]=1.5
-            }
+fun fun6():Double{ return noSuchFun(q)}
+fun fun6(a:Boolean):Double{ return fun7()}
+fun fun7():Int{ return g }
+fun fun8(param:Int):Int{
+  fun7(4, 5, true)
+    fun8 (fun7(4))
+     var arr: Array<Boolean> = Array<Boolean>(9, {1})
+      arr[3]=true
+    return arr[3]
+    }
