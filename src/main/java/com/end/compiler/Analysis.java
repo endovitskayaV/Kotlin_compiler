@@ -6,16 +6,21 @@ public class Analysis {
 
     //---------------------------------NODE analysis---------------------------------------//
     public static void analyze(Program program) {
-        Utils.getAllChildren(program, Expr.class).forEach(x -> x.fillType(getType(x)));
+        program.index.push(Utils.index);
+        fillIndex(program);
+        fillIndex(program);
+        Utils.getAllTargetClassChildren(program, Expr.class).forEach(x -> x.fillType(getType(x)));
 
         program.getClassDeclarationList().forEach(Analysis::analyze);
         program.getFunDeclarationList().forEach(Analysis::analyze);
     }
 
     private static void analyze(ClassDeclaration classDeclaration) {
+        fillIndex(classDeclaration);
+        classDeclaration.getClassName().index.addAll(classDeclaration.index);
         //class varName dublications
         List<ClassDeclaration> classList = new ArrayList<>();
-        classList.addAll(Utils.getAllVisibleNodes(classDeclaration, ClassDeclaration.class));
+        classList.addAll(Utils.getAllVisibleTagertClassNodes(classDeclaration, ClassDeclaration.class));
         if (classList.size() > 0) {
             classList.remove(classDeclaration);
             classList.stream().forEach(x -> {
@@ -25,16 +30,29 @@ public class Analysis {
             });
         }
 
-        Utils.getAllChildren(classDeclaration, FunDeclaration.class).forEach(Analysis::analyze);
+
+        Utils.getAllTargetClassChildren(classDeclaration, FunDeclaration.class).forEach(Analysis::analyze);
     }
 
     private static void analyze(FunDeclaration funDeclaration) {
+        fillIndex(funDeclaration);
+//        funDeclaration.getExpressionList().forEach(
+//                x->x.index.addAll(funDeclaration.index)
+//        );
+        funDeclaration.getFunParametersList().forEach(
+                x->x.index.addAll(funDeclaration.index)
+        );
+
+        funDeclaration.getFunParametersList().forEach(
+                x->x.getVariableName().index.addAll(funDeclaration.index)
+        );
+        funDeclaration.getFunName().index.addAll(funDeclaration.index);
         //fun dubliations
         List<FunDeclaration> funList = new ArrayList<>();
-        funList.addAll(Utils.getAllVisibleNodes(funDeclaration, FunDeclaration.class));
+        funList.addAll(Utils.getAllVisibleTagertClassNodes(funDeclaration, FunDeclaration.class));
         if (funList.size() > 0) {
             funList.remove(funDeclaration);
-            funList.stream().forEach(x -> {
+            funList.forEach(x -> {
                 if ((x.getFunName().getVarName().equals(funDeclaration.getFunName().getVarName())) &&
                         (areParamsListsEqual(funDeclaration.getFunParametersList(), x.getFunParametersList())))
                     PrintableErrors.printConflict(funDeclaration.position,
@@ -81,18 +99,21 @@ public class Analysis {
             analyze((DoWhileLoop) expression);
         else if (expression.getClass().getSimpleName().equals(Declaration.class.getSimpleName()))
             analyze((Declaration) expression);
-        else if (expression.getClass().getSimpleName().equals(IfElse.class.getSimpleName()))
-            analyze((IfElse) expression);
+        else if (expression.getClass().getSimpleName().equals(IfOper.class.getSimpleName()))
+            analyze((IfOper) expression);
         else if (expression.getClass().getSimpleName().equals(ElseBlock.class.getSimpleName()))
             analyze((ElseBlock) expression);
+        else if (expression.getClass().getSimpleName().equals(ThenBlock.class.getSimpleName()))
+            analyze((ThenBlock) expression);
         else if (expression instanceof Expr)
             analyze((Expr) expression);
     }
 
     private static void analyze(Declaration declaration) {
+        declaration.getVariable().index.addAll(declaration.index);
         //variable was declared
         List<Declaration> declList = new ArrayList<>();
-        declList.addAll(Utils.getAllVisibleNodes(declaration, Declaration.class));
+        declList.addAll(Utils.getAllVisibleTagertClassNodes(declaration, Declaration.class));
         declList.remove(declaration);
         declList.stream().forEach(x -> {
             if (x.getVariable().getVarName().equals(declaration.getVariable().getVarName()))
@@ -123,7 +144,7 @@ public class Analysis {
         analyze(assignment.getValue());
 
         //was variable declared
-        Optional<Declaration> declaration = Utils.getAllVisibleNodes(assignment, Declaration.class).stream()
+        Optional<Declaration> declaration = Utils.getAllVisibleTagertClassNodes(assignment, Declaration.class).stream()
                 .filter(x -> {
                     String name = "";
                     if (assignment.getLeft() instanceof VariableReference)
@@ -160,6 +181,7 @@ public class Analysis {
     }
 
     private static void analyze(WhileLoop whileLoop) {
+        fillIndex(whileLoop);
         analyze(whileLoop.getCondition());
 
         Type actualType = getType(whileLoop.getCondition());
@@ -170,6 +192,7 @@ public class Analysis {
     }
 
     private static void analyze(DoWhileLoop doWhileLoop) {
+        fillIndex(doWhileLoop);
         analyze(doWhileLoop.getCondition());
 
         Type actualType = getType(doWhileLoop.getCondition());
@@ -180,6 +203,7 @@ public class Analysis {
     }
 
     private static void analyze(ForLoop forLoop) {
+        fillIndex(forLoop);
         if (!(getType(forLoop.getIterable()) instanceof Array))
             PrintableErrors.printIsNotIterableError(forLoop.getIterable().position);
 
@@ -188,20 +212,29 @@ public class Analysis {
         forLoop.getExpressions().forEach(Analysis::analyze);
     }
 
-    private static void analyze(IfElse ifElse) {
-        analyze(ifElse.getCondition());
+    private static void analyze(IfOper ifOperBlock) {
+        fillIndex(ifOperBlock);
+        analyze(ifOperBlock.getCondition());
 
-        Type actualType = getType(ifElse.getCondition());
+        Type actualType = getType(ifOperBlock.getCondition());
         if (!typesAreEqual(actualType, new Boolean()))
-            PrintableErrors.printTypeMismatchError(new Boolean(), actualType, ifElse.getCondition().position);
+            PrintableErrors.printTypeMismatchError(new Boolean(), actualType, ifOperBlock.getCondition().position);
 
-        analyze(ifElse.getElseBlock());
+        analyze(ifOperBlock.getThenBlock());
+        analyze(ifOperBlock.getElseBlock());
 
     }
 
     private static void analyze(ElseBlock elseBlock) {
+        fillIndex(elseBlock);
         if (elseBlock != null)
             elseBlock.getExpressions().forEach(Analysis::analyze);
+    }
+
+    private static void analyze(ThenBlock thenBlock) {
+        fillIndex(thenBlock);
+        if (thenBlock != null)
+            thenBlock.getExpressions().forEach(Analysis::analyze);
     }
 //----------------------------------------------------------------------------------------------------------------//
 
@@ -256,8 +289,9 @@ public class Analysis {
     }
 
     private static void analyze(NewVariable newVariable) {
+        newVariable.getVariable().index.addAll(newVariable.index);
         //была ли такая уже
-        if (Utils.getAllVisibleNodes(newVariable, NewVariable.class)
+        if (Utils.getAllVisibleTagertClassNodes(newVariable, NewVariable.class)
                 .stream().anyMatch(x ->
                 {
                     return (x.name()).equals(newVariable.name());
@@ -267,7 +301,7 @@ public class Analysis {
 
     private static void analyze(FunCall funCall) {
         //была ли вызываемая функция объявлена
-        if (!(Utils.getAllVisibleNodes(funCall, FunDeclaration.class)
+        if (!(Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class)
                 .stream().filter(
                         x->(
                                 (x.getFunName().getVarName().equals(funCall.getName()))
@@ -280,14 +314,14 @@ public class Analysis {
 
     private static void analyze(VariableReference variableReference) {
         //была ли переменная объявлена
-        if (!((Utils.getAllVisibleNodes(variableReference, NewVariable.class)
+        if (!((Utils.getAllVisibleTagertClassNodes(variableReference, NewVariable.class)
                 .stream().anyMatch(x -> (x.getVariable().getVarName()).equals(variableReference.getVarName()))
                 ||
-                Utils.getAllVisibleNodes(variableReference, ForLoop.class)
+                Utils.getAllVisibleTagertClassNodes(variableReference, ForLoop.class)
                         .stream().anyMatch(x ->
                         (x.getIterator().getVarName()).equals(variableReference.getVarName())))
                 ||
-                Utils.getAllVisibleNodes(variableReference, Declaration.class)
+                Utils.getAllVisibleTagertClassNodes(variableReference, Declaration.class)
                         .stream().anyMatch(x -> (x.getVariable().getVarName()).equals(variableReference.getVarName()))))
 
             PrintableErrors.printUnresolvedReferenceError(variableReference.getVarName(), variableReference.position);
@@ -316,6 +350,7 @@ public class Analysis {
     }
 
     private static void analyze(ArrayAccess arrayAccess) {
+        arrayAccess.getVariableReference().index.addAll(arrayAccess.index);
         Type expectedType=new Integer();
         Type foundType=getType(arrayAccess.getExpr());
         if (!(typesAreEqual(foundType, expectedType)))
@@ -325,7 +360,7 @@ public class Analysis {
     }
 
     private static void analyze(ArrTypeSizeDefVal arrTypeSizeDefVal) {
-        Utils.getAllChildren(arrTypeSizeDefVal, Expr.class).forEach(Analysis::analyze);
+        Utils.getAllTargetClassChildren(arrTypeSizeDefVal, Expr.class).forEach(Analysis::analyze);
     }
 
     private static void analyze(ReturnExpr returnExpr) {
@@ -384,7 +419,7 @@ public class Analysis {
     }
 
     private static Type exploreType(ArrayAccess arrayAccess) {
-        Optional<Declaration> declaration = Utils.getAllVisibleNodes(arrayAccess, Declaration.class).stream()
+        Optional<Declaration> declaration = Utils.getAllVisibleTagertClassNodes(arrayAccess, Declaration.class).stream()
                 .filter(x -> (x.getVariable().getVarName().equals(arrayAccess.getVariableReference().name())
                         && (typesAreEqual(x.getType(), new Array())))).findFirst();
         if (declaration.isPresent())
@@ -394,7 +429,7 @@ public class Analysis {
 
     private static Type exploreType(FunCall funCall) {
         Optional<FunDeclaration> funDeclaration =
-                Utils.getAllVisibleNodes(funCall, FunDeclaration.class).stream()
+                Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class).stream()
                         .filter(x ->
                                 (x.getFunName().name().equals(funCall.getName())
                                         && (paramsListsAreEqual(x.getFunParametersList(), funCall.getParameters())))).
@@ -474,13 +509,13 @@ public class Analysis {
     // переменная можеть существовать без объявления
     //если она используется как счетчик в for. поэтому иногда мы не найдем declaration
     private static Type exploreType(VariableReference variableReference) {
-        Optional<Declaration> declaration = Utils.getAllVisibleNodes(variableReference, Declaration.class)
+        Optional<Declaration> declaration = Utils.getAllVisibleTagertClassNodes(variableReference, Declaration.class)
                 .stream().filter(decl -> decl.getVariable().getVarName().equals(variableReference.getVarName()))
                 .findFirst();
         if (declaration.isPresent()) return declaration.get().getType();
         else {
             // нужно сначала найти нужный for
-            Optional<ForLoop> forLoop = Utils.getAllVisibleNodes(variableReference, ForLoop.class)
+            Optional<ForLoop> forLoop = Utils.getAllVisibleTagertClassNodes(variableReference, ForLoop.class)
                     .stream().filter(x -> x.getIterator().getVarName()
                             .equals(variableReference.getVarName()))
                     .findFirst();
@@ -499,5 +534,14 @@ public class Analysis {
             // for (i in Array<Int>())
         }
         return null;
+    }
+
+    private static void fillIndex(Node parentNode){
+        List<Node> children=Utils.getAllChildren(parentNode);
+
+            children.forEach(
+                    x->x.index.push(Utils.index)
+            );
+            Utils.index++;
     }
 }

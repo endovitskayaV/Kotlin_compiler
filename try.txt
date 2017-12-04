@@ -1,0 +1,4 @@
+
+  fun funTest(a:Int):Unit{
+   var a:Int=9
+  }

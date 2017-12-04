@@ -70,8 +70,14 @@ class Test{}
         a=1}
 
         if (a){
-        b=1}
+         var a1:Double=9.9
+        if(true){
+        b-0
+        }
+        b=1
+      }
         else{
+        var a1:Double=9.9
         a=1}
 
       }

@@ -51,7 +51,7 @@ array_access: ident SBO expr SBC;
 //полноценные выражения, имеющие смысл
 expression:    assignment        #assig
              | declaration       #decl
-             | if_else           #ifElse
+             | if_else           #ifOper
              | loop              #loopExp
              | expr              #exprExp
              ;

@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import com.end.compiler.KParser;
 
+import com.end.compiler.KParser;
 import org.jetbrains.annotations.*;
 
 class ToAst {
 
     @NotNull
-    private static VariableReference toAst(KParser.IdentContext identContext) {
+    private static VariableReference toAst(com.end.compiler.KParser.IdentContext identContext) {
         VariableReference variableReference =
                 new VariableReference(identContext.getText());
         Utils.setPosition(variableReference, identContext);
@@ -228,8 +228,8 @@ class ToAst {
             return toAst(((KParser.AssigContext) expressionContext).assignment());
         else if (expressionContext instanceof KParser.DeclContext)
             return toAst(((KParser.DeclContext) expressionContext).declaration());
-        else if (expressionContext instanceof KParser.IfElseContext)
-            return toAst(((KParser.IfElseContext) expressionContext).if_else());
+        else if (expressionContext instanceof KParser.IfOperContext)
+            return toAst(((KParser.IfOperContext) expressionContext).if_else());
         else if (expressionContext instanceof KParser.ExprExpContext)
             return toAst(((KParser.ExprExpContext) expressionContext).expr());
         else if (expressionContext instanceof KParser.LoopExpContext)
@@ -262,53 +262,92 @@ class ToAst {
     @NotNull
     private static Expression toAst(KParser.If_elseContext ifElseContext) {
         if (ifElseContext.firstExpression != null && ifElseContext.secondExpression != null) {
-            IfElse ifElse = new IfElse(
+            ThenBlock thenBlock = new ThenBlock(Arrays.asList(toAst(ifElseContext.firstExpression)));
+            Utils.setPosition(thenBlock, ifElseContext);
+            Utils.setChildrensParent(thenBlock);
+
+            ElseBlock elseBlock = new ElseBlock(Arrays.asList(toAst(ifElseContext.secondExpression)));
+            Utils.setPosition(elseBlock, ifElseContext);
+            Utils.setChildrensParent(elseBlock);
+
+            IfOper anIfOper = new IfOper(
                     toAst(ifElseContext.expr()),
-                    Arrays.asList(toAst(ifElseContext.firstExpression)),
-                    new ElseBlock(Arrays.asList(toAst(ifElseContext.secondExpression))));
-            Utils.setPosition(ifElse, ifElseContext);
-            Utils.setChildrensParent(ifElse);
-            return ifElse;
+                    thenBlock,
+                    elseBlock);
+            Utils.setPosition(anIfOper, ifElseContext);
+            Utils.setChildrensParent(anIfOper);
+            return anIfOper;
         } else if (ifElseContext.firstBlock != null && ifElseContext.secondBlock != null) {
-            IfElse ifElse = new IfElse(
+            ThenBlock thenBlock = new ThenBlock(toAst(ifElseContext.firstBlock));
+            Utils.setPosition(thenBlock, ifElseContext);
+            Utils.setChildrensParent(thenBlock);
+
+            ElseBlock elseBlock = new ElseBlock(toAst(ifElseContext.secondBlock));
+            Utils.setPosition(elseBlock, ifElseContext);
+            Utils.setChildrensParent(elseBlock);
+
+            IfOper anIfOper = new IfOper(
                     toAst(ifElseContext.expr()),
-                    toAst(ifElseContext.firstBlock),
-                    new ElseBlock(toAst(ifElseContext.secondBlock)));
-            Utils.setPosition(ifElse, ifElseContext);
-            Utils.setChildrensParent(ifElse);
-            return ifElse;
+                    thenBlock,
+                    elseBlock);
+            Utils.setPosition(anIfOper, ifElseContext);
+            Utils.setChildrensParent(anIfOper);
+            return anIfOper;
         } else if (ifElseContext.firstExpression != null && ifElseContext.secondBlock != null) {
-            IfElse ifElse = new IfElse(
+            ThenBlock thenBlock = new ThenBlock(Arrays.asList(toAst(ifElseContext.firstExpression)));
+            Utils.setPosition(thenBlock, ifElseContext);
+            Utils.setChildrensParent(thenBlock);
+
+            ElseBlock elseBlock = new ElseBlock(toAst(ifElseContext.secondBlock));
+            Utils.setPosition(elseBlock, ifElseContext);
+            Utils.setChildrensParent(elseBlock);
+
+            IfOper anIfOper = new IfOper(
                     toAst(ifElseContext.expr()),
-                    Arrays.asList(toAst(ifElseContext.firstExpression)),
-                    new ElseBlock(toAst(ifElseContext.secondBlock)));
-            Utils.setPosition(ifElse, ifElseContext);
-            Utils.setChildrensParent(ifElse);
-            return ifElse;
+                    thenBlock,
+                    elseBlock);
+            Utils.setPosition(anIfOper, ifElseContext);
+            Utils.setChildrensParent(anIfOper);
+            return anIfOper;
         } else if (ifElseContext.firstBlock != null && ifElseContext.secondExpression != null) {
-            IfElse ifElse = new IfElse(
+            ThenBlock thenBlock = new ThenBlock(toAst(ifElseContext.firstBlock));
+            Utils.setPosition(thenBlock, ifElseContext);
+            Utils.setChildrensParent(thenBlock);
+
+            ElseBlock elseBlock = new ElseBlock(Arrays.asList(toAst(ifElseContext.secondExpression)));
+            Utils.setPosition(elseBlock, ifElseContext);
+            Utils.setChildrensParent(elseBlock);
+
+            IfOper anIfOper = new IfOper(
                     toAst(ifElseContext.expr()),
-                    toAst(ifElseContext.firstBlock),
-                    new ElseBlock(toAst(ifElseContext.secondBlock)));
-            Utils.setPosition(ifElse, ifElseContext);
-            Utils.setChildrensParent(ifElse);
-            return ifElse;
+                    thenBlock,
+                    elseBlock);
+            Utils.setPosition(anIfOper, ifElseContext);
+            Utils.setChildrensParent(anIfOper);
+            return anIfOper;
         } else if (ifElseContext.firstBlock != null) {//ifElseContext.secondExpression==null && secondBlock==null
-            IfElse ifElse = new IfElse(
+            ThenBlock thenBlock = new ThenBlock(toAst(ifElseContext.firstBlock));
+            Utils.setPosition(thenBlock, ifElseContext);
+            Utils.setChildrensParent(thenBlock);
+
+            IfOper anIfOper = new IfOper(
                     toAst(ifElseContext.expr()),
-                    toAst(ifElseContext.firstBlock),
+                    thenBlock,
                     null);
-            Utils.setPosition(ifElse, ifElseContext);
-            Utils.setChildrensParent(ifElse);
-            return ifElse;
+            Utils.setPosition(anIfOper, ifElseContext);
+            Utils.setChildrensParent(anIfOper);
+            return anIfOper;
         } else if (ifElseContext.firstExpression != null) {//ifElseContext.secondExpression==null && secondBlock==null
-            IfElse ifElse = new IfElse(
+            ThenBlock thenBlock = new ThenBlock(Arrays.asList(toAst(ifElseContext.firstExpression)));
+            Utils.setPosition(thenBlock, ifElseContext);
+            Utils.setChildrensParent(thenBlock);
+            IfOper anIfOper = new IfOper(
                     toAst(ifElseContext.expr()),
-                    Arrays.asList(toAst(ifElseContext.firstExpression)),
+                    thenBlock,
                     null);
-            Utils.setPosition(ifElse, ifElseContext);
-            Utils.setChildrensParent(ifElse);
-            return ifElse;
+            Utils.setPosition(anIfOper, ifElseContext);
+            Utils.setChildrensParent(anIfOper);
+            return anIfOper;
         } else throw new UnsupportedOperationException();
     }
 
@@ -443,44 +482,44 @@ class ToAst {
     @NotNull
     private static ClassDeclaration toAst(KParser.Class_declarationContext classDeclarationContext) {
         if (classDeclarationContext.class_body().declaration() != null) {
-            ClassDeclaration classDeclaration=new ClassDeclaration(
+            ClassDeclaration classDeclaration = new ClassDeclaration(
                     toAst(classDeclarationContext.ident()),
                     classDeclarationContext.class_body().fun_declaration()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()),
                     null);
             Utils.setPosition(classDeclaration, classDeclarationContext);
             Utils.setChildrensParent(classDeclaration);
-            return  classDeclaration;
+            return classDeclaration;
         } else {
-            ClassDeclaration classDeclaration=new ClassDeclaration(
+            ClassDeclaration classDeclaration = new ClassDeclaration(
                     toAst(classDeclarationContext.ident()),
                     null,
                     classDeclarationContext.class_body().declaration()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()));
             Utils.setPosition(classDeclaration, classDeclarationContext);
             Utils.setChildrensParent(classDeclaration);
-            return  classDeclaration;
+            return classDeclaration;
         }
     }
 
     @NotNull
     static Program toAst(KParser.ProgramContext programContext) {
         List<FunDeclaration> funDeclarationList = new ArrayList<>();
-        if (programContext.fun_declaration()!=null) {
+        if (programContext.fun_declaration() != null) {
             funDeclarationList.
                     addAll(programContext.fun_declaration()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()));
         }
         List<ClassDeclaration> classDeclarationList = new ArrayList<>();
-        if (programContext.class_declaration()!=null) {
+        if (programContext.class_declaration() != null) {
             classDeclarationList.
                     addAll(programContext.class_declaration()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()));
         }
 
-        Program program= new Program(classDeclarationList,funDeclarationList);
+        Program program = new Program(classDeclarationList, funDeclarationList);
         Utils.setPosition(program, programContext);
         Utils.setChildrensParent(program);
-        return  program;
+        return program;
     }
 }

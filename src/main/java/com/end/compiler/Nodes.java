@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 @Data
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 abstract class Node implements PrintableTreeNode {
     protected Node parent;
     protected Position position;
+    protected Stack<java.lang.Integer> index=new Stack<>();
 }
 
 @Data
@@ -79,7 +81,7 @@ class FunParameter extends Node {
 
     @Override
     public String name() {
-        return variableName.name() + ":" + type.name();
+        return variableName.getVarName() + ":" + type.name()+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -101,7 +103,7 @@ class FunDeclaration extends Node {
 
     @Override
     public String name() {
-        String returnStr = "fun " + funName.name() + "(";
+        String returnStr = "fun " + funName.getVarName() + "(";
         if (funParametersList.size() > 0) {
             for (Node funParam : funParametersList)
                 returnStr += funParam.name() + ", ";
@@ -110,6 +112,7 @@ class FunDeclaration extends Node {
         returnStr += ") :";
         if (returnType != null) returnStr += returnType.name();
         else returnStr += "Unit";
+        returnStr+=" index: "+Utils.stackToString(this.index);
         return returnStr;
     }
 
@@ -123,8 +126,7 @@ class FunDeclaration extends Node {
     }
     @Override
     public String toString(){
-        return name();
-
+        return  name();
     }
 }
 
@@ -140,7 +142,8 @@ class ClassDeclaration extends Node {
 
     @Override
     public String name() {
-        return "class " + className.name();
+        String i=Utils.stackToString(this.index);
+        return "class " + className.getVarName()+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -152,7 +155,7 @@ class ClassDeclaration extends Node {
     }
     @Override
     public String toString(){
-        return  name();
+        return "class " + className.getVarName() ;
     }
 }
 
@@ -167,7 +170,7 @@ class Program extends Node {
 
     @Override
     public String name() {
-        return "program";
+        return "program "+"index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -211,7 +214,7 @@ class WhileLoop extends Expression {
 
     @Override
     public String name() {
-        return "while";
+        return "while"+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -234,7 +237,7 @@ class ForLoop extends Expression {
 
     @Override
     public String name() {
-        return "for";
+        return "for"+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -257,7 +260,7 @@ class DoWhileLoop extends Expression {
 
     @Override
     public String name() {
-        return "do-while";
+        return "do-while"+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -304,21 +307,21 @@ class Declaration extends Expression {
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-class IfElse extends Expression {
+class IfOper extends Expression {
     private Expr condition;
-    private List<Expression> thenExpression;
+    private ThenBlock thenBlock;
     private ElseBlock elseBlock;
 
     @Override
     public String name() {
-        return "if";
+        return "if"+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children = new ArrayList<>();
         children.add(condition);
-        children.addAll(thenExpression);
+        children.add(thenBlock);
         if (elseBlock != null)
             children.add(elseBlock);
         return children;
@@ -334,7 +337,29 @@ class ElseBlock extends Expression {
 
     @Override
     public String name() {
-        return "else";
+        String returnStr="else ";
+        if (this!=null )returnStr+=Utils.stackToString(this.index);
+        return returnStr;
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        ArrayList<PrintableTreeNode> children = new ArrayList<>();
+        children.addAll(expressions);
+        return children;
+    }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+class ThenBlock extends Expression {
+    private List<Expression> expressions;
+
+    @Override
+    public String name() {
+        return "then index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -356,7 +381,7 @@ class BinaryExpr extends Expr {
 
     @Override
     public String name() {
-        return sign + typeOrNull() + castToIfNeed();
+        return sign + typeOrNull() + castToIfNeed()+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -376,7 +401,10 @@ class NewVariable extends Expr {
 
     @Override
     public String name() {
-        return varVal + " " + variable.name() + ":" + type.name() + typeOrNull() + castToIfNeed();
+        Stack<java.lang.Integer> st=this.index;
+        String s=Utils.stackToString(this.index);
+        return varVal + " " + variable.getVarName() + ":" + type.name() + typeOrNull() + castToIfNeed()
+        +" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -393,7 +421,8 @@ class VariableReference extends Expr {
     private String varName;
     @Override
     public String name() {
-        return varName + typeOrNull() + castToIfNeed();
+        String in=Utils.stackToString(this.index);
+        return varName + typeOrNull() + castToIfNeed()+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -416,7 +445,7 @@ class IntegerVar extends Expr {
 
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed();
+        return value + typeOrNull() + castToIfNeed()+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -434,7 +463,7 @@ class CharVar extends Expr {
 
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed();
+        return value + typeOrNull() + castToIfNeed()+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -452,7 +481,7 @@ class DoubleVar extends Expr {
 
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed();
+        return value + typeOrNull() + castToIfNeed()+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -470,7 +499,7 @@ class BooleanVar extends Expr {
 
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed();
+        return value + typeOrNull() + castToIfNeed()+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -501,7 +530,7 @@ class FunCall extends Expr {
 //        }
 //            returnStr+=")";
 //        return returnStr;
-        return name + "( )" + typeOrNull() + castToIfNeed();
+        return name + "( )" + typeOrNull() + castToIfNeed()+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -532,7 +561,8 @@ class ArrayAccess extends Expr {
 
     @Override
     public String name() {
-        return variableReference.getVarName() + "[ ]" + typeOrNull() + castToIfNeed();
+        return variableReference.getVarName() + "[ ]" + typeOrNull() + castToIfNeed()
+                +" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -553,7 +583,8 @@ class ArrTypeSizeDefVal extends Expr {
 
     @Override
     public String name() {
-        return "Array<" + nestedType.name() + "> (  " + ", {  })" + typeOrNull() + castToIfNeed();
+        return "Array<" + nestedType.name() + "> (  " + ", {  })" + typeOrNull() + castToIfNeed()
+                +" index: "+Utils.stackToString(this.index);
     }
 
     @Override
@@ -571,7 +602,7 @@ class ReturnExpr extends Expr {
 
     @Override
     public String name() {
-        return "return" + typeOrNull() + castToIfNeed();
+        return "return" + typeOrNull() + castToIfNeed()+" index: "+Utils.stackToString(this.index);
     }
 
     @Override
