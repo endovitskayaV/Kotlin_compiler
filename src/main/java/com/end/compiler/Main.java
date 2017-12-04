@@ -25,7 +25,7 @@ public class Main {
 
         CharStream stream = null;
         try {
-            stream = CharStreams.fromFileName("try.txt");
+            stream = CharStreams.fromFileName("codenew.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }

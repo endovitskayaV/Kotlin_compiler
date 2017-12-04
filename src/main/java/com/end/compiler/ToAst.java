@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.end.compiler.KParser;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.jetbrains.annotations.*;
 
 class ToAst {
@@ -168,19 +169,28 @@ class ToAst {
     private static Expression toAst(KParser.DeclarationContext declarationContext) {
         if (declarationContext.expr() != null) {
             if (declarationContext.KEYWORD_val() != null) {
-                Declaration declaration = new Declaration(
+                NewVariable newVariable=new NewVariable(
                         declarationContext.KEYWORD_val().toString(),
                         toAst(declarationContext.ident()),
-                        toAst(declarationContext.type()),
+                        toAst(declarationContext.type()));
+                Utils.setPosition(newVariable, declarationContext);
+                Utils.setChildrensParent(newVariable);
+
+                Declaration declaration = new Declaration(
+                       newVariable,
                         toAst(declarationContext.expr()));
                 Utils.setPosition(declaration, declarationContext);
                 Utils.setChildrensParent(declaration);
                 return declaration;
             } else if (declarationContext.KEYWORD_var() != null) {
-                Declaration declaration = new Declaration(
+                NewVariable newVariable=new NewVariable(
                         declarationContext.KEYWORD_var().toString(),
                         toAst(declarationContext.ident()),
-                        toAst(declarationContext.type()),
+                        toAst(declarationContext.type()));
+                Utils.setPosition(newVariable, declarationContext);
+                Utils.setChildrensParent(newVariable);
+                Declaration declaration = new Declaration(
+                        newVariable,
                         toAst(declarationContext.expr()));
                 Utils.setPosition(declaration, declarationContext);
                 Utils.setChildrensParent(declaration);

@@ -1,9 +1,226 @@
  ── program index: 0
-    └── fun funTest(a:Int index: 1.0) :Unit index: 1.0
+    ├── class Test index: 1.0
+    ├── class class1 index: 1.0
+    │   └── fun funTest() :Unit index: 2.1.0
+    │       ├── =
+    │       │   ├── var wrong:Double type: Double index: 3.2.1.0
+    │       │   └── + type: Double index: 3.2.1.0
+    │       │       ├── 9 type: Int cast to : Double index: 3.2.1.0
+    │       │       └── 7.7 type: Double index: 3.2.1.0
+    │       ├── =
+    │       │   ├── wrong type: Double index: 3.2.1.0
+    │       │   └── 8 type: Int index: 3.2.1.0
+    │       ├── =
+    │       │   ├── e index: 3.2.1.0
+    │       │   └── true type: Boolean index: 3.2.1.0
+    │       └── =
+    │           ├── var variable:Int type: Int index: 3.2.1.0
+    │           └── - type: Int index: 3.2.1.0
+    │               ├── + type: Int index: 3.2.1.0
+    │               │   ├── 1 type: Int index: 3.2.1.0
+    │               │   └── 3 type: Int index: 3.2.1.0
+    │               └── 0 type: Int index: 3.2.1.0
+    ├── class Test index: 1.0
+    │   └── fun fun4() :Boolean index: 4.1.0
+    │       ├── =
+    │       │   ├── c index: 5.4.1.0
+    │       │   └── 9 type: Int index: 5.4.1.0
+    │       ├── =
+    │       │   ├── a index: 5.4.1.0
+    │       │   └── 0 type: Int index: 5.4.1.0
+    │       ├── =
+    │       │   ├── c index: 5.4.1.0
+    │       │   └── 9 type: Int index: 5.4.1.0
+    │       ├── =
+    │       │   ├── a index: 5.4.1.0
+    │       │   └── * index: 5.4.1.0
+    │       │       ├── e index: 5.4.1.0
+    │       │       └── 7 type: Int index: 5.4.1.0
+    │       └── return type: Int index: 5.4.1.0
+    │           └── 6 type: Int index: 5.4.1.0
+    ├── fun fun1() :Unit index: 1.0
+    │   ├── =
+    │   │   ├── var wrong:Boolean type: Boolean index: 6.1.0
+    │   │   └── true type: Boolean index: 6.1.0
+    │   ├── =
+    │   │   ├── var wrong:Boolean type: Boolean index: 6.1.0
+    │   │   └── false type: Boolean index: 6.1.0
+    │   ├── =
+    │   │   ├── val i:Int type: Int index: 6.1.0
+    │   │   └── 5.6 type: Double index: 6.1.0
+    │   └── return type: Boolean index: 6.1.0
+    │       └── true type: Boolean index: 6.1.0
+    ├── fun fun1() :Int index: 1.0
+    │   └── return type: Int index: 7.1.0
+    │       └── 2 type: Int index: 7.1.0
+    ├── fun fun1() :Double index: 1.0
+    │   └── return type: Double index: 8.1.0
+    │       └── 5.7 type: Double index: 8.1.0
+    ├── fun fun1() :Boolean index: 1.0
+    │   └── return type: Boolean index: 9.1.0
+    │       └── true type: Boolean index: 9.1.0
+    ├── fun fun1(s:Int index: 1.0) :Boolean index: 1.0
+    │   └── return type: Boolean index: 10.1.0
+    │       └── true type: Boolean index: 10.1.0
+    ├── fun fun1(A:Int index: 1.0) :Int index: 1.0
+    │   └── return type: Int index: 11.1.0
+    │       └── 1 type: Int index: 11.1.0
+    ├── fun Test() :Unit index: 1.0
+    │   ├── =
+    │   │   ├── var a:Int type: Int index: 12.1.0
+    │   │   └── 9 type: Int index: 12.1.0
+    │   ├── while index: 12.1.0
+    │   │   └── != type: Boolean index: 13.12.1.0
+    │   │       ├── a type: Int index: 13.12.1.0
+    │   │       └── 23 type: Int index: 13.12.1.0
+    │   ├── while index: 12.1.0
+    │   │   ├── - type: Int index: 14.12.1.0
+    │   │   │   ├── a type: Int index: 14.12.1.0
+    │   │   │   └── 89 type: Int index: 14.12.1.0
+    │   │   └── =
+    │   │       ├── b index: 14.12.1.0
+    │   │       └── - type: Int index: 14.12.1.0
+    │   │           ├── 6 type: Int index: 14.12.1.0
+    │   │           └── 5 type: Int index: 14.12.1.0
+    │   ├── do-while index: 12.1.0
+    │   │   ├── true type: Boolean index: 15.12.1.0
+    │   │   └── =
+    │   │       ├── a type: Int index: 15.12.1.0
+    │   │       └── 12 type: Int index: 15.12.1.0
+    │   ├── for index: 12.1.0
+    │   │   ├── i type: Int index: 16.12.1.0
+    │   │   └── Array<Int> (  , {  }) type: Array<Int> index: 16.12.1.0
+    │   │       ├── 4 type: Int index: 16.12.1.0
+    │   │       └── 1 type: Int index: 16.12.1.0
+    │   ├── for index: 12.1.0
+    │   │   ├── i type: Int index: 17.12.1.0
+    │   │   ├── true type: Boolean index: 17.12.1.0
+    │   │   └── =
+    │   │       ├── c index: 17.12.1.0
+    │   │       └── 0 type: Int index: 17.12.1.0
+    │   ├── if index: 12.1.0
+    │   │   ├── true type: Boolean index: 18.12.1.0
+    │   │   └── then index: 18.12.1.0
+    │   │       └── =
+    │   │           ├── a type: Int index: 19.18.12.1.0
+    │   │           └── 1 type: Int index: 19.18.12.1.0
+    │   └── if index: 12.1.0
+    │       ├── a type: Int index: 20.12.1.0
+    │       ├── then index: 20.12.1.0
+    │       │   ├── =
+    │       │   │   ├── var a1:Double type: Double index: 21.20.12.1.0
+    │       │   │   └── 9.9 type: Double index: 21.20.12.1.0
+    │       │   ├── if index: 21.20.12.1.0
+    │       │   │   ├── true type: Boolean index: 22.21.20.12.1.0
+    │       │   │   └── then index: 22.21.20.12.1.0
+    │       │   │       └── - index: 23.22.21.20.12.1.0
+    │       │   │           ├── b index: 23.22.21.20.12.1.0
+    │       │   │           └── 0 type: Int index: 23.22.21.20.12.1.0
+    │       │   └── =
+    │       │       ├── b index: 21.20.12.1.0
+    │       │       └── 1 type: Int index: 21.20.12.1.0
+    │       └── else 20.12.1.0
+    │           ├── =
+    │           │   ├── var a1:Double type: Double index: 24.20.12.1.0
+    │           │   └── 9.9 type: Double index: 24.20.12.1.0
+    │           └── =
+    │               ├── a type: Int index: 24.20.12.1.0
+    │               └── 1 type: Int index: 24.20.12.1.0
+    ├── fun finQ() :Unit index: 1.0
+    │   ├── =
+    │   │   ├── var a:Int type: Int index: 25.1.0
+    │   │   └── 9 type: Int index: 25.1.0
+    │   ├── =
+    │   │   ├── var b:Int type: Int index: 25.1.0
+    │   │   └── 5 type: Int index: 25.1.0
+    │   ├── =
+    │   │   ├── a type: Int index: 25.1.0
+    │   │   └── + index: 25.1.0
+    │   │       ├── b type: Int index: 25.1.0
+    │   │       └── funTest( ) index: 25.1.0
+    │   │           └── we index: 25.1.0
+    │   ├── =
+    │   │   ├── a type: Int index: 25.1.0
+    │   │   └── - index: 25.1.0
+    │   │       ├── b type: Int index: 25.1.0
+    │   │       └── fun6( ) index: 25.1.0
+    │   ├── =
+    │   │   ├── var a1:Double type: Double index: 25.1.0
+    │   │   └── 9.9 type: Double index: 25.1.0
+    │   ├── =
+    │   │   ├── var b1:Double type: Double index: 25.1.0
+    │   │   └── 5.1 type: Double index: 25.1.0
+    │   ├── =
+    │   │   ├── a type: Int index: 25.1.0
+    │   │   └── * index: 25.1.0
+    │   │       ├── b1 type: Double index: 25.1.0
+    │   │       └── fun6( ) index: 25.1.0
+    │   ├── =
+    │   │   ├── a1 type: Double index: 25.1.0
+    │   │   └── - index: 25.1.0
+    │   │       ├── b1 type: Double index: 25.1.0
+    │   │       └── fun7( ) index: 25.1.0
+    │   ├── =
+    │   │   ├── a1 type: Double index: 25.1.0
+    │   │   └── - index: 25.1.0
+    │   │       ├── b1 type: Double index: 25.1.0
+    │   │       └── fun7( ) index: 25.1.0
+    │   │           └── a type: Int index: 25.1.0
+    │   ├── =
+    │   │   ├── a1 type: Double index: 25.1.0
+    │   │   └── - index: 25.1.0
+    │   │       ├── b1 type: Double index: 25.1.0
+    │   │       └── fun8( ) index: 25.1.0
+    │   │           └── a type: Int index: 25.1.0
+    │   ├── =
+    │   │   ├── var arr:Array<Boolean> type: Array<Boolean> index: 25.1.0
+    │   │   └── Array<Boolean> (  , {  }) type: Array<Boolean> index: 25.1.0
+    │   │       ├── 9 type: Int index: 25.1.0
+    │   │       └── 1 type: Int index: 25.1.0
+    │   ├── =
+    │   │   ├── var arr1:Array<Int> type: Array<Int> index: 25.1.0
+    │   │   └── Array<Double> (  , {  }) type: Array<Double> index: 25.1.0
+    │   │       ├── 9 type: Int index: 25.1.0
+    │   │       └── 1 type: Int index: 25.1.0
+    │   ├── =
+    │   │   ├── arr3[ ] index: 25.1.0
+    │   │   │   └── 4 type: Int index: 25.1.0
+    │   │   └── 1 type: Int index: 25.1.0
+    │   ├── =
+    │   │   ├── arr[ ] index: 25.1.0
+    │   │   │   └── 2 type: Int index: 25.1.0
+    │   │   └── 1.5 type: Double index: 25.1.0
+    │   └── =
+    │       ├── arr[ ] index: 25.1.0
+    │       │   └── 3.4 type: Double index: 25.1.0
+    │       └── true type: Boolean index: 25.1.0
+    ├── fun fun6() :Double index: 1.0
+    │   └── return index: 26.1.0
+    │       └── noSuchFun( ) index: 26.1.0
+    │           └── q index: 26.1.0
+    ├── fun fun6(a:Boolean index: 1.0) :Double index: 1.0
+    │   └── return index: 27.1.0
+    │       └── fun7( ) index: 27.1.0
+    ├── fun fun7() :Int index: 1.0
+    │   └── return index: 28.1.0
+    │       └── g index: 28.1.0
+    └── fun fun8(param:Int index: 1.0) :Int index: 1.0
+        ├── fun7( ) index: 29.1.0
+        │   ├── 4 type: Int index: 29.1.0
+        │   ├── 5 type: Int index: 29.1.0
+        │   └── true type: Boolean index: 29.1.0
+        ├── fun8( ) index: 29.1.0
+        │   └── fun7( ) index: 29.1.0
+        │       └── 4 type: Int index: 29.1.0
         ├── =
-        │   ├── var a:Int index: 
-        │   └── 9 type: Int index: 2.1.0
-        ├── var d:Boolean type: Boolean index: 2.1.0
-        └── =
-            ├── d index: 2.1.0
-            └── true type: Boolean index: 2.1.0
+        │   ├── var arr:Array<Boolean> type: Array<Boolean> index: 29.1.0
+        │   └── Array<Boolean> (  , {  }) type: Array<Boolean> index: 29.1.0
+        │       ├── 9 type: Int index: 29.1.0
+        │       └── 1 type: Int index: 29.1.0
+        ├── =
+        │   ├── arr[ ] index: 29.1.0
+        │   │   └── 3 type: Int index: 29.1.0
+        │   └── true type: Boolean index: 29.1.0
+        └── return index: 29.1.0
+            └── arr[ ] index: 29.1.0
+                └── 3 type: Int index: 29.1.0

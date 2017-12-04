@@ -277,9 +277,7 @@ class DoWhileLoop extends Expression {
 @NoArgsConstructor
 @EqualsAndHashCode
 class Declaration extends Expression {
-    private String varVal;
-    private VariableReference variable;
-    private Type type;
+    private NewVariable newVariable;
     private Expr expr;
 
     @Override
@@ -290,16 +288,14 @@ class Declaration extends Expression {
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children = new ArrayList<>();
-        NewVariable newVariable = new NewVariable(varVal, variable, type);
         children.add(newVariable);
-        // children.add(nestedType);
         children.add(expr);
         return children;
     }
 
     @Override
     public String toString(){
-        return varVal+" "+variable.getVarName()+":"+type.name();
+        return newVariable.toString();
     }
 }
 

@@ -1,4 +1,4 @@
-
-  fun funTest(a:Int):Unit{
-   var a:Int=9
-  }
+class Test{}
+  class class1{
+      fun funTest():Unit{}
+      }

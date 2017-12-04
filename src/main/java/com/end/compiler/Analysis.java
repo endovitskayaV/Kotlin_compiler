@@ -36,9 +36,7 @@ public class Analysis {
 
     private static void analyze(FunDeclaration funDeclaration) {
         fillIndex(funDeclaration);
-//        funDeclaration.getExpressionList().forEach(
-//                x->x.index.addAll(funDeclaration.index)
-//        );
+
         funDeclaration.getFunParametersList().forEach(
                 x->x.index.addAll(funDeclaration.index)
         );
@@ -110,13 +108,13 @@ public class Analysis {
     }
 
     private static void analyze(Declaration declaration) {
-        declaration.getVariable().index.addAll(declaration.index);
         //variable was declared
         List<Declaration> declList = new ArrayList<>();
         declList.addAll(Utils.getAllVisibleTagertClassNodes(declaration, Declaration.class));
         declList.remove(declaration);
         declList.stream().forEach(x -> {
-            if (x.getVariable().getVarName().equals(declaration.getVariable().getVarName()))
+            if (x.getNewVariable().getVariable().getVarName().equals
+                    (declaration.getNewVariable().getVariable().getVarName()))
                 PrintableErrors.printConflict(declaration.position,
                         declaration, x);
         });
@@ -124,17 +122,17 @@ public class Analysis {
         analyze(declaration.getExpr());
 
         Type foundType = getType(declaration.getExpr());
-        if (!typesAreEqual(foundType, declaration.getType()))
+        if (!typesAreEqual(foundType, declaration.getNewVariable().getType()))
             PrintableErrors.printTypeMismatchError(
-                    declaration.getType(),
+                    declaration.getNewVariable().getType(),
                     foundType,
                     declaration.position);
 
         if (declaration.getExpr() instanceof ArrTypeSizeDefVal) {
-            String expectedType = declaration.getType().name();
+            String expectedType = declaration.getNewVariable().getType().name();
             if (!(expectedType.equals(foundType.name())))
                 PrintableErrors.printTypeMismatchError(
-                        declaration.getType(),
+                        declaration.getNewVariable().getType(),
                         foundType,
                         declaration.position);
         }
@@ -150,7 +148,7 @@ public class Analysis {
                     if (assignment.getLeft() instanceof VariableReference)
                         name = ((VariableReference) assignment.getLeft()).getVarName();
                     else name = ((ArrayAccess) assignment.getLeft()).getVariableReference().getVarName();
-                    return name.equals(x.getVariable().getVarName());
+                    return name.equals(x.getNewVariable().getVariable().getVarName());
                 }).findFirst();
         if (!declaration.isPresent()) {
             String name=(assignment.getLeft() instanceof  ArrayAccess)?
@@ -172,9 +170,9 @@ public class Analysis {
             }
             //именно equals type, not castable
             // нельзя var wrong: Double=9;
-            else if (!typesAreEqual(declaration.get().getType(), getType(assignment.getValue())))
+            else if (!typesAreEqual(declaration.get().getNewVariable().getType(), getType(assignment.getValue())))
                 PrintableErrors.printTypeMismatchError(
-                        declaration.get().getType(),//expectedType
+                        declaration.get().getNewVariable().getType(),//expectedType
                         getType(assignment.getValue()),//actual type
                         assignment.position);
         }
@@ -212,6 +210,7 @@ public class Analysis {
         forLoop.getExpressions().forEach(Analysis::analyze);
     }
 
+    //TODO: find out index of if condition
     private static void analyze(IfOper ifOperBlock) {
         fillIndex(ifOperBlock);
         analyze(ifOperBlock.getCondition());
@@ -322,7 +321,7 @@ public class Analysis {
                         (x.getIterator().getVarName()).equals(variableReference.getVarName())))
                 ||
                 Utils.getAllVisibleTagertClassNodes(variableReference, Declaration.class)
-                        .stream().anyMatch(x -> (x.getVariable().getVarName()).equals(variableReference.getVarName()))))
+                        .stream().anyMatch(x -> (x.getNewVariable().getVariable().getVarName()).equals(variableReference.getVarName()))))
 
             PrintableErrors.printUnresolvedReferenceError(variableReference.getVarName(), variableReference.position);
     }
@@ -420,10 +419,10 @@ public class Analysis {
 
     private static Type exploreType(ArrayAccess arrayAccess) {
         Optional<Declaration> declaration = Utils.getAllVisibleTagertClassNodes(arrayAccess, Declaration.class).stream()
-                .filter(x -> (x.getVariable().getVarName().equals(arrayAccess.getVariableReference().name())
-                        && (typesAreEqual(x.getType(), new Array())))).findFirst();
+                .filter(x -> (x.getNewVariable().getVariable().getVarName().equals(arrayAccess.getVariableReference().name())
+                        && (typesAreEqual(x.getNewVariable().getType(), new Array())))).findFirst();
         if (declaration.isPresent())
-            return ((Array)declaration.get().getType()).getType();
+            return ((Array)declaration.get().getNewVariable().getType()).getType();
         return null;
     }
 
@@ -510,9 +509,9 @@ public class Analysis {
     //если она используется как счетчик в for. поэтому иногда мы не найдем declaration
     private static Type exploreType(VariableReference variableReference) {
         Optional<Declaration> declaration = Utils.getAllVisibleTagertClassNodes(variableReference, Declaration.class)
-                .stream().filter(decl -> decl.getVariable().getVarName().equals(variableReference.getVarName()))
+                .stream().filter(decl -> decl.getNewVariable().getVariable().getVarName().equals(variableReference.getVarName()))
                 .findFirst();
-        if (declaration.isPresent()) return declaration.get().getType();
+        if (declaration.isPresent()) return declaration.get().getNewVariable().getType();
         else {
             // нужно сначала найти нужный for
             Optional<ForLoop> forLoop = Utils.getAllVisibleTagertClassNodes(variableReference, ForLoop.class)
@@ -538,10 +537,11 @@ public class Analysis {
 
     private static void fillIndex(Node parentNode){
         List<Node> children=Utils.getAllChildren(parentNode);
-
+        if(children.size()>0) {
             children.forEach(
-                    x->x.index.push(Utils.index)
+                    x -> x.index.push(Utils.index)
             );
             Utils.index++;
+        }
     }
 }
