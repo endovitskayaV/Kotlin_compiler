@@ -105,7 +105,9 @@
     │   │           ├── a type: Int index: 19.18.12.1.0
     │   │           └── 1 type: Int index: 19.18.12.1.0
     │   └── if index: 12.1.0
-    │       ├── a type: Int index: 20.12.1.0
+    │       ├── > type: Boolean index: 20.12.1.0
+    │       │   ├── a type: Int index: 20.12.1.0
+    │       │   └── 0 type: Int index: 20.12.1.0
     │       ├── then index: 20.12.1.0
     │       │   ├── =
     │       │   │   ├── var a1:Double type: Double index: 21.20.12.1.0

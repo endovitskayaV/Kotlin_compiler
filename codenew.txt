@@ -69,7 +69,7 @@ class Test{}
         if (true){
         a=1}
 
-        if (a){
+        if (a>0){
          var a1:Double=9.9
         if(true){
         b-0
