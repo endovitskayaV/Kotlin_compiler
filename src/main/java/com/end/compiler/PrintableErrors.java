@@ -69,7 +69,8 @@ public class PrintableErrors {
     }
 
     public static void printNoReturnStatement(Position funDeclPosition) {
-        printlnError("No return statement at function at:" + funDeclPosition.startLine + ": " + funDeclPosition.startIndexInLine);
+        printlnError("No return statement at function at:" + funDeclPosition.startLine +
+                ": " + funDeclPosition.startIndexInLine);
 
     }
 

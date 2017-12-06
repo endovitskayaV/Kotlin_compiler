@@ -1,4 +1,4 @@
-class Test{}
-  class class1{
-      fun funTest():Unit{}
-      }
+ fun fun10(a:Boolean, b:Int, c:Double, e:Boolean):Unit{
+        var wrong: Double=9+7.7
+                 wrong=8-0.9
+    }

@@ -3,12 +3,11 @@ package com.end.compiler;
 import java.util.*;
 
 public class Analysis {
+    private static int index;
 
     //---------------------------------NODE analysis---------------------------------------//
     public static void analyze(Program program) {
-        program.index.push(Utils.index);
-        fillIndex(program);
-        fillIndex(program);
+
         Utils.getAllTargetClassChildren(program, Expr.class).forEach(x -> x.fillType(getType(x)));
 
         program.getClassDeclarationList().forEach(Analysis::analyze);
@@ -16,8 +15,7 @@ public class Analysis {
     }
 
     private static void analyze(ClassDeclaration classDeclaration) {
-        fillIndex(classDeclaration);
-        classDeclaration.getClassName().index.addAll(classDeclaration.index);
+
         //class varName dublications
         List<ClassDeclaration> classList = new ArrayList<>();
         classList.addAll(Utils.getAllVisibleTagertClassNodes(classDeclaration, ClassDeclaration.class));
@@ -30,21 +28,13 @@ public class Analysis {
             });
         }
 
-
         Utils.getAllTargetClassChildren(classDeclaration, FunDeclaration.class).forEach(Analysis::analyze);
     }
 
     private static void analyze(FunDeclaration funDeclaration) {
-        fillIndex(funDeclaration);
+        index=0;
+        fillIndex(funDeclaration.getFunParametersList());
 
-        funDeclaration.getFunParametersList().forEach(
-                x->x.index.addAll(funDeclaration.index)
-        );
-
-        funDeclaration.getFunParametersList().forEach(
-                x->x.getVariableName().index.addAll(funDeclaration.index)
-        );
-        funDeclaration.getFunName().index.addAll(funDeclaration.index);
         //fun dubliations
         List<FunDeclaration> funList = new ArrayList<>();
         funList.addAll(Utils.getAllVisibleTagertClassNodes(funDeclaration, FunDeclaration.class));
@@ -108,17 +98,18 @@ public class Analysis {
     }
 
     private static void analyze(Declaration declaration) {
+        fillIndex(declaration.getNewVariable().getVariable());
+
         //variable was declared
         List<Declaration> declList = new ArrayList<>();
         declList.addAll(Utils.getAllVisibleTagertClassNodes(declaration, Declaration.class));
         declList.remove(declaration);
-        declList.stream().forEach(x -> {
+        declList.forEach(x -> {
             if (x.getNewVariable().getVariable().getVarName().equals
                     (declaration.getNewVariable().getVariable().getVarName()))
-                PrintableErrors.printConflict(declaration.position,
-                        declaration, x);
+            {PrintableErrors.printConflict(declaration.position,
+                        declaration, x);}
         });
-
         analyze(declaration.getExpr());
 
         Type foundType = getType(declaration.getExpr());
@@ -139,6 +130,7 @@ public class Analysis {
     }
 
     private static void analyze(Assignment assignment) {
+        analyze(assignment.getLeft());
         analyze(assignment.getValue());
 
         //was variable declared
@@ -150,13 +142,7 @@ public class Analysis {
                     else name = ((ArrayAccess) assignment.getLeft()).getVariableReference().getVarName();
                     return name.equals(x.getNewVariable().getVariable().getVarName());
                 }).findFirst();
-        if (!declaration.isPresent()) {
-            String name=(assignment.getLeft() instanceof  ArrayAccess)?
-                    (( ArrayAccess)assignment.getLeft()).getVariableReference().name() :
-                    assignment.getLeft().name();
-            PrintableErrors.printUnresolvedReferenceError(name, assignment.position);
-        }
-        else { //if variable was declared check types
+        if (declaration.isPresent()) { //if variable was declared check types
 
             if (assignment.getLeft() instanceof ArrayAccess) {
                 analyze((ArrayAccess) assignment.getLeft());
@@ -179,7 +165,7 @@ public class Analysis {
     }
 
     private static void analyze(WhileLoop whileLoop) {
-        fillIndex(whileLoop);
+
         analyze(whileLoop.getCondition());
 
         Type actualType = getType(whileLoop.getCondition());
@@ -190,7 +176,6 @@ public class Analysis {
     }
 
     private static void analyze(DoWhileLoop doWhileLoop) {
-        fillIndex(doWhileLoop);
         analyze(doWhileLoop.getCondition());
 
         Type actualType = getType(doWhileLoop.getCondition());
@@ -201,7 +186,8 @@ public class Analysis {
     }
 
     private static void analyze(ForLoop forLoop) {
-        fillIndex(forLoop);
+       fillIndex(forLoop.getIterator());
+
         if (!(getType(forLoop.getIterable()) instanceof Array))
             PrintableErrors.printIsNotIterableError(forLoop.getIterable().position);
 
@@ -210,9 +196,7 @@ public class Analysis {
         forLoop.getExpressions().forEach(Analysis::analyze);
     }
 
-    //TODO: find out index of if condition
     private static void analyze(IfOper ifOperBlock) {
-        fillIndex(ifOperBlock);
         analyze(ifOperBlock.getCondition());
 
         Type actualType = getType(ifOperBlock.getCondition());
@@ -225,13 +209,11 @@ public class Analysis {
     }
 
     private static void analyze(ElseBlock elseBlock) {
-        fillIndex(elseBlock);
         if (elseBlock != null)
             elseBlock.getExpressions().forEach(Analysis::analyze);
     }
 
     private static void analyze(ThenBlock thenBlock) {
-        fillIndex(thenBlock);
         if (thenBlock != null)
             thenBlock.getExpressions().forEach(Analysis::analyze);
     }
@@ -253,9 +235,34 @@ public class Analysis {
             analyze((ArrTypeSizeDefVal) expr);
         else if (expr.getClass().getSimpleName().equals(ReturnExpr.class.getSimpleName()))
             analyze(((ReturnExpr) expr).getExpr());
-        //IntegerVar, BooleanVar, CharVar, DoubleVar->nothing to analyze
+        else if (expr.getClass().getSimpleName().equals(IntegerVar.class.getSimpleName()))
+            analyze(((IntegerVar) expr));
+        else if (expr.getClass().getSimpleName().equals(BooleanVar.class.getSimpleName()))
+            analyze(((BooleanVar) expr));
+        else if (expr.getClass().getSimpleName().equals(CharVar.class.getSimpleName()))
+            analyze(((CharVar) expr));
+        else if (expr.getClass().getSimpleName().equals(DoubleVar.class.getSimpleName()))
+            analyze(((DoubleVar) expr));
     }
 
+    private static void analyze (DoubleVar doubleVar){
+        doubleVar.fillIndex(doubleVar.getValue());
+    }
+
+    private static void analyze (CharVar charVar){
+        charVar.fillIndex(java.lang.Integer.toString
+                (((int) charVar.getValue().charAt(0))));
+    }
+
+    private static void analyze (IntegerVar integerVar){
+        integerVar.fillIndex(integerVar.getValue());
+    }
+
+    private static void analyze (BooleanVar booleanVar){
+        if (booleanVar.getValue().equals("true")) booleanVar.fillIndex("1");
+        else if (booleanVar.getValue().equals("false")) booleanVar.fillIndex("0");
+        else throw new UnsupportedOperationException();
+    }
     private static void analyze(BinaryExpr binaryExpr) {
         analyze(binaryExpr.getLeft());
         analyze(binaryExpr.getRight());
@@ -288,9 +295,11 @@ public class Analysis {
     }
 
     private static void analyze(NewVariable newVariable) {
-        newVariable.getVariable().index.addAll(newVariable.index);
+        fillIndex(newVariable.getVariable());
+        List<NewVariable> newVariableList=Utils.getAllVisibleTagertClassNodes(newVariable, NewVariable.class);
+        if (newVariableList.size()>0) newVariableList.remove(newVariable);
         //была ли такая уже
-        if (Utils.getAllVisibleTagertClassNodes(newVariable, NewVariable.class)
+        if (newVariableList
                 .stream().anyMatch(x ->
                 {
                     return (x.name()).equals(newVariable.name());
@@ -312,7 +321,7 @@ public class Analysis {
     }
 
     private static void analyze(VariableReference variableReference) {
-        //была ли переменная объявлена
+        //была ли переменная объявлена (if not then Error)
         if (!((Utils.getAllVisibleTagertClassNodes(variableReference, NewVariable.class)
                 .stream().anyMatch(x -> (x.getVariable().getVarName()).equals(variableReference.getVarName()))
                 ||
@@ -324,6 +333,31 @@ public class Analysis {
                         .stream().anyMatch(x -> (x.getNewVariable().getVariable().getVarName()).equals(variableReference.getVarName()))))
 
             PrintableErrors.printUnresolvedReferenceError(variableReference.getVarName(), variableReference.position);
+
+        else {
+           Optional<NewVariable> newVariable=
+                   Utils.getAllVisibleTagertClassNodes(variableReference, NewVariable.class)
+                    .stream().filter((x -> (x.getVariable().getVarName()).equals(variableReference.getVarName())))
+                    .findFirst();
+           if(newVariable.isPresent()) variableReference.fillIndex(newVariable.get().getVariable().getIndex());
+
+            Optional<ForLoop> forLoop=
+                    Utils.getAllVisibleTagertClassNodes(variableReference, ForLoop.class)
+                            .stream().filter
+                                    (x -> (x.getIterator().getVarName().equals(variableReference.getVarName())))
+                            .findFirst();
+            if(forLoop.isPresent()) variableReference.fillIndex(forLoop.get().getIterator().getIndex());
+            Optional<Declaration> declaration=
+                    Utils.getAllVisibleTagertClassNodes(variableReference, Declaration.class)
+                            .stream().filter(
+                                    (x -> (x.getNewVariable().getVariable().getVarName()).
+                                            equals(variableReference.getVarName())))
+                            .findFirst();
+
+            if(declaration.isPresent()) variableReference.fillIndex(
+                    declaration.get().getNewVariable().getVariable().getIndex());
+
+        }
     }
 
     private static boolean paramsListsAreEqual(List<FunParameter> list1, List<Expr> list2) {
@@ -349,12 +383,12 @@ public class Analysis {
     }
 
     private static void analyze(ArrayAccess arrayAccess) {
-        arrayAccess.getVariableReference().index.addAll(arrayAccess.index);
         Type expectedType=new Integer();
         Type foundType=getType(arrayAccess.getExpr());
         if (!(typesAreEqual(foundType, expectedType)))
             PrintableErrors.printTypeMismatchError(expectedType, foundType,arrayAccess.getExpr().getPosition());
 
+        analyze(arrayAccess.getVariableReference());
         analyze(arrayAccess.getExpr());
     }
 
@@ -419,7 +453,7 @@ public class Analysis {
 
     private static Type exploreType(ArrayAccess arrayAccess) {
         Optional<Declaration> declaration = Utils.getAllVisibleTagertClassNodes(arrayAccess, Declaration.class).stream()
-                .filter(x -> (x.getNewVariable().getVariable().getVarName().equals(arrayAccess.getVariableReference().name())
+                .filter(x -> (x.getNewVariable().getVariable().getVarName().equals(arrayAccess.getVariableReference().getVarName())
                         && (typesAreEqual(x.getNewVariable().getType(), new Array())))).findFirst();
         if (declaration.isPresent())
             return ((Array)declaration.get().getNewVariable().getType()).getType();
@@ -535,13 +569,17 @@ public class Analysis {
         return null;
     }
 
-    private static void fillIndex(Node parentNode){
-        List<Node> children=Utils.getAllChildren(parentNode);
-        if(children.size()>0) {
-            children.forEach(
-                    x -> x.index.push(Utils.index)
-            );
-            Utils.index++;
+
+    private static void fillIndex(List<FunParameter> funParameters){
+        int i=0;
+        for (FunParameter funParameter:funParameters) {
+            funParameter.getVariable().fillIndex(java.lang.Integer.toString(i));
+            i++;
         }
+    }
+
+    private  static <T extends Indexable> void fillIndex(T indexableNode){
+        indexableNode.fillIndex(java.lang.Integer.toString(index));
+        index++;
     }
 }

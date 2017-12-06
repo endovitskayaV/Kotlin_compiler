@@ -58,7 +58,7 @@ class Test{}
 
   do{a=12}
   while (true)
-  for (i in Array<Int>(4, {1})) {
+  for (i in Array<Int>(4)) {
 
               }
 
@@ -95,8 +95,8 @@ var b:Int=5
         a1=b1-fun8(a)
 
 
-     var arr: Array<Boolean> = Array<Boolean>(9, {1})
-     var arr1: Array<Int> = Array<Double>(9, {1})
+     var arr: Array<Boolean> = Array<Boolean>(9)
+     var arr1: Array<Int> = Array<Double>(9)
       arr3[4]=1
       arr[2]=1.5
       arr[3.4]=true
@@ -107,7 +107,10 @@ fun fun7():Int{ return g }
 fun fun8(param:Int):Int{
   fun7(4, 5, true)
     fun8 (fun7(4))
-     var arr: Array<Boolean> = Array<Boolean>(9, {1})
+     var arr: Array<Boolean> = Array<Boolean>(9)
       arr[3]=true
     return arr[3]
+    }
+    fun fun10(a:Boolean, b:Int, c:Double, e:Boolean):Unit{
+    var d:Int;
     }

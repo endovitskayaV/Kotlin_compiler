@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.end.compiler.KParser;
 import com.sun.org.apache.bcel.internal.generic.NEW;
+import com.sun.org.apache.xpath.internal.operations.Variable;
 import org.jetbrains.annotations.*;
 
 class ToAst {
@@ -116,8 +117,12 @@ class ToAst {
 
     @NotNull
     private static Expr toAst(KParser.Array_accessContext arrayAccessContext) {
+//        VariableReference variableReference=new VariableReference(.getText());
+//        Utils.setPosition(variableReference, arrayAccessContext);
+//        Utils.setChildrensParent(variableReference);
+
         ArrayAccess arrayAccess = new ArrayAccess(
-                toAst(arrayAccessContext.ident()),
+               toAst(arrayAccessContext.ident()),
                 toAst(arrayAccessContext.expr()));
         Utils.setPosition(arrayAccess, arrayAccessContext);
         Utils.setChildrensParent(arrayAccess);
@@ -128,7 +133,7 @@ class ToAst {
     private static Expr toAst(KParser.Arr_type_size_def_valContext arrTypeSizeDefValContext) {
         ArrTypeSizeDefVal arrTypeSizeDefVal = new ArrTypeSizeDefVal(
                 toAst(arrTypeSizeDefValContext.type()),
-                arrTypeSizeDefValContext.expr().stream().map(ToAst::toAst).collect(Collectors.toList()));
+               toAst(arrTypeSizeDefValContext.expr())); //.stream().map(ToAst::toAst).collect(Collectors.toList()));
         Utils.setPosition(arrTypeSizeDefVal, arrTypeSizeDefValContext);
         Utils.setChildrensParent(arrTypeSizeDefVal);
         return arrTypeSizeDefVal;

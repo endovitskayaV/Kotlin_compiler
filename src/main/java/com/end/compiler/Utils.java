@@ -11,15 +11,10 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class Utils {
-    public static int index = 0;
+
 
     public static void setChildrensParent(Node node) {
-        List<? extends PrintableTreeNode> b=node.children();
-        if(node!=null && node.children()!=null && node.children().size()>0) {
-            //((Node) node.children().get(0)).setParent(node);
-            node.children().forEach(x ->{if (x!=null)
-                    ((Node) x).setParent(node);});
-        }
+       node.children().forEach(x -> ((Node) x).setParent(node));
     }
 
     public static Node getClosestParent(Node node) {
@@ -90,17 +85,4 @@ public class Utils {
     }
 
 
-    public static String stackToString(Stack<Integer> stack1) {
-        String targetStr = "";
-        if (stack1!= null) {
-        Stack<Integer> stack=new Stack<>();
-        stack.addAll(stack1);
-            while (!stack.empty()) {
-                targetStr += stack.pop().toString()+".";
-            }
-        }
-
-        if (targetStr.length()>1) targetStr=targetStr.substring(0, targetStr.length()-1);
-        return targetStr;
-    }
 }

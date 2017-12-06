@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.Tree;
+
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import javax.swing.JFrame;
@@ -23,6 +24,7 @@ public class Main {
 
     public static void main(String[] args) {
 
+        //read code from file
         CharStream stream = null;
         try {
             stream = CharStreams.fromFileName("codenew.txt");
@@ -35,26 +37,37 @@ public class Main {
         KParser kParser = new KParser(tokenStream);
         Tree tree = kParser.program();
 
-        showSyntaxTree(tree,kParser);
+        //showSyntaxTree(tree, kParser);
 
-        Program astTree = ToAst.toAst((KParser.ProgramContext) tree);
+        //build astTree (root=program)
+        Program program = ToAst.toAst((KParser.ProgramContext) tree);
 
-         Analysis.analyze(astTree);
+        //analyze tree(recursively, start from root)
+        Analysis.analyze(program);
 
-        String outputStr=TreePrinter.toString(astTree);
+        //if no errors -> generate code
+        if (!PrintableErrors.isErrorOccurred()) {
+            String byteCode = CodeGenerator.generateCode(program);
+            String byteCodeFileName = "bytecode.txt";
+            printInFile(byteCodeFileName, byteCode);
+            System.out.println("Printed in " + byteCodeFileName + ":\n" + byteCode);
+        } else System.out.println("\nCannot generate code. Error(s) occurred\n");
 
-        String fileName="astTree.txt";
-        try(PrintWriter printWriter=new PrintWriter(fileName)) {
+        String astTreeStr = TreePrinter.toString(program);
+        String astTreeFileName = "astTree.txt";
+        printInFile(astTreeFileName, astTreeStr);
+        System.out.println("Printed in " + astTreeFileName + ":\n" + astTreeStr);
+    }
+
+    private static void printInFile(String fileName, String outputStr) {
+        try (PrintWriter printWriter = new PrintWriter(fileName)) {
             printWriter.write(outputStr);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
-        System.out.println("Printed in " + fileName + ":\n" + outputStr);
-
     }
 
-    private static  void showSyntaxTree(Tree tree, KParser kParser){
+    private static void showSyntaxTree(Tree tree, KParser kParser) {
         JFrame frame = new JFrame("Syntax tree");
         TreeViewer treeViewer = new TreeViewer(Arrays.asList(kParser.getRuleNames()), tree);
         treeViewer.setScale(1.5);
