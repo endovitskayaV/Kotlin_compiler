@@ -21,14 +21,14 @@ abstract class Node implements PrintableTreeNode {
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 abstract class Expression extends Node {
 }
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 abstract class Expr extends Expression {
     private Type castTo;
     private Type type;
@@ -51,12 +51,12 @@ abstract class Expr extends Expression {
         else return "";
     }
 
-   // public String errorName(){return this.type.name();}
+    // public String errorName(){return this.type.name();}
 }
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 abstract class Type extends Node {
     public List<PrintableTreeNode> children() {
         return new ArrayList<>();
@@ -68,25 +68,28 @@ abstract class Type extends Node {
     //public String errorName(){return this.name();}
 }
 
-interface Indexable{
+interface Indexable {
     void fillIndex(String index);
+
     String indexStr();
 
 }
+
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode
-class FunParameter extends Expr{
+@EqualsAndHashCode(callSuper=true)
+class FunParameter extends Expr {
     private VariableReference variable;
     private Type type;
 
-    public FunParameter(VariableReference variable, Type type){
+    public FunParameter(VariableReference variable, Type type) {
         setVariable(variable);
         setType(type);
     }
+
     @Override
     public String name() {
-        return variable.getVarName() + ":" + type.name()+variable.indexStr();
+        return variable.getVarName() + ":" + type.name() + variable.indexStr();
     }
 
     @Override
@@ -100,7 +103,7 @@ class FunParameter extends Expr{
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class FunDeclaration extends Node {
     private VariableReference funName;
     private Type returnType;
@@ -130,8 +133,9 @@ class FunDeclaration extends Node {
             children.add(returnExpr);
         return children;
     }
+
     @Override
-    public String toString(){
+    public String toString() {
         String returnStr = "fun " + funName.getVarName() + "(";
         if (funParametersList.size() > 0) {
             for (FunParameter funParam : funParametersList)
@@ -148,7 +152,7 @@ class FunDeclaration extends Node {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class ClassDeclaration extends Node {
 
     private VariableReference className;
@@ -157,7 +161,7 @@ class ClassDeclaration extends Node {
 
     @Override
     public String name() {
-        return "class " ;
+        return "class ";
     }
 
     @Override
@@ -167,16 +171,17 @@ class ClassDeclaration extends Node {
         if (funDeclarations != null) children.addAll(funDeclarations);
         return children;
     }
+
     @Override
-    public String toString(){
-        return "class " + className.getVarName() ;
+    public String toString() {
+        return "class " + className.getVarName();
     }
 }
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class Program extends Node {
 
     private List<ClassDeclaration> classDeclarationList;
@@ -199,7 +204,7 @@ class Program extends Node {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class Assignment extends Expression {
     private Expr left;
     private Expr value;
@@ -221,7 +226,7 @@ class Assignment extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class WhileLoop extends Expression {
     private Expr condition;
     private List<Expression> expressions;
@@ -243,7 +248,7 @@ class WhileLoop extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class ForLoop extends Expression {
     private VariableReference iterator;
     private Expr iterable;
@@ -267,7 +272,7 @@ class ForLoop extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class DoWhileLoop extends Expression {
     private Expr condition;
     private List<Expression> expressions;
@@ -289,7 +294,7 @@ class DoWhileLoop extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class Declaration extends Expression {
     private NewVariable newVariable;
     private Expr expr;
@@ -303,12 +308,12 @@ class Declaration extends Expression {
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children = new ArrayList<>();
         children.add(newVariable);
-        children.add(expr);
+        if (expr != null) children.add(expr);
         return children;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return newVariable.toString();
     }
 }
@@ -316,7 +321,7 @@ class Declaration extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class IfOper extends Expression {
     private Expr condition;
     private ThenBlock thenBlock;
@@ -341,7 +346,7 @@ class IfOper extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class ElseBlock extends Expression {
     private List<Expression> expressions;
 
@@ -361,7 +366,7 @@ class ElseBlock extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class ThenBlock extends Expression {
     private List<Expression> expressions;
 
@@ -381,7 +386,7 @@ class ThenBlock extends Expression {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class BinaryExpr extends Expr {
     private Expr left;
     private Expr right;
@@ -401,7 +406,7 @@ class BinaryExpr extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class NewVariable extends Expr {
     private String varVal;
     private VariableReference variable;
@@ -410,7 +415,7 @@ class NewVariable extends Expr {
     @Override
     public String name() {
         return varVal + " " + variable.getVarName() + typeOrNull() + castToIfNeed()
-        +variable.indexStr();
+                + variable.indexStr();
     }
 
     @Override
@@ -419,24 +424,25 @@ class NewVariable extends Expr {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return variable.getVarName();
     }
 }
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class VariableReference extends Expr implements Indexable {
     private String varName;
-    private String index="-1";
+    private String index = "-1";
 
-    public VariableReference(String varName){
+    public VariableReference(String varName) {
         setVarName(varName);
     }
+
     @Override
     public String name() {
-        return varName + typeOrNull() + castToIfNeed()+indexStr();
+        return varName + typeOrNull() + castToIfNeed() + indexStr();
     }
 
     @Override
@@ -446,12 +452,12 @@ class VariableReference extends Expr implements Indexable {
 
     @Override
     public void fillIndex(String index) {
-        this.index=index;
+        this.index = index;
     }
 
     @Override
     public String indexStr() {
-        return " index:"+index;
+        return " index:" + index;
     }
 
 //    @Override
@@ -462,31 +468,33 @@ class VariableReference extends Expr implements Indexable {
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode
-class IntegerVar extends Expr implements Indexable{
+@EqualsAndHashCode(callSuper=true)
+class IntegerVar extends Expr implements Indexable {
     private String value;
     private String index;
 
-    public IntegerVar(String value){
+    public IntegerVar(String value) {
         setValue(value);
     }
+
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed()+" const "+indexStr();
+        return value + typeOrNull() + castToIfNeed() + " const " + indexStr();
     }
 
     @Override
     public List<? extends PrintableTreeNode> children() {
         return new ArrayList<>();
     }
+
     @Override
     public void fillIndex(String index) {
-        this.index=index;
+        this.index = index;
     }
 
     @Override
     public String indexStr() {
-        return " index:"+index;
+        return " index:" + index;
     }
 
 
@@ -494,18 +502,18 @@ class IntegerVar extends Expr implements Indexable{
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class CharVar extends Expr implements Indexable {
     private String value;
-    private String index="-1";
+    private String index = "-1";
 
-    public CharVar(String value){
+    public CharVar(String value) {
         setValue(value);
     }
 
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed()+" const "+indexStr();
+        return value + typeOrNull() + castToIfNeed() + " const " + indexStr();
     }
 
     @Override
@@ -515,60 +523,62 @@ class CharVar extends Expr implements Indexable {
 
     @Override
     public void fillIndex(String index) {
-        this.index=index;
+        this.index = index;
     }
 
     @Override
     public String indexStr() {
-        return " index:"+index;
+        return " index:" + index;
     }
 }
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class DoubleVar extends Expr implements Indexable {
     private String value;
-    private String index="-1";
+    private String index = "-1";
 
-    public DoubleVar(String value){
+    public DoubleVar(String value) {
         setValue(value);
     }
+
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed()+" const "+indexStr();
+        return value + typeOrNull() + castToIfNeed() + " const " + indexStr();
     }
 
     @Override
     public List<? extends PrintableTreeNode> children() {
         return new ArrayList<>();
     }
+
     @Override
     public void fillIndex(String index) {
-        this.index=index;
+        this.index = index;
     }
 
     @Override
     public String indexStr() {
-        return " index:"+index;
+        return " index:" + index;
     }
 }
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode
-class BooleanVar extends Expr implements Indexable{
+@EqualsAndHashCode(callSuper=true)
+class BooleanVar extends Expr implements Indexable {
     private String value;
-    private String index="-1";
+    private String index = "-1";
 
-    public BooleanVar(String value){
+    public BooleanVar(String value) {
         setValue(value);
     }
 
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed()+" const "+indexStr();
+        return value + typeOrNull() + castToIfNeed() + " const " + indexStr();
     }
 
     @Override
@@ -578,19 +588,19 @@ class BooleanVar extends Expr implements Indexable{
 
     @Override
     public void fillIndex(String index) {
-        this.index=index;
+        this.index = index;
     }
 
     @Override
     public String indexStr() {
-        return " index:"+index;
+        return " index:" + index;
     }
 }
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class FunCall extends Expr {
     private String name;
     private List<Expr> parameters;
@@ -633,7 +643,7 @@ class FunCall extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class ArrayAccess extends Expr {
     private VariableReference variableReference;
     private Expr expr;
@@ -652,21 +662,20 @@ class ArrayAccess extends Expr {
     }
 
 
-
 }
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
-class ArrTypeSizeDefVal extends Expr {
+@EqualsAndHashCode(callSuper=true)
+class ArrayInitailization extends Expr {
     private Type nestedType;
     //private List<Expr> exprList;
     private Expr expr;
 
     @Override
     public String name() {
-        return  typeOrNull() + castToIfNeed();
+        return typeOrNull() + castToIfNeed();
     }
 
     @Override
@@ -680,7 +689,7 @@ class ArrTypeSizeDefVal extends Expr {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class ReturnExpr extends Expr {
     private Expr expr;
 
@@ -734,7 +743,7 @@ class Char extends Type {
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper=true)
 class Array extends Type {
     private Type type;
 

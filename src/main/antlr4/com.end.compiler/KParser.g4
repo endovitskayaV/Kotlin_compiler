@@ -28,7 +28,7 @@ variable:
 expr: RBO+ expr RBC+            #parenExpr
      | fun_call                 #funcCall
      | variable                 #var
-     | arr_type_size_def_val    #arrTypeSizeDefVal
+     | array_initialization    #arrayInitailization
      | array_access             #arrayAccess
      |  left=expr operator=(MUL|DIV) right=expr     #binaryExpr
      | left=expr operator=(ADD|SUB) right=expr      #binaryExpr
@@ -45,7 +45,7 @@ type: KEYWORD_int               #intType
 declaration: (KEYWORD_val|KEYWORD_var) ident COLON type  (ASSIGN expr)?;
 assignment: (ident| array_access) ASSIGN expr;
 
-arr_type_size_def_val: KEYWORD_array '<'type'>' RBO expr /*COMMA CBO expr CBC*/ RBC;
+array_initialization: KEYWORD_array '<'type'>' RBO expr /*COMMA CBO expr CBC*/ RBC;
 array_access: ident SBO expr SBC;
 
 //полноценные выражения, имеющие смысл

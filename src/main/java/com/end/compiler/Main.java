@@ -14,10 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import javax.swing.JFrame;
 import java.io.IOException;
-import java.lang.Integer;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 
 public class Main {
@@ -25,14 +22,14 @@ public class Main {
     public static void main(String[] args) {
 
         //read code from file
-        CharStream stream = null;
+        CharStream charStream = null;
         try {
-            stream = CharStreams.fromFileName("codenew.txt");
+            charStream = CharStreams.fromFileName("codenew.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        KLexer kLexer = new KLexer(stream);
+        KLexer kLexer = new KLexer(charStream);
         TokenStream tokenStream = new CommonTokenStream(kLexer);
         KParser kParser = new KParser(tokenStream);
         Tree tree = kParser.program();

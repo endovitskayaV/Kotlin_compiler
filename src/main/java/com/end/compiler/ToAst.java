@@ -5,9 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.end.compiler.KParser;
-import com.sun.org.apache.bcel.internal.generic.NEW;
-import com.sun.org.apache.xpath.internal.operations.Variable;
 import org.jetbrains.annotations.*;
 
 class ToAst {
@@ -23,13 +20,13 @@ class ToAst {
 
     @NotNull
     @Contract("null -> fail")
-    private static Expr toAst(KParser.NumberContext numberContext) {
-        if (numberContext instanceof KParser.IntegerLitContext) {
+    private static Expr toAst(com.end.compiler.KParser.NumberContext numberContext) {
+        if (numberContext instanceof com.end.compiler.KParser.IntegerLitContext) {
             IntegerVar integerVar = new IntegerVar(numberContext.getText());
             Utils.setPosition(integerVar, numberContext);
             Utils.setChildrensParent(integerVar);
             return integerVar;
-        } else if (numberContext instanceof KParser.DoubleLitContext) {
+        } else if (numberContext instanceof com.end.compiler.KParser.DoubleLitContext) {
             DoubleVar doubleVar = new DoubleVar(numberContext.getText());
             Utils.setPosition(doubleVar, numberContext);
             Utils.setChildrensParent(doubleVar);
@@ -38,7 +35,7 @@ class ToAst {
     }
 
     @NotNull
-    private static Expr toAst(KParser.Char_varContext charVarContext) {
+    private static Expr toAst(com.end.compiler.KParser.Char_varContext charVarContext) {
         CharVar charVar = new CharVar(charVarContext.getText());
         Utils.setPosition(charVar, charVarContext);
         Utils.setChildrensParent(charVar);
@@ -46,7 +43,7 @@ class ToAst {
     }
 
     @NotNull
-    private static Expr toAst(KParser.Boolean_varContext booleanVarContext) {
+    private static Expr toAst(com.end.compiler.KParser.Boolean_varContext booleanVarContext) {
         BooleanVar booleanVar = new BooleanVar(booleanVarContext.getText());
         Utils.setPosition(booleanVar, booleanVarContext);
         Utils.setChildrensParent(booleanVar);
@@ -55,51 +52,51 @@ class ToAst {
 
     @NotNull
     @Contract("null -> fail")
-    private static Expr toAst(KParser.Concrete_varContext concreteVarContext) {
-        if (concreteVarContext instanceof KParser.NumberLitContext)
-            return toAst(((KParser.NumberLitContext) concreteVarContext).number());
-        else if (concreteVarContext instanceof KParser.BooleanLitContext)
-            return toAst(((KParser.BooleanLitContext) concreteVarContext).boolean_var());
-        else if (concreteVarContext instanceof KParser.CharLitContext)
-            return toAst(((KParser.CharLitContext) concreteVarContext).char_var());
+    private static Expr toAst(com.end.compiler.KParser.Concrete_varContext concreteVarContext) {
+        if (concreteVarContext instanceof com.end.compiler.KParser.NumberLitContext)
+            return toAst(((com.end.compiler.KParser.NumberLitContext) concreteVarContext).number());
+        else if (concreteVarContext instanceof com.end.compiler.KParser.BooleanLitContext)
+            return toAst(((com.end.compiler.KParser.BooleanLitContext) concreteVarContext).boolean_var());
+        else if (concreteVarContext instanceof com.end.compiler.KParser.CharLitContext)
+            return toAst(((com.end.compiler.KParser.CharLitContext) concreteVarContext).char_var());
         else throw new UnsupportedOperationException();
     }
 
     @NotNull
     @Contract("null -> fail")
-    private static Expr toAst(KParser.VariableContext variableContext) {
-        if (variableContext instanceof KParser.ConcreteVariableContext)
-            return toAst(((KParser.ConcreteVariableContext) variableContext).concrete_var());
-        else if (variableContext instanceof KParser.IdentifierContext)
-            return toAst(((KParser.IdentifierContext) variableContext).ident());
+    private static Expr toAst(com.end.compiler.KParser.VariableContext variableContext) {
+        if (variableContext instanceof com.end.compiler.KParser.ConcreteVariableContext)
+            return toAst(((com.end.compiler.KParser.ConcreteVariableContext) variableContext).concrete_var());
+        else if (variableContext instanceof com.end.compiler.KParser.IdentifierContext)
+            return toAst(((com.end.compiler.KParser.IdentifierContext) variableContext).ident());
         else throw new UnsupportedOperationException();
     }
 
     @Contract("null -> fail")
-    private static Expr toAst(KParser.ExprContext exprContext) {
-        if (exprContext instanceof KParser.BinaryExprContext) {
+    private static Expr toAst(com.end.compiler.KParser.ExprContext exprContext) {
+        if (exprContext instanceof com.end.compiler.KParser.BinaryExprContext) {
             BinaryExpr binaryExpr = new BinaryExpr(ToAst.
-                    toAst(((KParser.BinaryExprContext) exprContext).left),
-                    ToAst.toAst(((KParser.BinaryExprContext) exprContext).right),
-                    ((KParser.BinaryExprContext) exprContext).operator.getText());
+                    toAst(((com.end.compiler.KParser.BinaryExprContext) exprContext).left),
+                    ToAst.toAst(((com.end.compiler.KParser.BinaryExprContext) exprContext).right),
+                    ((com.end.compiler.KParser.BinaryExprContext) exprContext).operator.getText());
             Utils.setPosition(binaryExpr, exprContext);
             Utils.setChildrensParent(binaryExpr);
             return binaryExpr;
-        } else if (exprContext instanceof KParser.VarContext)
-            return toAst(((KParser.VarContext) exprContext).variable());
-        else if (exprContext instanceof KParser.ParenExprContext)
-            return toAst(((KParser.ParenExprContext) exprContext).expr());
-        else if (exprContext instanceof KParser.FuncCallContext)
-            return toAst(((KParser.FuncCallContext) exprContext).fun_call());
-        else if (exprContext instanceof KParser.ArrayAccessContext)
-            return toAst(((KParser.ArrayAccessContext) exprContext).array_access());
-        else if (exprContext instanceof KParser.ArrTypeSizeDefValContext)
-            return toAst(((KParser.ArrTypeSizeDefValContext) exprContext).arr_type_size_def_val());
+        } else if (exprContext instanceof com.end.compiler.KParser.VarContext)
+            return toAst(((com.end.compiler.KParser.VarContext) exprContext).variable());
+        else if (exprContext instanceof com.end.compiler.KParser.ParenExprContext)
+            return toAst(((com.end.compiler.KParser.ParenExprContext) exprContext).expr());
+        else if (exprContext instanceof com.end.compiler.KParser.FuncCallContext)
+            return toAst(((com.end.compiler.KParser.FuncCallContext) exprContext).fun_call());
+        else if (exprContext instanceof com.end.compiler.KParser.ArrayAccessContext)
+            return toAst(((com.end.compiler.KParser.ArrayAccessContext) exprContext).array_access());
+        else if (exprContext instanceof com.end.compiler.KParser.ArrayInitailizationContext)
+            return toAst(((com.end.compiler.KParser.ArrayInitailizationContext) exprContext).array_initialization());
         else throw new UnsupportedOperationException();
     }
 
     @NotNull
-    private static Expr toAst(KParser.Fun_callContext funCallContext) {
+    private static Expr toAst(com.end.compiler.KParser.Fun_callContext funCallContext) {
         if (funCallContext.expr() != null) {
             FunCall funCall = new FunCall(
                     funCallContext.ident().getText(),
@@ -116,11 +113,7 @@ class ToAst {
     }
 
     @NotNull
-    private static Expr toAst(KParser.Array_accessContext arrayAccessContext) {
-//        VariableReference variableReference=new VariableReference(.getText());
-//        Utils.setPosition(variableReference, arrayAccessContext);
-//        Utils.setChildrensParent(variableReference);
-
+    private static Expr toAst(com.end.compiler.KParser.Array_accessContext arrayAccessContext) {
         ArrayAccess arrayAccess = new ArrayAccess(
                toAst(arrayAccessContext.ident()),
                 toAst(arrayAccessContext.expr()));
@@ -130,40 +123,40 @@ class ToAst {
     }
 
     @NotNull
-    private static Expr toAst(KParser.Arr_type_size_def_valContext arrTypeSizeDefValContext) {
-        ArrTypeSizeDefVal arrTypeSizeDefVal = new ArrTypeSizeDefVal(
-                toAst(arrTypeSizeDefValContext.type()),
-               toAst(arrTypeSizeDefValContext.expr())); //.stream().map(ToAst::toAst).collect(Collectors.toList()));
-        Utils.setPosition(arrTypeSizeDefVal, arrTypeSizeDefValContext);
-        Utils.setChildrensParent(arrTypeSizeDefVal);
-        return arrTypeSizeDefVal;
+    private static Expr toAst(com.end.compiler.KParser.Array_initializationContext arrayInitializationContext) {
+        ArrayInitailization arrayInitailization = new ArrayInitailization(
+                toAst(arrayInitializationContext.type()),
+               toAst(arrayInitializationContext.expr()));
+        Utils.setPosition(arrayInitailization, arrayInitializationContext);
+        Utils.setChildrensParent(arrayInitailization);
+        return arrayInitailization;
     }
 
     @NotNull
     @Contract("null -> fail")
-    private static Type toAst(KParser.TypeContext typeContext) {
-        if (typeContext instanceof KParser.IntTypeContext) {
+    private static Type toAst(com.end.compiler.KParser.TypeContext typeContext) {
+        if (typeContext instanceof com.end.compiler.KParser.IntTypeContext) {
             Integer integerType = new Integer();
             Utils.setPosition(integerType, typeContext);
             Utils.setChildrensParent(integerType);
             return integerType;
-        } else if (typeContext instanceof KParser.DoubleTypeContext) {
+        } else if (typeContext instanceof com.end.compiler.KParser.DoubleTypeContext) {
             Double doubleType = new Double();
             Utils.setPosition(doubleType, typeContext);
             Utils.setChildrensParent(doubleType);
             return doubleType;
-        } else if (typeContext instanceof KParser.BooleanTypeContext) {
+        } else if (typeContext instanceof com.end.compiler.KParser.BooleanTypeContext) {
             Boolean booleanType = new Boolean();
             Utils.setPosition(booleanType, typeContext);
             Utils.setChildrensParent(booleanType);
             return booleanType;
-        } else if (typeContext instanceof KParser.CharTypeContext) {
+        } else if (typeContext instanceof com.end.compiler.KParser.CharTypeContext) {
             Char charType = new Char();
             Utils.setPosition(charType, typeContext);
             Utils.setChildrensParent(charType);
             return charType;
-        } else if (typeContext instanceof KParser.ArrayTypeContext) {
-            Array array = new Array((toAst(((KParser.ArrayTypeContext) typeContext).type())));
+        } else if (typeContext instanceof com.end.compiler.KParser.ArrayTypeContext) {
+            Array array = new Array((toAst(((com.end.compiler.KParser.ArrayTypeContext) typeContext).type())));
             Utils.setPosition(array, typeContext);
             Utils.setChildrensParent(array);
             return array;
@@ -171,7 +164,7 @@ class ToAst {
     }
 
     @NotNull
-    private static Expression toAst(KParser.DeclarationContext declarationContext) {
+    private static Expression toAst(com.end.compiler.KParser.DeclarationContext declarationContext) {
         if (declarationContext.expr() != null) {
             if (declarationContext.KEYWORD_val() != null) {
                 NewVariable newVariable=new NewVariable(
@@ -194,6 +187,7 @@ class ToAst {
                         toAst(declarationContext.type()));
                 Utils.setPosition(newVariable, declarationContext);
                 Utils.setChildrensParent(newVariable);
+
                 Declaration declaration = new Declaration(
                         newVariable,
                         toAst(declarationContext.expr()));
@@ -201,7 +195,7 @@ class ToAst {
                 Utils.setChildrensParent(declaration);
                 return declaration;
             } else throw new UnsupportedOperationException();
-        } else {
+        } else {//expr=null
             if (declarationContext.KEYWORD_val() != null) {
                 NewVariable newVariable = new NewVariable(
                         declarationContext.KEYWORD_val().toString(),
@@ -209,7 +203,13 @@ class ToAst {
                         toAst(declarationContext.type()));
                 Utils.setPosition(newVariable, declarationContext);
                 Utils.setChildrensParent(newVariable);
-                return newVariable;
+
+                Declaration declaration = new Declaration(
+                        newVariable,
+                       null);
+                Utils.setPosition(declaration, declarationContext);
+                Utils.setChildrensParent(declaration);
+                return declaration;
             } else if (declarationContext.KEYWORD_var() != null) {
                 NewVariable newVariable = new NewVariable(
                         declarationContext.KEYWORD_var().toString(),
@@ -217,13 +217,19 @@ class ToAst {
                         toAst(declarationContext.type()));
                 Utils.setPosition(newVariable, declarationContext);
                 Utils.setChildrensParent(newVariable);
-                return newVariable;
+
+                Declaration declaration = new Declaration(
+                        newVariable,
+                        null);
+                Utils.setPosition(declaration, declarationContext);
+                Utils.setChildrensParent(declaration);
+                return declaration;
             } else throw new UnsupportedOperationException();
         }
     }
 
     @NotNull
-    private static Expression toAst(KParser.AssignmentContext assignmentContext) {
+    private static Expression toAst(com.end.compiler.KParser.AssignmentContext assignmentContext) {
         if (assignmentContext.ident() != null) {
             Assignment assignment = new Assignment(toAst(assignmentContext.ident()), toAst(assignmentContext.expr()));
             Utils.setPosition(assignment, assignmentContext);
@@ -238,44 +244,44 @@ class ToAst {
     }
 
     @Contract("null -> fail")
-    private static Expression toAst(KParser.ExpressionContext expressionContext) {
-        if (expressionContext instanceof KParser.AssigContext)
-            return toAst(((KParser.AssigContext) expressionContext).assignment());
-        else if (expressionContext instanceof KParser.DeclContext)
-            return toAst(((KParser.DeclContext) expressionContext).declaration());
-        else if (expressionContext instanceof KParser.IfOperContext)
-            return toAst(((KParser.IfOperContext) expressionContext).if_else());
-        else if (expressionContext instanceof KParser.ExprExpContext)
-            return toAst(((KParser.ExprExpContext) expressionContext).expr());
-        else if (expressionContext instanceof KParser.LoopExpContext)
-            return toAst(((KParser.LoopExpContext) expressionContext).loop());
+    private static Expression toAst(com.end.compiler.KParser.ExpressionContext expressionContext) {
+        if (expressionContext instanceof com.end.compiler.KParser.AssigContext)
+            return toAst(((com.end.compiler.KParser.AssigContext) expressionContext).assignment());
+        else if (expressionContext instanceof com.end.compiler.KParser.DeclContext)
+            return toAst(((com.end.compiler.KParser.DeclContext) expressionContext).declaration());
+        else if (expressionContext instanceof com.end.compiler.KParser.IfOperContext)
+            return toAst(((com.end.compiler.KParser.IfOperContext) expressionContext).if_else());
+        else if (expressionContext instanceof com.end.compiler.KParser.ExprExpContext)
+            return toAst(((com.end.compiler.KParser.ExprExpContext) expressionContext).expr());
+        else if (expressionContext instanceof com.end.compiler.KParser.LoopExpContext)
+            return toAst(((com.end.compiler.KParser.LoopExpContext) expressionContext).loop());
         else throw new UnsupportedOperationException();
     }
 
     @NotNull
     @Contract("null -> fail")
-    private static Expression toAst(KParser.LoopContext loopContext) {
-        if (loopContext instanceof KParser.WhileLoopContext)
-            return toAst(((KParser.WhileLoopContext) loopContext).while_loop());
-        else if (loopContext instanceof KParser.ForLoopContext)
-            return toAst(((KParser.ForLoopContext) loopContext).for_loop());
-        else if (loopContext instanceof KParser.DoWhileLoopContext)
-            return toAst(((KParser.DoWhileLoopContext) loopContext).do_while_loop());
+    private static Expression toAst(com.end.compiler.KParser.LoopContext loopContext) {
+        if (loopContext instanceof com.end.compiler.KParser.WhileLoopContext)
+            return toAst(((com.end.compiler.KParser.WhileLoopContext) loopContext).while_loop());
+        else if (loopContext instanceof com.end.compiler.KParser.ForLoopContext)
+            return toAst(((com.end.compiler.KParser.ForLoopContext) loopContext).for_loop());
+        else if (loopContext instanceof com.end.compiler.KParser.DoWhileLoopContext)
+            return toAst(((com.end.compiler.KParser.DoWhileLoopContext) loopContext).do_while_loop());
         else throw new UnsupportedOperationException();
     }
 
-    private static List<Expression> toAst(KParser.ExpressionsContext expressionsContext) {
+    private static List<Expression> toAst(com.end.compiler.KParser.ExpressionsContext expressionsContext) {
         if (expressionsContext.expression() != null)
             return expressionsContext.expression().stream().map(ToAst::toAst).collect(Collectors.toList());
         else return new ArrayList<>();
     }
 
-    private static List<Expression> toAst(KParser.BlockContext blockContext) {
+    private static List<Expression> toAst(com.end.compiler.KParser.BlockContext blockContext) {
         return toAst(blockContext.expressions());
     }
 
     @NotNull
-    private static Expression toAst(KParser.If_elseContext ifElseContext) {
+    private static Expression toAst(com.end.compiler.KParser.If_elseContext ifElseContext) {
         if (ifElseContext.firstExpression != null && ifElseContext.secondExpression != null) {
             ThenBlock thenBlock = new ThenBlock(Arrays.asList(toAst(ifElseContext.firstExpression)));
             Utils.setPosition(thenBlock, ifElseContext);
@@ -367,7 +373,7 @@ class ToAst {
     }
 
     @NotNull
-    private static Expression toAst(KParser.While_loopContext whileLoopContext) {
+    private static Expression toAst(com.end.compiler.KParser.While_loopContext whileLoopContext) {
         if (whileLoopContext.expression() == null) {
             WhileLoop whileLoop = new WhileLoop(
                     toAst(whileLoopContext.expr()),
@@ -387,7 +393,7 @@ class ToAst {
 
     //TODO: solve Arrays.AsList warnings
     @NotNull
-    private static Expression toAst(KParser.For_loopContext forLoopContext) {
+    private static Expression toAst(com.end.compiler.KParser.For_loopContext forLoopContext) {
         VariableReference variableReference =
                 new VariableReference(forLoopContext.variable().getText());
         Utils.setPosition(variableReference, forLoopContext.variable());
@@ -413,7 +419,7 @@ class ToAst {
     }
 
     @NotNull
-    private static Expression toAst(KParser.Do_while_loopContext doWhileLoopContext) {
+    private static Expression toAst(com.end.compiler.KParser.Do_while_loopContext doWhileLoopContext) {
         DoWhileLoop doWhileLoop = new DoWhileLoop(
                 toAst(doWhileLoopContext.expr()), toAst(doWhileLoopContext.block()));
         Utils.setPosition(doWhileLoop, doWhileLoopContext);
@@ -422,7 +428,7 @@ class ToAst {
     }
 
     @NotNull
-    private static FunParameter toAst(KParser.Fun_parameterContext funParameterContext) {
+    private static FunParameter toAst(com.end.compiler.KParser.Fun_parameterContext funParameterContext) {
         FunParameter funParameter = new FunParameter(
                 toAst(funParameterContext.ident()), toAst(funParameterContext.type()));
         Utils.setPosition(funParameter, funParameterContext);
@@ -431,7 +437,7 @@ class ToAst {
     }
 
     @NotNull
-    private static FunDeclaration toAst(KParser.Fun_declarationContext funDeclarationContext) {
+    private static FunDeclaration toAst(com.end.compiler.KParser.Fun_declarationContext funDeclarationContext) {
         if (funDeclarationContext.type() != null && funDeclarationContext.KEYWORD_return() != null) {
             ReturnExpr returnExpr = new ReturnExpr(toAst(funDeclarationContext.expr()));
             Utils.setPosition(returnExpr, funDeclarationContext.expr());
@@ -495,7 +501,7 @@ class ToAst {
     }
 
     @NotNull
-    private static ClassDeclaration toAst(KParser.Class_declarationContext classDeclarationContext) {
+    private static ClassDeclaration toAst(com.end.compiler.KParser.Class_declarationContext classDeclarationContext) {
         if (classDeclarationContext.class_body().declaration() != null) {
             ClassDeclaration classDeclaration = new ClassDeclaration(
                     toAst(classDeclarationContext.ident()),
@@ -518,7 +524,7 @@ class ToAst {
     }
 
     @NotNull
-    static Program toAst(KParser.ProgramContext programContext) {
+    static Program toAst(com.end.compiler.KParser.ProgramContext programContext) {
         List<FunDeclaration> funDeclarationList = new ArrayList<>();
         if (programContext.fun_declaration() != null) {
             funDeclarationList.
