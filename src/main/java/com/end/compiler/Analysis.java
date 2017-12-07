@@ -15,14 +15,13 @@ public class Analysis {
     }
 
     private static void analyze(ClassDeclaration classDeclaration) {
-
         //class varName dublications
         List<ClassDeclaration> classList = new ArrayList<>();
         classList.addAll(Utils.getAllVisibleTagertClassNodes(classDeclaration, ClassDeclaration.class));
         if (classList.size() > 0) {
             classList.remove(classDeclaration);
-            classList.stream().forEach(x -> {
-                if (x.name().equals(classDeclaration.name()))
+            classList.forEach(x -> {
+                if ((x.getClassName().getVarName()).equals(classDeclaration.getClassName().getVarName()))
                     PrintableErrors.printConflict(classDeclaration.position,
                             classDeclaration, x);
             });
@@ -145,14 +144,14 @@ public class Analysis {
         if (declaration.isPresent()) { //if variable was declared check types
 
             if (assignment.getLeft() instanceof ArrayAccess) {
-                analyze((ArrayAccess) assignment.getLeft());
-                Type actualType =  getType(assignment.getValue());
-                Type expectedType = ((ArrTypeSizeDefVal) declaration.get().getExpr()).getNestedType();
-                if (!typesAreEqual(expectedType, actualType))
-                    PrintableErrors.printTypeMismatchError(
-                            expectedType,
-                            actualType,
-                            assignment.position);
+//                analyze((ArrayAccess) assignment.getLeft());
+//                Type actualType =  getType(assignment.getValue());
+//                Type expectedType = ((ArrTypeSizeDefVal) declaration.get().getExpr()).getNestedType();
+//                if (!typesAreEqual(expectedType, actualType))
+//                    PrintableErrors.printTypeMismatchError(
+//                            expectedType,
+//                            actualType,
+//                            assignment.position);
             }
             //именно equals type, not castable
             // нельзя var wrong: Double=9;
@@ -251,7 +250,7 @@ public class Analysis {
 
     private static void analyze (CharVar charVar){
         charVar.fillIndex(java.lang.Integer.toString
-                (((int) charVar.getValue().charAt(0))));
+                (((int) charVar.getValue().charAt(1))));
     }
 
     private static void analyze (IntegerVar integerVar){
@@ -263,6 +262,7 @@ public class Analysis {
         else if (booleanVar.getValue().equals("false")) booleanVar.fillIndex("0");
         else throw new UnsupportedOperationException();
     }
+
     private static void analyze(BinaryExpr binaryExpr) {
         analyze(binaryExpr.getLeft());
         analyze(binaryExpr.getRight());
@@ -308,6 +308,7 @@ public class Analysis {
     }
 
     private static void analyze(FunCall funCall) {
+        List<FunDeclaration> f= Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class);
         //была ли вызываемая функция объявлена
         if (!(Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class)
                 .stream().filter(
@@ -461,10 +462,11 @@ public class Analysis {
     }
 
     private static Type exploreType(FunCall funCall) {
+        List<FunDeclaration> f=  Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class);
         Optional<FunDeclaration> funDeclaration =
                 Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class).stream()
                         .filter(x ->
-                                (x.getFunName().name().equals(funCall.getName())
+                                (x.getFunName().getVarName().equals(funCall.getName())
                                         && (paramsListsAreEqual(x.getFunParametersList(), funCall.getParameters())))).
                         findFirst();
         if (funDeclaration.isPresent()) return funDeclaration.get().getReturnType();
@@ -504,7 +506,7 @@ public class Analysis {
     private static Type resolveByInt(Type type) {
         if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return new Integer();
         if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return new Double();
-        if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Integer();
+        if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Array.class.getSimpleName())) return null;
         return null;
@@ -513,15 +515,15 @@ public class Analysis {
     private static Type resolveByDouble(Type type) {
         if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return new Double();
         if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return new Double();
-        if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Double();
+        if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Array.class.getSimpleName())) return null;
         return null;
     }
 
     private static Type resolveByChar(Type type) {
-        if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return new Integer();
-        if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return new Double();
+        if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Char();
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Array.class.getSimpleName())) return null;
@@ -531,7 +533,7 @@ public class Analysis {
     private static Type resolveByBoolean(Type type) {
         if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return null;
-        if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Char();
+        if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return new Boolean();
         if (type.getClass().getSimpleName().equals(Array.class.getSimpleName())) return null;
 

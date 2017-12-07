@@ -142,9 +142,9 @@
     │   │           └── we index:-1
     │   ├── =
     │   │   ├── a type:Int index:0
-    │   │   └── -
-    │   │       ├── b type:Int index:1
-    │   │       └── fun6( )
+    │   │   └── - type:Double
+    │   │       ├── b type:Int cast to:Double index:1
+    │   │       └── fun6( ) type:Double
     │   ├── =
     │   │   ├── var a1 type:Double index:2
     │   │   └── 9.9 type:Double const  index:9.9
@@ -153,14 +153,14 @@
     │   │   └── 5.1 type:Double const  index:5.1
     │   ├── =
     │   │   ├── a type:Int index:0
-    │   │   └── *
+    │   │   └── * type:Double
     │   │       ├── b1 type:Double index:3
-    │   │       └── fun6( )
+    │   │       └── fun6( ) type:Double
     │   ├── =
     │   │   ├── a1 type:Double index:2
-    │   │   └── -
+    │   │   └── - type:Double
     │   │       ├── b1 type:Double index:3
-    │   │       └── fun7( )
+    │   │       └── fun7( ) type:Int cast to:Double
     │   ├── =
     │   │   ├── a1 type:Double index:2
     │   │   └── -
@@ -169,9 +169,9 @@
     │   │           └── a type:Int index:0
     │   ├── =
     │   │   ├── a1 type:Double index:2
-    │   │   └── -
+    │   │   └── - type:Double
     │   │       ├── b1 type:Double index:3
-    │   │       └── fun8( )
+    │   │       └── fun8( ) type:Int cast to:Double
     │   │           └── a type:Int index:0
     │   ├── =
     │   │   ├── var arr type:Array<Boolean> index:4
@@ -201,8 +201,8 @@
     │       └── noSuchFun( )
     │           └── q index:-1
     ├── fun fun6(a:Boolean index:0) :Double
-    │   └── return
-    │       └── fun7( )
+    │   └── return type:Int
+    │       └── fun7( ) type:Int
     ├── fun fun7() :Int
     │   └── return
     │       └── g index:-1
@@ -218,14 +218,15 @@
     │   │   ├── var arr type:Array<Boolean> index:0
     │   │   └──  type:Array<Boolean>
     │   │       └── 9 type:Int const  index:9
-    │   ├── =
-    │   │   ├── [ ] type:Boolean
-    │   │   │   ├── arr type:Array<Boolean> index:0
-    │   │   │   └── 3 type:Int const  index:3
-    │   │   └── true type:Boolean const  index:1
     │   └── return type:Boolean
     │       └── [ ] type:Boolean
     │           ├── arr type:Array<Boolean> index:0
     │           └── 3 type:Int const  index:3
     └── fun fun10(a:Boolean index:0, b:Int index:1, c:Double index:2, e:Boolean index:3) :Unit
-        └── var d type:Int index:0
+        ├── var d type:Int index:0
+        ├── var d2 type:Int index:1
+        ├── var d3 type:Int index:2
+        ├── var d4 type:Int index:3
+        └── =
+            ├── d index:0
+            └── 4 type:Int const  index:4
