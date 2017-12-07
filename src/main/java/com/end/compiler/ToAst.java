@@ -2,6 +2,7 @@ package com.end.compiler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -283,11 +284,11 @@ class ToAst {
     @NotNull
     private static Expression toAst(com.end.compiler.KParser.If_elseContext ifElseContext) {
         if (ifElseContext.firstExpression != null && ifElseContext.secondExpression != null) {
-            ThenBlock thenBlock = new ThenBlock(Arrays.asList(toAst(ifElseContext.firstExpression)));
+            ThenBlock thenBlock = new ThenBlock(Collections.singletonList(toAst(ifElseContext.firstExpression)));
             Utils.setPosition(thenBlock, ifElseContext);
             Utils.setChildrensParent(thenBlock);
 
-            ElseBlock elseBlock = new ElseBlock(Arrays.asList(toAst(ifElseContext.secondExpression)));
+            ElseBlock elseBlock = new ElseBlock(Collections.singletonList(toAst(ifElseContext.secondExpression)));
             Utils.setPosition(elseBlock, ifElseContext);
             Utils.setChildrensParent(elseBlock);
 
@@ -315,7 +316,7 @@ class ToAst {
             Utils.setChildrensParent(anIfOper);
             return anIfOper;
         } else if (ifElseContext.firstExpression != null && ifElseContext.secondBlock != null) {
-            ThenBlock thenBlock = new ThenBlock(Arrays.asList(toAst(ifElseContext.firstExpression)));
+            ThenBlock thenBlock = new ThenBlock(Collections.singletonList(toAst(ifElseContext.firstExpression)));
             Utils.setPosition(thenBlock, ifElseContext);
             Utils.setChildrensParent(thenBlock);
 
@@ -335,7 +336,7 @@ class ToAst {
             Utils.setPosition(thenBlock, ifElseContext);
             Utils.setChildrensParent(thenBlock);
 
-            ElseBlock elseBlock = new ElseBlock(Arrays.asList(toAst(ifElseContext.secondExpression)));
+            ElseBlock elseBlock = new ElseBlock(Collections.singletonList(toAst(ifElseContext.secondExpression)));
             Utils.setPosition(elseBlock, ifElseContext);
             Utils.setChildrensParent(elseBlock);
 
@@ -359,7 +360,7 @@ class ToAst {
             Utils.setChildrensParent(anIfOper);
             return anIfOper;
         } else if (ifElseContext.firstExpression != null) {//ifElseContext.secondExpression==null && secondBlock==null
-            ThenBlock thenBlock = new ThenBlock(Arrays.asList(toAst(ifElseContext.firstExpression)));
+            ThenBlock thenBlock = new ThenBlock(Collections.singletonList(toAst(ifElseContext.firstExpression)));
             Utils.setPosition(thenBlock, ifElseContext);
             Utils.setChildrensParent(thenBlock);
             IfOper anIfOper = new IfOper(
@@ -384,14 +385,13 @@ class ToAst {
             return whileLoop;
         } else if (whileLoopContext.block() == null) {
             WhileLoop whileLoop = new WhileLoop(
-                    toAst(whileLoopContext.expr()), Arrays.asList(toAst(whileLoopContext.expression())));
+                    toAst(whileLoopContext.expr()), Collections.singletonList(toAst(whileLoopContext.expression())));
             Utils.setPosition(whileLoop, whileLoopContext);
             Utils.setChildrensParent(whileLoop);
             return whileLoop;
         } else throw new UnsupportedOperationException();
     }
 
-    //TODO: solve Arrays.AsList warnings
     @NotNull
     private static Expression toAst(com.end.compiler.KParser.For_loopContext forLoopContext) {
         VariableReference variableReference =
@@ -411,7 +411,7 @@ class ToAst {
             ForLoop forLoop = new ForLoop(
                     variableReference,
                     toAst(forLoopContext.expr()),
-                    Arrays.asList(toAst(forLoopContext.expression())));
+                    Collections.singletonList(toAst(forLoopContext.expression())));
             Utils.setPosition(forLoop, forLoopContext);
             Utils.setChildrensParent(forLoop);
             return forLoop;

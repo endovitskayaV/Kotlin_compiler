@@ -113,16 +113,16 @@ class FunDeclaration extends Node {
 
     @Override
     public String name() {
-        String returnStr = "fun " + funName.getVarName() + "(";
+        StringBuilder returnStr = new StringBuilder("fun " + funName.getVarName() + "(");
         if (funParametersList.size() > 0) {
             for (Node funParam : funParametersList)
-                returnStr += funParam.name() + ", ";
-            returnStr = returnStr.substring(0, returnStr.length() - 2);
+                returnStr.append(funParam.name()).append(", ");
+            returnStr = new StringBuilder(returnStr.substring(0, returnStr.length() - 2));
         }
-        returnStr += ") :";
-        if (returnType != null) returnStr += returnType.name();
-        else returnStr += "Unit";
-        return returnStr;
+        returnStr.append(") :");
+        if (returnType != null) returnStr.append(returnType.name());
+        else returnStr.append("Unit");
+        return returnStr.toString();
     }
 
     @Override
@@ -136,16 +136,16 @@ class FunDeclaration extends Node {
 
     @Override
     public String toString() {
-        String returnStr = "fun " + funName.getVarName() + "(";
+        StringBuilder returnStr = new StringBuilder("fun " + funName.getVarName() + "(");
         if (funParametersList.size() > 0) {
             for (FunParameter funParam : funParametersList)
-                returnStr += funParam.getType().name() + ", ";
-            returnStr = returnStr.substring(0, returnStr.length() - 2);
+                returnStr.append(funParam.getType().name()).append(", ");
+            returnStr = new StringBuilder(returnStr.substring(0, returnStr.length() - 2));
         }
-        returnStr += ") :";
-        if (returnType != null) returnStr += returnType.name();
-        else returnStr += "Unit";
-        return returnStr;
+        returnStr.append(") :");
+        if (returnType != null) returnStr.append(returnType.name());
+        else returnStr.append("Unit");
+        return returnStr.toString();
     }
 }
 

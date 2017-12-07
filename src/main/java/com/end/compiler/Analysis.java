@@ -9,7 +9,7 @@ public class Analysis {
     public static void analyze(Program program) {
 
         //fill type for all expr
-        Utils.getAllTargetClassChildren(program, Expr.class).stream().filter(x -> x != null)
+        Utils.getAllTargetClassChildren(program, Expr.class).stream().filter(Objects::nonNull)
                 .forEach(x -> x.fillType(getType(x)));
 
         program.getClassDeclarationList().forEach(Analysis::analyze);
@@ -266,9 +266,16 @@ public class Analysis {
     }
 
     private static void analyze(BooleanVar booleanVar) {
-        if (booleanVar.getValue().equals("true")) booleanVar.fillIndex("1");
-        else if (booleanVar.getValue().equals("false")) booleanVar.fillIndex("0");
-        else throw new UnsupportedOperationException();
+        switch (booleanVar.getValue()) {
+            case "true":
+                booleanVar.fillIndex("1");
+                break;
+            case "false":
+                booleanVar.fillIndex("0");
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
     }
 
     private static void analyze(BinaryExpr binaryExpr) {
