@@ -1,5 +1,0 @@
-
-    fun fun7():Boolean{
-      var arr:Array<Int> = Array<Boolean>(7)
-      var arr:Boolean
-    }

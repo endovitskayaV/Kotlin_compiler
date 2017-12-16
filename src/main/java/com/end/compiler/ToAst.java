@@ -36,12 +36,21 @@ class ToAst {
     }
 
     @NotNull
+    private static Expr toAst(com.end.compiler.KParser.String_varContext stringVarContext) {
+       StringVar stringVar = new StringVar(stringVarContext.getText());
+        Utils.setPosition(stringVar, stringVarContext);
+        Utils.setChildrensParent(stringVar);
+        return stringVar;
+    }
+
+    @NotNull
     private static Expr toAst(com.end.compiler.KParser.Char_varContext charVarContext) {
-        CharVar charVar = new CharVar(charVarContext.getText());
+       CharVar charVar = new CharVar(charVarContext.getText());
         Utils.setPosition(charVar, charVarContext);
         Utils.setChildrensParent(charVar);
         return charVar;
     }
+
 
     @NotNull
     private static Expr toAst(com.end.compiler.KParser.Boolean_varContext booleanVarContext) {
@@ -60,6 +69,8 @@ class ToAst {
             return toAst(((com.end.compiler.KParser.BooleanLitContext) concreteVarContext).boolean_var());
         else if (concreteVarContext instanceof com.end.compiler.KParser.CharLitContext)
             return toAst(((com.end.compiler.KParser.CharLitContext) concreteVarContext).char_var());
+        else if (concreteVarContext instanceof com.end.compiler.KParser.StringLitContext)
+            return toAst(((com.end.compiler.KParser.StringLitContext) concreteVarContext).string_var());
         else throw new UnsupportedOperationException();
     }
 
@@ -116,7 +127,7 @@ class ToAst {
     @NotNull
     private static Expr toAst(com.end.compiler.KParser.Array_accessContext arrayAccessContext) {
         ArrayAccess arrayAccess = new ArrayAccess(
-               toAst(arrayAccessContext.ident()),
+                toAst(arrayAccessContext.ident()),
                 toAst(arrayAccessContext.expr()));
         Utils.setPosition(arrayAccess, arrayAccessContext);
         Utils.setChildrensParent(arrayAccess);
@@ -127,7 +138,7 @@ class ToAst {
     private static Expr toAst(com.end.compiler.KParser.Array_initializationContext arrayInitializationContext) {
         ArrayInitailization arrayInitailization = new ArrayInitailization(
                 toAst(arrayInitializationContext.type()),
-               toAst(arrayInitializationContext.expr()));
+                toAst(arrayInitializationContext.expr()));
         Utils.setPosition(arrayInitailization, arrayInitializationContext);
         Utils.setChildrensParent(arrayInitailization);
         return arrayInitailization;
@@ -156,6 +167,11 @@ class ToAst {
             Utils.setPosition(charType, typeContext);
             Utils.setChildrensParent(charType);
             return charType;
+        }  else if (typeContext instanceof com.end.compiler.KParser.StringTypeContext) {
+           StringType stringType = new StringType();
+            Utils.setPosition(stringType, typeContext);
+            Utils.setChildrensParent(stringType);
+            return stringType;
         } else if (typeContext instanceof com.end.compiler.KParser.ArrayTypeContext) {
             Array array = new Array((toAst(((com.end.compiler.KParser.ArrayTypeContext) typeContext).type())));
             Utils.setPosition(array, typeContext);
@@ -165,10 +181,10 @@ class ToAst {
     }
 
     @NotNull
-    private static Expression toAst(com.end.compiler.KParser.DeclarationContext declarationContext) {
+    private static Declaration toAst(com.end.compiler.KParser.DeclarationContext declarationContext) {
         if (declarationContext.expr() != null) {
             if (declarationContext.KEYWORD_val() != null) {
-                NewVariable newVariable=new NewVariable(
+                NewVariable newVariable = new NewVariable(
                         declarationContext.KEYWORD_val().toString(),
                         toAst(declarationContext.ident()),
                         toAst(declarationContext.type()));
@@ -176,13 +192,13 @@ class ToAst {
                 Utils.setChildrensParent(newVariable);
 
                 Declaration declaration = new Declaration(
-                       newVariable,
+                        newVariable,
                         toAst(declarationContext.expr()));
                 Utils.setPosition(declaration, declarationContext);
                 Utils.setChildrensParent(declaration);
                 return declaration;
             } else if (declarationContext.KEYWORD_var() != null) {
-                NewVariable newVariable=new NewVariable(
+                NewVariable newVariable = new NewVariable(
                         declarationContext.KEYWORD_var().toString(),
                         toAst(declarationContext.ident()),
                         toAst(declarationContext.type()));
@@ -207,7 +223,7 @@ class ToAst {
 
                 Declaration declaration = new Declaration(
                         newVariable,
-                       null);
+                        null);
                 Utils.setPosition(declaration, declarationContext);
                 Utils.setChildrensParent(declaration);
                 return declaration;
@@ -436,6 +452,69 @@ class ToAst {
         return funParameter;
     }
 
+
+    private static Annotation toAst(com.end.compiler.KParser.AnnotationContext annotationContext) {
+        if (annotationContext == null) return null;
+        if (annotationContext.ident() != null) {
+            Annotation annotation = new Annotation(
+                    annotationContext.SimpleName().getText(),
+                    annotationContext.ident().getText());
+            Utils.setPosition(annotation, annotationContext);
+            Utils.setChildrensParent(annotation);
+            return annotation;
+        } else {
+            Annotation annotation = new Annotation(
+                    annotationContext.SimpleName().getText(), null);
+            Utils.setPosition(annotation, annotationContext);
+            Utils.setChildrensParent(annotation);
+            return annotation;
+        }
+    }
+
+
+    private static FunSignature toAst(com.end.compiler.KParser.Fun_signatureContext funSignatureContext){
+        FunSignature funSignature = new FunSignature(
+                toAst(funSignatureContext.annotation()),
+                toAst(funSignatureContext.ident()),
+                toAst(funSignatureContext.type()),
+                funSignatureContext.fun_parameters().fun_parameter()
+                        .stream().map(ToAst::toAst).collect(Collectors.toList()));
+        Utils.setPosition(funSignature, funSignatureContext);
+        Utils.setChildrensParent(funSignature);
+        return funSignature;
+    }
+
+    @NotNull
+    private static InterfaceDeclaration toAst(com.end.compiler.KParser.Interface_declarationContext interfaceDeclarationContext) {
+        List<Declaration> declarationList = new ArrayList<>();
+        if (interfaceDeclarationContext.declaration() != null) {
+            declarationList.
+                    addAll(interfaceDeclarationContext.declaration()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()));
+        }
+        List<FunSignature> funSignatureList = new ArrayList<>();
+        if (interfaceDeclarationContext.fun_signature() != null) {
+            funSignatureList.
+                    addAll(interfaceDeclarationContext.fun_signature()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()));
+        }
+
+        InterfaceDeclaration interfaceDeclaration = new InterfaceDeclaration(
+                toAst(interfaceDeclarationContext.ident()),
+                declarationList, funSignatureList);
+        Utils.setPosition(interfaceDeclaration, interfaceDeclarationContext);
+        Utils.setChildrensParent(interfaceDeclaration);
+        return interfaceDeclaration;
+    }
+
+    private static List<Expression> getExpressionsList (com.end.compiler.KParser.Fun_declarationContext funDeclarationContext){
+        if (funDeclarationContext.expressions()==null) return null;
+        else {
+           return funDeclarationContext.expressions().expression()
+                    .stream().map(ToAst::toAst).collect(Collectors.toList());
+        }
+    }
+
     @NotNull
     private static FunDeclaration toAst(com.end.compiler.KParser.Fun_declarationContext funDeclarationContext) {
         if (funDeclarationContext.type() != null && funDeclarationContext.KEYWORD_return() != null) {
@@ -443,13 +522,14 @@ class ToAst {
             Utils.setPosition(returnExpr, funDeclarationContext.expr());
             Utils.setChildrensParent(returnExpr);
 
+
             FunDeclaration funDeclaration = new FunDeclaration(
+                    toAst(funDeclarationContext.annotation()),
                     toAst(funDeclarationContext.ident()),
                     toAst(funDeclarationContext.type()),
                     funDeclarationContext.fun_parameters().fun_parameter()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()),
-                    funDeclarationContext.expressions().expression()
-                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
+                    getExpressionsList(funDeclarationContext),
                     returnExpr);
             Utils.setPosition(funDeclaration, funDeclarationContext);
             Utils.setChildrensParent(funDeclaration);
@@ -457,12 +537,12 @@ class ToAst {
 
         } else if (funDeclarationContext.type() != null && funDeclarationContext.KEYWORD_return() == null) {
             FunDeclaration funDeclaration = new FunDeclaration(
+                    toAst(funDeclarationContext.annotation()),
                     toAst(funDeclarationContext.ident()),
                     toAst(funDeclarationContext.type()),
                     funDeclarationContext.fun_parameters().fun_parameter()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()),
-                    funDeclarationContext.expressions().expression()
-                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
+                    getExpressionsList(funDeclarationContext),
                     null);
             Utils.setPosition(funDeclaration, funDeclarationContext);
             Utils.setChildrensParent(funDeclaration);
@@ -474,12 +554,12 @@ class ToAst {
             Utils.setChildrensParent(returnExpr);
 
             FunDeclaration funDeclaration = new FunDeclaration(
+                    toAst(funDeclarationContext.annotation()),
                     toAst(funDeclarationContext.ident()),
                     null,
                     funDeclarationContext.fun_parameters().fun_parameter()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()),
-                    funDeclarationContext.expressions().expression()
-                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
+                    getExpressionsList(funDeclarationContext),
                     returnExpr);
             Utils.setPosition(funDeclaration, funDeclarationContext);
             Utils.setChildrensParent(funDeclaration);
@@ -487,12 +567,12 @@ class ToAst {
 
         } else if (funDeclarationContext.type() == null && funDeclarationContext.KEYWORD_return() == null) {
             FunDeclaration funDeclaration = new FunDeclaration(
+                    toAst(funDeclarationContext.annotation()),
                     toAst(funDeclarationContext.ident()),
                     null,
                     funDeclarationContext.fun_parameters().fun_parameter()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()),
-                    funDeclarationContext.expressions().expression()
-                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
+                    getExpressionsList(funDeclarationContext),
                     null);
             Utils.setPosition(funDeclaration, funDeclarationContext);
             Utils.setChildrensParent(funDeclaration);
@@ -505,7 +585,7 @@ class ToAst {
         if (classDeclarationContext.class_body().declaration() != null) {
             ClassDeclaration classDeclaration = new ClassDeclaration(
                     toAst(classDeclarationContext.ident()),
-                    classDeclarationContext.class_body().fun_declaration()
+                    classDeclarationContext.class_body().declaration()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()),
                     null);
             Utils.setPosition(classDeclaration, classDeclarationContext);
@@ -515,7 +595,7 @@ class ToAst {
             ClassDeclaration classDeclaration = new ClassDeclaration(
                     toAst(classDeclarationContext.ident()),
                     null,
-                    classDeclarationContext.class_body().declaration()
+                    classDeclarationContext.class_body().fun_declaration()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()));
             Utils.setPosition(classDeclaration, classDeclarationContext);
             Utils.setChildrensParent(classDeclaration);
@@ -537,8 +617,14 @@ class ToAst {
                     addAll(programContext.class_declaration()
                             .stream().map(ToAst::toAst).collect(Collectors.toList()));
         }
+        List<InterfaceDeclaration> interfaceDeclarationList = new ArrayList<>();
+        if (programContext.interface_declaration() != null) {
+            interfaceDeclarationList.
+                    addAll(programContext.interface_declaration()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()));
+        }
 
-        Program program = new Program(classDeclarationList, funDeclarationList);
+        Program program = new Program(classDeclarationList, funDeclarationList, interfaceDeclarationList);
         Utils.setPosition(program, programContext);
         Utils.setChildrensParent(program);
         return program;

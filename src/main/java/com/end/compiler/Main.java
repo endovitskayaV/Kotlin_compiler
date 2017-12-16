@@ -15,16 +15,55 @@ import java.io.PrintWriter;
 import javax.swing.JFrame;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class Main {
 
+    static List<FunDeclaration> cSharpFunDeclarationList;
+
     public static void main(String[] args) {
+
+        Program cSharpFunDeclProgram=parse("CSharpFunDeclarations.vl");
+        cSharpFunDeclarationList= cSharpFunDeclProgram.getFunDeclarationList();
+        printAstTree(cSharpFunDeclProgram, "astCsharpFunDecl.txt");
+
+
+
+        Program program=parse("try.vl");
+
+        //if no errors -> generate code
+        if (!PrintableErrors.isErrorOccurred()) {
+            String byteCode = CodeGenerator.generateCode(program);
+            String byteCodeFileName = "bytecode.il";
+            printInFile(byteCodeFileName, byteCode);
+            System.out.println("Printed in " + byteCodeFileName + ":\n" + byteCode);
+        } else System.out.println("\nCannot generate code. Error(s) occurred\n");
+
+       printAstTree(program,"astTree.txt");
+    }
+
+    private static void printInFile(String fileName, String outputStr) {
+        try (PrintWriter printWriter = new PrintWriter(fileName)) {
+            printWriter.write(outputStr);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void printAstTree(Program program, String fileName){
+        String astTreeStr = TreePrinter.toString(program);
+        String astTreeFileName = fileName;
+        printInFile(astTreeFileName, astTreeStr);
+        System.out.println("Printed in " + astTreeFileName + ":\n" + astTreeStr);
+    }
+
+    private static Program parse(String fileName){
 
         //read code from file
         CharStream charStream = null;
         try {
-            charStream = CharStreams.fromFileName("codenew.txt");
+            charStream = CharStreams.fromFileName(fileName);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -34,34 +73,14 @@ public class Main {
         KParser kParser = new KParser(tokenStream);
         Tree tree = kParser.program();
 
-        //showSyntaxTree(tree, kParser);
-
         //build astTree (root=program)
         Program program = ToAst.toAst((KParser.ProgramContext) tree);
 
+
         //analyze tree(recursively, start from root)
         Analysis.analyze(program);
+        return program;
 
-        //if no errors -> generate code
-        if (!PrintableErrors.isErrorOccurred()) {
-            String byteCode = CodeGenerator.generateCode(program);
-            String byteCodeFileName = "bytecode.txt";
-            printInFile(byteCodeFileName, byteCode);
-            System.out.println("Printed in " + byteCodeFileName + ":\n" + byteCode);
-        } else System.out.println("\nCannot generate code. Error(s) occurred\n");
-
-        String astTreeStr = TreePrinter.toString(program);
-        String astTreeFileName = "astTree.txt";
-        printInFile(astTreeFileName, astTreeStr);
-        System.out.println("Printed in " + astTreeFileName + ":\n" + astTreeStr);
-    }
-
-    private static void printInFile(String fileName, String outputStr) {
-        try (PrintWriter printWriter = new PrintWriter(fileName)) {
-            printWriter.write(outputStr);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     private static void showSyntaxTree(Tree tree, KParser kParser) {

@@ -1,0 +1,10 @@
+fun fun10(a:Boolean, b:Int, c:Double, e:Boolean):Unit{
+          var d:String
+          d="qwerty"
+          var d1:Char
+                    d1="qwerty"
+                    d1='d'
+
+          print(d)
+
+          }

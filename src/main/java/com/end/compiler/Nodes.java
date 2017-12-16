@@ -51,7 +51,7 @@ abstract class Expr extends Expression {
         else return "";
     }
 
-    // public String errorName(){return this.type.name();}
+    // public String errorName(){return this.nestedType.name();}
 }
 
 @Data
@@ -75,28 +75,8 @@ interface Indexable {
 
 }
 
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper=true)
-class FunParameter extends Expr {
-    private VariableReference variable;
-    private Type type;
-
-    public FunParameter(VariableReference variable, Type type) {
-        setVariable(variable);
-        setType(type);
-    }
-
-    @Override
-    public String name() {
-        return variable.getVarName() + ":" + type.name() + variable.indexStr();
-    }
-
-    @Override
-    public List<? extends PrintableTreeNode> children() {
-        return new ArrayList<>();
-    }
-
+interface Constantable {
+    void fillCILValue(String CILValue);
 
 }
 
@@ -105,6 +85,7 @@ class FunParameter extends Expr {
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=true)
 class FunDeclaration extends Node {
+    private Annotation annotation;
     private VariableReference funName;
     private Type returnType;
     private List<FunParameter> funParametersList;
@@ -128,7 +109,8 @@ class FunDeclaration extends Node {
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children = new ArrayList<>();
-        children.addAll(0, expressionList);
+        if (annotation!=null) children.add(annotation);
+       if (expressionList!=null) children.addAll(0, expressionList);
         if (returnExpr != null)
             children.add(returnExpr);
         return children;
@@ -156,12 +138,12 @@ class FunDeclaration extends Node {
 class ClassDeclaration extends Node {
 
     private VariableReference className;
-    private List<Node> propertiesDecls;
-    private List<Node> funDeclarations;
+    private List<Declaration> propertiesDecls;
+    private List<FunDeclaration> funDeclarations;
 
     @Override
     public String name() {
-        return "class ";
+        return "class "+className.getVarName();
     }
 
     @Override
@@ -174,9 +156,64 @@ class ClassDeclaration extends Node {
 
     @Override
     public String toString() {
-        return "class " + className.getVarName();
+        return name();
     }
 }
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper=true)
+class  FunSignature extends Node {
+    private Annotation annotation;
+    private VariableReference funName;
+    private Type returnType;
+    private List<FunParameter> funParametersList;
+
+    @Override
+    public String name() {
+            StringBuilder returnStr = new StringBuilder("fun " + funName.getVarName() + "(");
+            if (funParametersList.size() > 0) {
+                for (Node funParam : funParametersList)
+                    returnStr.append(funParam.name()).append(", ");
+                returnStr = new StringBuilder(returnStr.substring(0, returnStr.length() - 2));
+            }
+            returnStr.append(") :");
+            if (returnType != null) returnStr.append(returnType.name());
+            else returnStr.append("Unit");
+            return returnStr.toString();
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        ArrayList<PrintableTreeNode> children = new ArrayList<>();
+        if (annotation!=null) children.add(annotation);
+        return children;
+    }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper=true)
+class InterfaceDeclaration extends Node {
+    private VariableReference interfaceName;
+    private List<Declaration> propertiesDecls;
+    private List<FunSignature> funSignatureList;
+    @Override
+    public String name() {
+        return "interface "+interfaceName.getVarName();
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        ArrayList<PrintableTreeNode> children = new ArrayList<>();
+        if (propertiesDecls != null) children.addAll(propertiesDecls);
+        if (funSignatureList != null) children.addAll(funSignatureList);
+        return children;
+    }
+}
+
 
 @Data
 @AllArgsConstructor
@@ -186,6 +223,7 @@ class Program extends Node {
 
     private List<ClassDeclaration> classDeclarationList;
     private List<FunDeclaration> funDeclarationList;
+    private List <InterfaceDeclaration> interfaceDeclarationList;
 
     @Override
     public String name() {
@@ -195,9 +233,35 @@ class Program extends Node {
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children = new ArrayList<>();
+        if (interfaceDeclarationList != null) children.addAll(interfaceDeclarationList);
         if (classDeclarationList != null) children.addAll(classDeclarationList);
         if (funDeclarationList != null) children.addAll(funDeclarationList);
         return children;
+    }
+}
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper=true)
+class Annotation extends Node{
+
+    private String name;
+    private String parameter;
+
+    @Override
+    public void setParent(Node parent){
+        this.parent=null;
+    }
+
+    @Override
+    public String name() {
+        return "@"+name;
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        return new ArrayList<>();
     }
 }
 
@@ -384,6 +448,32 @@ class ThenBlock extends Expression {
 }
 
 @Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper=true)
+class FunParameter extends Expr {
+    private VariableReference variable;
+    private Type type;
+
+    public FunParameter(VariableReference variable, Type type) {
+        setVariable(variable);
+        setType(type);
+    }
+
+    @Override
+    public String name() {
+        return variable.getVarName() + ":" + type.name() + variable.indexStr();
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        return new ArrayList<>();
+    }
+
+
+}
+
+
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=true)
@@ -469,9 +559,9 @@ class VariableReference extends Expr implements Indexable {
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=true)
-class IntegerVar extends Expr implements Indexable {
+class IntegerVar extends Expr implements Constantable {
     private String value;
-    private String index;
+    private String CILValue;
 
     public IntegerVar(String value) {
         setValue(value);
@@ -479,7 +569,7 @@ class IntegerVar extends Expr implements Indexable {
 
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed() + " const " + indexStr();
+        return value + typeOrNull() + castToIfNeed() + " const " + CILValue;
     }
 
     @Override
@@ -487,33 +577,26 @@ class IntegerVar extends Expr implements Indexable {
         return new ArrayList<>();
     }
 
-    @Override
-    public void fillIndex(String index) {
-        this.index = index;
-    }
 
     @Override
-    public String indexStr() {
-        return " index:" + index;
+    public void fillCILValue(String CILValue) {
+        this.CILValue=CILValue;
     }
-
-
 }
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=true)
-class CharVar extends Expr implements Indexable {
+class CharVar extends Expr implements Constantable {
     private String value;
-    private String index = "-1";
-
+    private String CILValue;
     public CharVar(String value) {
         setValue(value);
     }
 
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed() + " const " + indexStr();
+        return value + typeOrNull() + castToIfNeed() + " const " + CILValue;
     }
 
     @Override
@@ -521,14 +604,38 @@ class CharVar extends Expr implements Indexable {
         return new ArrayList<>();
     }
 
+
     @Override
-    public void fillIndex(String index) {
-        this.index = index;
+    public void fillCILValue(String CILValue) {
+        this.CILValue=CILValue;
+    }
+}
+
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper=true)
+class StringVar extends Expr implements Constantable {
+    private String value;
+    private String CILValue;
+    public StringVar(String value) {
+        setValue(value);
     }
 
     @Override
-    public String indexStr() {
-        return " index:" + index;
+    public String name() {
+        return value + typeOrNull() + castToIfNeed() + " const " + CILValue;
+    }
+
+    @Override
+    public List<? extends PrintableTreeNode> children() {
+        return new ArrayList<>();
+    }
+
+
+    @Override
+    public void fillCILValue(String CILValue) {
+        this.CILValue=CILValue;
     }
 }
 
@@ -536,9 +643,9 @@ class CharVar extends Expr implements Indexable {
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=true)
-class DoubleVar extends Expr implements Indexable {
+class DoubleVar extends Expr implements Constantable {
     private String value;
-    private String index = "-1";
+    private String CILValue;
 
     public DoubleVar(String value) {
         setValue(value);
@@ -546,7 +653,7 @@ class DoubleVar extends Expr implements Indexable {
 
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed() + " const " + indexStr();
+        return value + typeOrNull() + castToIfNeed() + " const " + CILValue;
     }
 
     @Override
@@ -555,22 +662,17 @@ class DoubleVar extends Expr implements Indexable {
     }
 
     @Override
-    public void fillIndex(String index) {
-        this.index = index;
-    }
-
-    @Override
-    public String indexStr() {
-        return " index:" + index;
+    public void fillCILValue(String CILValue) {
+        this.CILValue=CILValue;
     }
 }
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=true)
-class BooleanVar extends Expr implements Indexable {
+class BooleanVar extends Expr implements Constantable {
     private String value;
-    private String index = "-1";
+    private String CILValue;
 
     public BooleanVar(String value) {
         setValue(value);
@@ -578,7 +680,7 @@ class BooleanVar extends Expr implements Indexable {
 
     @Override
     public String name() {
-        return value + typeOrNull() + castToIfNeed() + " const " + indexStr();
+        return value + typeOrNull() + castToIfNeed() + " const " + CILValue;
     }
 
     @Override
@@ -586,14 +688,11 @@ class BooleanVar extends Expr implements Indexable {
         return new ArrayList<>();
     }
 
-    @Override
-    public void fillIndex(String index) {
-        this.index = index;
-    }
+
 
     @Override
-    public String indexStr() {
-        return " index:" + index;
+    public void fillCILValue(String CILValue) {
+     this.CILValue=CILValue;
     }
 }
 
@@ -632,7 +731,7 @@ class FunCall extends Expr {
 //        String returnStr=name+"(";
 //        if (this.parameters.size()>0){
 //            returnStr+=this.getParameters().stream()
-//                    .map(x->x.getType().name())
+//                    .map(x->x.getNestedType().name())
 //                    .collect(Collectors.joining(","));
 //        }
 //        returnStr+=")";
@@ -740,16 +839,25 @@ class Char extends Type {
 
 }
 
+@NoArgsConstructor
+class StringType extends Type {
+    @Override
+    public String name() {
+        return "String";
+    }
+
+}
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=true)
 class Array extends Type {
-    private Type type;
+    private Type nestedType;
 
     @Override
     public String name() {
-        return "Array<" + type.name() + ">";
+        return "Array<" + nestedType.name() + ">";
     }
 }
 

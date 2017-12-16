@@ -1,5 +1,6 @@
 package com.end.compiler;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class Analysis {
@@ -7,8 +8,7 @@ public class Analysis {
 
     //---------------------------------NODE analysis---------------------------------------//
     public static void analyze(Program program) {
-
-        //fill type for all expr
+        //fill nestedType for all expr
         Utils.getAllTargetClassChildren(program, Expr.class).stream().filter(Objects::nonNull)
                 .forEach(x -> x.fillType(getType(x)));
 
@@ -42,6 +42,8 @@ public class Analysis {
         //fun dubliations
         List<FunDeclaration> funList = new ArrayList<>();
         funList.addAll(Utils.getAllVisibleTagertClassNodes(funDeclaration, FunDeclaration.class));
+       if (Main.cSharpFunDeclarationList!=null)
+        funList.addAll(Main.cSharpFunDeclarationList);
         if (funList.size() > 0) { //check possibility to remove item
             funList.remove(funDeclaration); //remove this funDeclaeation
             funList.forEach(x -> {
@@ -51,12 +53,13 @@ public class Analysis {
             });
         }
 
-        funDeclaration.getExpressionList().forEach(Analysis::analyze);
+        if (funDeclaration.getExpressionList() != null)
+            funDeclaration.getExpressionList().forEach(Analysis::analyze);
 
         if (funDeclaration.getReturnExpr() != null) analyze(funDeclaration.getReturnExpr());
 
         //Type: returnExpr and declared
-        //wrong returnExpr type?
+        //wrong returnExpr nestedType?
         if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() != null) {
             Type returnExprType = getType(funDeclaration.getReturnExpr());
 
@@ -118,7 +121,7 @@ public class Analysis {
         if (declaration.getExpr() != null) {
             analyze(declaration.getExpr());
 
-            //check types: declared and expr type
+            //check types: declared and expr nestedType
             Type foundType = getType(declaration.getExpr());
             if (!typesAreEqual(foundType, declaration.getNewVariable().getType()))
                 PrintableErrors.printTypeMismatchError(
@@ -126,7 +129,7 @@ public class Analysis {
                         foundType,
                         declaration.position);
 
-            //check nested type
+            //check nested nestedType
             if (declaration.getExpr() instanceof ArrayInitailization) {
                 String expectedType = declaration.getNewVariable().getType().name();
                 if (!(expectedType.equals(foundType.name())))
@@ -142,6 +145,7 @@ public class Analysis {
         analyze(assignment.getLeft());
         analyze(assignment.getValue());
 
+        //TODO: fun Was variable declared/ assigned -> check declaration, assignment
         //was variable declared
         Optional<Declaration> declaration = Utils.getAllVisibleTagertClassNodes(assignment, Declaration.class).stream()
                 .filter(x -> {
@@ -153,22 +157,28 @@ public class Analysis {
                 }).findFirst();
 
         //if variable was declared check types
-        if ((declaration.isPresent())
-                //arr access type was checked in leftExpr
-                && (!(assignment.getLeft() instanceof ArrayAccess))
-                && (!typesAreEqual
-                (declaration.get().getNewVariable().getType(), getType(assignment.getValue()))))
-            PrintableErrors.printTypeMismatchError(
-                    declaration.get().getNewVariable().getType(),//expectedType
-                    getType(assignment.getValue()),//actual type
-                    assignment.position);
+        if (declaration.isPresent()) {
+            if ((assignment.getLeft() instanceof ArrayAccess)) {
+                if (!typesAreEqual
+                        (((Array) declaration.get().getNewVariable().getType()).getNestedType(), getType(assignment.getValue())))
+                    PrintableErrors.printTypeMismatchError(
+                            ((Array) declaration.get().getNewVariable().getType()).getNestedType(),//expectedType
+                            getType(assignment.getValue()),//actual nestedType
+                            assignment.position);
+            } else if (!typesAreEqual
+                    (declaration.get().getNewVariable().getType(), getType(assignment.getValue())))
+                PrintableErrors.printTypeMismatchError(
+                        declaration.get().getNewVariable().getType(),//expectedType
+                        getType(assignment.getValue()),//actual nestedType
+                        assignment.position);
+        }
     }
 
     private static void analyze(WhileLoop whileLoop) {
 
         analyze(whileLoop.getCondition());
 
-        //check if condition type is Boolean
+        //check if condition nestedType is Boolean
         Type actualType = getType(whileLoop.getCondition());
         if (!typesAreEqual(actualType, new Boolean()))
             PrintableErrors.printTypeMismatchError
@@ -180,7 +190,7 @@ public class Analysis {
     private static void analyze(DoWhileLoop doWhileLoop) {
         analyze(doWhileLoop.getCondition());
 
-        //check if condition type is Boolean
+        //check if condition nestedType is Boolean
         Type actualType = getType(doWhileLoop.getCondition());
         if (!typesAreEqual(actualType, new Boolean()))
             PrintableErrors.printTypeMismatchError
@@ -192,7 +202,7 @@ public class Analysis {
     private static void analyze(ForLoop forLoop) {
         fillIndex(forLoop.getIterator());
 
-        //check if iterable type is Array
+        //check if iterable nestedType is Array
         if (!(getType(forLoop.getIterable()) instanceof Array))
             PrintableErrors.printIsNotIterableError(forLoop.getIterable().position);
 
@@ -204,7 +214,7 @@ public class Analysis {
     private static void analyze(IfOper ifOperBlock) {
         analyze(ifOperBlock.getCondition());
 
-        //check if condition type is Boolean
+        //check if condition nestedType is Boolean
         Type actualType = getType(ifOperBlock.getCondition());
         if (!typesAreEqual(actualType, new Boolean()))
             PrintableErrors.printTypeMismatchError(
@@ -250,28 +260,34 @@ public class Analysis {
             analyze(((CharVar) expr));
         else if (expr.getClass().getSimpleName().equals(DoubleVar.class.getSimpleName()))
             analyze(((DoubleVar) expr));
+        else if (expr.getClass().getSimpleName().equals(StringVar.class.getSimpleName()))
+            analyze(((StringVar) expr));
     }
 
     private static void analyze(DoubleVar doubleVar) {
-        doubleVar.fillIndex(doubleVar.getValue());
+        doubleVar.fillCILValue(doubleVar.getValue());
     }
 
     private static void analyze(CharVar charVar) {
-        charVar.fillIndex(java.lang.Integer.toString
+        charVar.fillCILValue(java.lang.Integer.toString
                 (((int) charVar.getValue().charAt(1))));
     }
 
+    private static void analyze(StringVar stringVar) {
+        stringVar.fillCILValue("-2");
+    }
+
     private static void analyze(IntegerVar integerVar) {
-        integerVar.fillIndex(integerVar.getValue());
+        integerVar.fillCILValue(integerVar.getValue());
     }
 
     private static void analyze(BooleanVar booleanVar) {
         switch (booleanVar.getValue()) {
             case "true":
-                booleanVar.fillIndex("1");
+                booleanVar.fillCILValue("1");
                 break;
             case "false":
-                booleanVar.fillIndex("0");
+                booleanVar.fillCILValue("0");
                 break;
             default:
                 throw new UnsupportedOperationException();
@@ -329,9 +345,11 @@ public class Analysis {
     }
 
     private static void analyze(FunCall funCall) {
+        List<FunDeclaration> funDeclarationList=Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class);
+      if (Main.cSharpFunDeclarationList!=null)
+        funDeclarationList.addAll(Main.cSharpFunDeclarationList);
         //was fun declared
-        if (!(Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class)
-                .stream().filter(
+        if (!(funDeclarationList.stream().filter(
                         x -> (
                                 (x.getFunName().getVarName().equals(funCall.getName()))
                                         &&
@@ -411,7 +429,7 @@ public class Analysis {
     }
 
     private static void analyze(ArrayAccess arrayAccess) {
-        //check if index is Integer type
+        //check if index is Integer nestedType
         Type expectedType = new Integer();
         Type foundType = getType(arrayAccess.getExpr());
         if (!(typesAreEqual(foundType, expectedType)))
@@ -450,7 +468,7 @@ public class Analysis {
             //need to do it here
             AutoCastType(getType(((BinaryExpr) expr).getLeft()), getType(((BinaryExpr) expr).getRight()));
 
-            //if there is comparing signs in expr, type is definitely Boolean
+            //if there is comparing signs in expr, nestedType is definitely Boolean
             if (Arrays.asList("!=", "==", ">=", "<=", ">", "<")
                     .contains(((BinaryExpr) expr).getSign()))
                 return new Boolean();
@@ -470,6 +488,8 @@ public class Analysis {
             return new Char();
         else if (expr.getClass().getSimpleName().equals(DoubleVar.class.getSimpleName()))
             return new Double();
+        else if (expr.getClass().getSimpleName().equals(StringVar.class.getSimpleName()))
+            return new StringType();
         else if (expr.getClass().getSimpleName().equals(BooleanVar.class.getSimpleName()))
             return new Boolean();
         else if (expr.getClass().getSimpleName().equals(FunCall.class.getSimpleName()))
@@ -494,8 +514,8 @@ public class Analysis {
                                 && (typesAreEqual(x.getNewVariable().getType(), new Array())))).findFirst();
 
         if (declaration.isPresent())
-            //return nested type assumig than declaration type is Array
-            return ((Array) declaration.get().getNewVariable().getType()).getType();
+            //return nested nestedType assumig than declaration nestedType is Array
+            return ((Array) declaration.get().getNewVariable().getType()).getNestedType();
         //else
         return null;
     }
@@ -536,6 +556,8 @@ public class Analysis {
             return resolveByDouble(type2);
         if (type1.getClass().getSimpleName().equals(Char.class.getSimpleName()))
             return resolveByChar(type2);
+        if (type1.getClass().getSimpleName().equals(StringType.class.getSimpleName()))
+            return resolveByString(type2);
         if (type1.getClass().getSimpleName().equals(Boolean.class.getSimpleName()))
             return resolveByBoolean(type2);
         if (type1.getClass().getSimpleName().equals(Array.class.getSimpleName()))
@@ -551,6 +573,7 @@ public class Analysis {
         if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return new Double();
 
         if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(StringType.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Array.class.getSimpleName())) return null;
         return null;
@@ -561,6 +584,7 @@ public class Analysis {
         if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return new Double();
 
         if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(StringType.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Array.class.getSimpleName())) return null;
         return null;
@@ -569,6 +593,18 @@ public class Analysis {
     private static Type resolveByChar(Type type) {
         if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return new Char();
 
+        if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(StringType.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
+        if (type.getClass().getSimpleName().equals(Array.class.getSimpleName())) return null;
+        return null;
+    }
+
+    private static Type resolveByString(Type type) {
+        if (type.getClass().getSimpleName().equals(StringType.class.getSimpleName())) return new StringType();
+
+        if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return null;
@@ -579,6 +615,7 @@ public class Analysis {
     private static Type resolveByBoolean(Type type) {
         if (type.getClass().getSimpleName().equals(Boolean.class.getSimpleName())) return new Boolean();
 
+        if (type.getClass().getSimpleName().equals(StringType.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Integer.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Double.class.getSimpleName())) return null;
         if (type.getClass().getSimpleName().equals(Char.class.getSimpleName())) return null;
@@ -596,10 +633,10 @@ public class Analysis {
         //was declared?
         Optional<Declaration> declaration =
                 Utils.getAllVisibleTagertClassNodes(variableReference, Declaration.class)
-                .stream().filter(decl ->
+                        .stream().filter(decl ->
                         decl.getNewVariable().getVariable().getVarName()
                                 .equals(variableReference.getVarName()))
-                .findFirst();
+                        .findFirst();
         if (declaration.isPresent()) return declaration.get().getNewVariable().getType();
         else {// used in for?
             Optional<ForLoop> forLoop = Utils.getAllVisibleTagertClassNodes(variableReference, ForLoop.class)
@@ -610,7 +647,7 @@ public class Analysis {
                 if (getType(forLoop.get().getIterable()) instanceof Array) {
                     //перебираемая переменная - массив?
                     //тип переменной - это тип элемента массива
-                    return ((Array) getType(forLoop.get().getIterable())).getType();
+                    return ((Array) getType(forLoop.get().getIterable())).getNestedType();
                 }
             }
         } //does not exist

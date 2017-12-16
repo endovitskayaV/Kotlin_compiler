@@ -16,6 +16,7 @@ KEYWORD_int: 'Int';
 KEYWORD_double: 'Double';
 KEYWORD_boolean: 'Boolean';
 KEYWORD_char:'Char';
+KEYWORD_string:'String';
 KEYWORD_array:'Array';
 
 KEYWORD_true: 'true';
@@ -28,14 +29,9 @@ KEYWORD_do:'do';
 KEYWORD_for: 'for';
 KEYWORD_in: 'in';
 
-KEYWORD_div:'div';
-KEYWORD_rem:'rem';
-KEYWORD_inc:'inc';
-KEYWORD_dec:'dec';
-KEYWORD_print:'print';
-KEYWORD_println:'println';
-KEYWORD_readLine: 'readLine';
+KEYWORD_interface: 'interface';
 
+AT: '@';
 
 NOT:'!';
 NNV:'!!';
@@ -52,9 +48,10 @@ DIGIT: '0'..'9';
 
 INTEGER: ('0'| ('1'..'9' DIGIT*));
 DOUBLE : DIGIT+ (DOT DIGIT+)?;
-CHAR
-    : '\'' (EscapeSeq | .) '\''
-    ;
+CHAR: '\'' (EscapeSeq | .) '\'' ;
+STRING: UnterminatedStringLiteral DOUBLE_QUOTES;
+
+UnterminatedStringLiteral: DOUBLE_QUOTES (~["\\\r\n] | '\\' (. | EOF))*;
 
 fragment
 EscapeSeq: UniCharacterLiteral | EscapedIdentifier;
@@ -96,3 +93,5 @@ CBC: '}';
 CBO: '{';
 SBC: ']';
 SBO: '[';
+
+DOUBLE_QUOTES: '"';

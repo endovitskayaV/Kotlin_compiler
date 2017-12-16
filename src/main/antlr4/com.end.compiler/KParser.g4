@@ -4,8 +4,6 @@ parser grammar KParser;
 //* 0-..
 //+ 1-..
 
-//TODO: think of better way of semicolon
-//TODO: String, Reference parameters
 
 options {tokenVocab=KLexer; }
 
@@ -15,10 +13,13 @@ number: INTEGER #integerLit
        ;
 char_var: CHAR;
 boolean_var: KEYWORD_true | KEYWORD_false;
+string_var:STRING;
+
 concrete_var:
       number        #numberLit
     | boolean_var   #booleanLit
     | char_var      #charLit
+    | string_var    #stringLit
     ;
 variable:
     concrete_var    #concreteVariable
@@ -40,6 +41,7 @@ type: KEYWORD_int               #intType
     | KEYWORD_boolean           #booleanType
     | KEYWORD_array '<'type'>'  #arrayType
     | KEYWORD_char              #charType
+    | KEYWORD_string            #stringType
     ;
 
 declaration: (KEYWORD_val|KEYWORD_var) ident COLON type  (ASSIGN expr)?;
@@ -72,17 +74,22 @@ for_loop:KEYWORD_for  RBO (variable KEYWORD_in expr) RBC  (expression | block);
 do_while_loop:KEYWORD_do block  NL* KEYWORD_while RBO expr RBC;
 
 
+ annotation: AT SimpleName (RBO ident RBC)?;
  fun_parameter: ident COLON type;
  fun_parameters: RBO (fun_parameter (COMMA fun_parameter)*)? RBC;
- fun_declaration: KEYWORD_fun ident fun_parameters COLON (type|KEYWORD_Unit) CBO expressions (KEYWORD_return expr)? CBC;
+ fun_declaration: annotation? KEYWORD_fun ident fun_parameters COLON (type|KEYWORD_Unit)
+                  CBO expressions (KEYWORD_return expr)? CBC;
  fun_call: ident RBO (expr (COMMA expr)* )? RBC;
 
  class_body: CBO (declaration| fun_declaration)*  CBC;
  class_declaration: KEYWORD_class ident class_body;
 
- program: (class_declaration | fun_declaration)*;
 
+ fun_signature: annotation? KEYWORD_fun ident fun_parameters COLON (type|KEYWORD_Unit);
+ interface_declaration: KEYWORD_interface ident
+                        CBO (declaration|fun_signature)*  CBC;
 
+ program: (class_declaration | fun_declaration | interface_declaration)*;
 
 
 

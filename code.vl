@@ -91,7 +91,6 @@ var b:Int=5
     var b1:Double=5.1
         a=b1*fun6()
         a1=b1-fun7()
-        a1=b1-fun7(a)
         a1=b1-fun8(a)
 
 
@@ -100,6 +99,9 @@ var b:Int=5
       arr3[4]=1
       arr[2]=1.5
       arr[3.4]=true
+
+       var arr5:Array<Int>
+            var arr5:Boolean
     }
 fun fun6():Double{ return noSuchFun(q)}
 fun fun6(a:Boolean):Double{ return fun7()}
@@ -108,7 +110,8 @@ fun fun8(param:Int):Int{
 
   fun7(4, 5, true)
     fun8 (fun7(4))
-     var arr: Array<Boolean> = Array<Boolean>(9)
+     var arr: Array<Int> = Array<Int>(9)
+     fun67(arr)
     return arr[3]
     }
     fun fun10(a:Boolean, b:Int, c:Double, e:Boolean):Unit{
@@ -117,4 +120,12 @@ fun fun8(param:Int):Int{
     var d3:Int
     var d4:Int
     d=4
+    if(true){
+    var c:Boolean
+    c=false
+
+    }
+    }
+
+    fun fun67(arr:Array<Int>):Unit{
     }
