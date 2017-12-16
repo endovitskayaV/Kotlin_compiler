@@ -469,6 +469,11 @@ class FunParameter extends Expr {
         return new ArrayList<>();
     }
 
+    @Override
+    public String toString(){
+        return variable.getVarName();
+    }
+
 
 }
 

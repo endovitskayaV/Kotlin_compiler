@@ -61,7 +61,7 @@ class Test{}
   for (i in Array<Int>(4)) {
 
               }
-
+``
               for (i in true) {
               c=0
                           }
@@ -106,6 +106,7 @@ var b:Int=5
 fun fun6():Double{ return noSuchFun(q)}
 fun fun6(a:Boolean):Double{ return fun7()}
 fun fun7():Int{ return g }
+
 fun fun8(param:Int):Int{
 
   fun7(4, 5, true)
@@ -114,7 +115,8 @@ fun fun8(param:Int):Int{
      fun67(arr)
     return arr[3]
     }
-    fun fun10(a:Boolean, b:Int, c:Double, e:Boolean):Unit{
+
+    fun fun10(b:Boolean, a:Int, c:Double, e:Boolean):Unit{
     var d:Int
     var d2:Int
     var d3:Int
@@ -125,7 +127,15 @@ fun fun8(param:Int):Int{
     c=false
 
     }
+
+    a=true
+    b=1
+    c=9.8
+    e=false
     }
 
     fun fun67(arr:Array<Int>):Unit{
+    var a:String="печатает))"
+    print(a)
+    print (1)
     }

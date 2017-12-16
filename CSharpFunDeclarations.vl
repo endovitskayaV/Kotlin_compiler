@@ -1,2 +1,2 @@
 
- fun print(str: String){}
+ fun print(str: String):Unit{}

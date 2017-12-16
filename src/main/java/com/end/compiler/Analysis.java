@@ -1,7 +1,7 @@
 package com.end.compiler;
 
-import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Analysis {
     private static int index;
@@ -42,8 +42,8 @@ public class Analysis {
         //fun dubliations
         List<FunDeclaration> funList = new ArrayList<>();
         funList.addAll(Utils.getAllVisibleTagertClassNodes(funDeclaration, FunDeclaration.class));
-       if (Main.cSharpFunDeclarationList!=null)
-        funList.addAll(Main.cSharpFunDeclarationList);
+        if (Main.cSharpFunDeclarationList != null)
+            funList.addAll(Main.cSharpFunDeclarationList);
         if (funList.size() > 0) { //check possibility to remove item
             funList.remove(funDeclaration); //remove this funDeclaeation
             funList.forEach(x -> {
@@ -103,20 +103,25 @@ public class Analysis {
     }
 
     private static void analyze(Declaration declaration) {
-        analyze(declaration.getNewVariable());
+        fillIndex(declaration.getNewVariable().getVariable());
+        //analyze(declaration.getNewVariable());
 
-        //was variable declared
-        //cannot check it in newVariable analysis
-        List<Declaration> declList = new ArrayList<>();
-        declList.addAll(Utils.getAllVisibleTagertClassNodes(declaration, Declaration.class));
-        declList.remove(declaration);
-        declList.forEach(x -> {
-            if (x.getNewVariable().getVariable().getVarName().equals
-                    (declaration.getNewVariable().getVariable().getVarName())) {
-                PrintableErrors.printConflict(declaration.position,
-                        declaration, x);
-            }
-        });
+        Expression parent = wasVariableDeclared(declaration, declaration.getNewVariable().getVariable().getVarName());
+        if (parent != null) PrintableErrors.printConflict(declaration.position, declaration, parent);
+
+
+//        //was variable declared
+//        //cannot check it in newVariable analysis
+//        List<Declaration> declList = new ArrayList<>();
+//        declList.addAll(Utils.getAllVisibleTagertClassNodes(declaration, Declaration.class));
+//        declList.remove(declaration);
+//        declList.forEach(x -> {
+//            if (x.getNewVariable().getVariable().getVarName().equals
+//                    (declaration.getNewVariable().getVariable().getVarName())) {
+//                PrintableErrors.printConflict(declaration.position,
+//                        declaration, x);
+//            }
+//        });
 
         if (declaration.getExpr() != null) {
             analyze(declaration.getExpr());
@@ -131,8 +136,8 @@ public class Analysis {
 
             //check nested nestedType
             if (declaration.getExpr() instanceof ArrayInitailization) {
-                String expectedType = declaration.getNewVariable().getType().name();
-                if (!(expectedType.equals(foundType.name())))
+                String expectedNestedType = declaration.getNewVariable().getType().name();
+                if (!(expectedNestedType.equals(foundType.name())))
                     PrintableErrors.printTypeMismatchError(
                             declaration.getNewVariable().getType(),
                             foundType,
@@ -141,34 +146,49 @@ public class Analysis {
         }
     }
 
+    private static Type getType(Expression expression) {
+        if (expression instanceof Expr) return getType((Expr) expression);
+        else if (expression instanceof ForLoop) return getType(((ForLoop) expression).getIterator());
+        else /*if (expression instanceof Declaration)*/ return getType(((Declaration) expression).getNewVariable());
+    }
+
     private static void analyze(Assignment assignment) {
         analyze(assignment.getLeft());
         analyze(assignment.getValue());
 
-        //TODO: fun Was variable declared/ assigned -> check declaration, assignment
-        //was variable declared
-        Optional<Declaration> declaration = Utils.getAllVisibleTagertClassNodes(assignment, Declaration.class).stream()
-                .filter(x -> {
-                    String name;
-                    if (assignment.getLeft() instanceof VariableReference)
-                        name = ((VariableReference) assignment.getLeft()).getVarName();
-                    else name = ((ArrayAccess) assignment.getLeft()).getVariableReference().getVarName();
-                    return name.equals(x.getNewVariable().getVariable().getVarName());
-                }).findFirst();
+        String name;
+        if (assignment.getLeft() instanceof VariableReference)
+            name = ((VariableReference) assignment.getLeft()).getVarName();
+        else name = ((ArrayAccess) assignment.getLeft()).getVariableReference().getVarName();
+        Expression parent = wasVariableDeclared(assignment, name);
 
-        //if variable was declared check types
-        if (declaration.isPresent()) {
+        if (parent != null) {
+            Type expectedType = getType(parent);
+
+
+//        //was variable declared
+//        Optional<Declaration> declaration = Utils.getAllVisibleTagertClassNodes(assignment, Declaration.class).stream()
+//                .filter(x -> {
+//                    String name;
+//                    if (assignment.getLeft() instanceof VariableReference)
+//                        name = ((VariableReference) assignment.getLeft()).getVarName();
+//                    else name = ((ArrayAccess) assignment.getLeft()).getVariableReference().getVarName();
+//                    return name.equals(x.getNewVariable().getVariable().getVarName());
+//                }).findFirst();
+//
+//        //if variable was declared check types
+//        if (declaration.isPresent()) {
             if ((assignment.getLeft() instanceof ArrayAccess)) {
                 if (!typesAreEqual
-                        (((Array) declaration.get().getNewVariable().getType()).getNestedType(), getType(assignment.getValue())))
+                        (((Array) expectedType).getNestedType(), getType(assignment.getValue())))
                     PrintableErrors.printTypeMismatchError(
-                            ((Array) declaration.get().getNewVariable().getType()).getNestedType(),//expectedType
+                            ((Array) expectedType).getNestedType(),//expectedType
                             getType(assignment.getValue()),//actual nestedType
                             assignment.position);
             } else if (!typesAreEqual
-                    (declaration.get().getNewVariable().getType(), getType(assignment.getValue())))
+                    (expectedType, getType(assignment.getValue())))
                 PrintableErrors.printTypeMismatchError(
-                        declaration.get().getNewVariable().getType(),//expectedType
+                        expectedType,//expectedType
                         getType(assignment.getValue()),//actual nestedType
                         assignment.position);
         }
@@ -274,7 +294,7 @@ public class Analysis {
     }
 
     private static void analyze(StringVar stringVar) {
-        stringVar.fillCILValue("-2");
+        stringVar.fillCILValue(stringVar.getValue());
     }
 
     private static void analyze(IntegerVar integerVar) {
@@ -333,75 +353,107 @@ public class Analysis {
     private static void analyze(NewVariable newVariable) {
         fillIndex(newVariable.getVariable());
 
-        //check if there was such newVariable among newVariables
-        List<NewVariable> newVariableList = Utils.getAllVisibleTagertClassNodes
-                (newVariable, NewVariable.class);
-        if (newVariableList.size() > 0) {//check possibility to remove item
-            newVariableList.remove(newVariable); //remove this newVariable
-            if (newVariableList.stream()
-                    .anyMatch(x -> (x.name()).equals(newVariable.name())))
-                PrintableErrors.printDublicatesError(newVariable.name(), newVariable.position);
-        }
+//        //check if there was such newVariable among newVariables
+//        List<NewVariable> newVariableList = Utils.getAllVisibleTagertClassNodes
+//                (newVariable, NewVariable.class);
+//        if (newVariableList.size() > 0) {//check possibility to remove item
+//            newVariableList.remove(newVariable); //remove this newVariable
+//            if (newVariableList.stream()
+//                    .anyMatch(x -> (x.name()).equals(newVariable.name())))
+        if (wasVariableDeclared(newVariable, newVariable.getVariable().getVarName()) != null)
+            PrintableErrors.printDublicatesError(newVariable.name(), newVariable.position);
+        // }
     }
 
     private static void analyze(FunCall funCall) {
-        List<FunDeclaration> funDeclarationList=Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class);
-      if (Main.cSharpFunDeclarationList!=null)
-        funDeclarationList.addAll(Main.cSharpFunDeclarationList);
+        List<FunDeclaration> funDeclarationList = Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class);
+        if (Main.cSharpFunDeclarationList != null)
+            funDeclarationList.addAll(Main.cSharpFunDeclarationList);
         //was fun declared
         if (!(funDeclarationList.stream().filter(
-                        x -> (
-                                (x.getFunName().getVarName().equals(funCall.getName()))
-                                        &&
-                                        (areFormalAndActualParamsEqual(x.getFunParametersList(), funCall.getParameters()))
-                        )).findFirst().isPresent()))
+                x -> (
+                        (x.getFunName().getVarName().equals(funCall.getName()))
+                                &&
+                                (areFormalAndActualParamsEqual(x.getFunParametersList(), funCall.getParameters()))
+                )).findFirst().isPresent()))
             PrintableErrors.printNoSuchFunctionError(funCall, funCall.position);
 
         funCall.getParameters().forEach(Analysis::analyze);
     }
 
-    private static void analyze(VariableReference variableReference) {
+    private static <T extends Expression> T wasVariableDeclared(T node, String nodeName) {
+        List<NewVariable> newVariable =
+                Utils.getAllVisibleTagertClassNodes(node, NewVariable.class)
+                        .stream().filter((x -> (x.getVariable().getVarName()).equals(nodeName))).collect(Collectors.toList());
+        newVariable.remove(node);
 
-        //была ли переменная объявлена (if not then Error)
-        if (!((Utils.getAllVisibleTagertClassNodes(variableReference, NewVariable.class)
-                .stream().anyMatch(x -> (x.getVariable().getVarName()).equals(variableReference.getVarName()))
-                ||
-                Utils.getAllVisibleTagertClassNodes(variableReference, ForLoop.class)
-                        .stream().anyMatch(x ->
-                        (x.getIterator().getVarName()).equals(variableReference.getVarName())))
-                ||
-                Utils.getAllVisibleTagertClassNodes(variableReference, Declaration.class)
-                        .stream().anyMatch(x -> (x.getNewVariable().getVariable().getVarName()).equals(variableReference.getVarName()))))
+        if (newVariable.size() > 0) return ((T) newVariable.get(0));
+        //---------------------------------------------------------------------------------------//
+        List<ForLoop> forLoop =
+                Utils.getAllVisibleTagertClassNodes(node, ForLoop.class)
+                        .stream().filter
+                        (x -> (x.getIterator().getVarName().equals(nodeName))).collect(Collectors.toList());
+        forLoop.remove(node);
+        if (forLoop.size() > 0) return ((T) forLoop.get(0));
+        //----------------------------------------------------------------------------------------//
+        List<Declaration> declaration =
+                Utils.getAllVisibleTagertClassNodes(node, Declaration.class)
+                        .stream().filter(
+                        (x -> (x.getNewVariable().getVariable().getVarName()).
+                                equals(nodeName))).collect(Collectors.toList());
+        declaration.remove(node);
+        if (declaration.size() > 0) return ((T) declaration.get(0));
+        //-------------------------------------------------------------------------------------------//
+        List<FunParameter> funParameterList = new ArrayList<>();
+       FunDeclaration funDeclaration = Utils.getClosestTargetClassParent(node, FunDeclaration.class);
+        if (funDeclaration!=null)
+       funParameterList.addAll(funDeclaration.getFunParametersList());
 
+        funParameterList.remove(node);
+        if (funParameterList.size() > 0) {
+            Optional<FunParameter> funParameter =
+                    funParameterList.stream().filter(
+                            (x -> (x.getVariable().getVarName()).
+                                    equals(nodeName)))
+                            .findFirst();
+
+            if (funParameter.isPresent()) return ((T) funParameter.get());
+        }
+        return null;
+//                    ((Utils.getAllVisibleTagertClassNodes(node, NewVariable.class)
+//                            .stream().anyMatch(x -> (x.getVariable().getVarName()).equals(nodeName))
+//                            ||
+//                            Utils.getAllVisibleTagertClassNodes(node, ForLoop.class)
+//                                    .stream().anyMatch(x ->
+//                                    (x.getIterator().getVarName()).equals(nodeName)))
+//                            ||
+//                            Utils.getAllVisibleTagertClassNodes(node, Declaration.class)
+//                                    .stream().anyMatch(x -> (x.getNewVariable().getVariable().getVarName()).equals(nodeName))
+//                            ||
+//                            Utils.getAllVisibleTagertClassNodes(node, FunParameter.class)
+//                                    .stream().anyMatch(x -> (x.getVariable().getVarName()).equals(nodeName)))
+
+    }
+
+    private static <T extends Expression> void analyze(VariableReference variableReference) {
+
+        T parent = ((T) wasVariableDeclared(variableReference, variableReference.getVarName()));
+        if (parent == null)
             PrintableErrors.printUnresolvedReferenceError(variableReference.getVarName(), variableReference.position);
 
         else {
             //variable declared
             //need to find where variable was declared to fill index
-            Optional<NewVariable> newVariable =
-                    Utils.getAllVisibleTagertClassNodes(variableReference, NewVariable.class)
-                            .stream().filter((x -> (x.getVariable().getVarName()).equals(variableReference.getVarName())))
-                            .findFirst();
-            if (newVariable.isPresent())
-                variableReference.fillIndex(newVariable.get().getVariable().getIndex());
-
-            Optional<ForLoop> forLoop =
-                    Utils.getAllVisibleTagertClassNodes(variableReference, ForLoop.class)
-                            .stream().filter
-                            (x -> (x.getIterator().getVarName().equals(variableReference.getVarName())))
-                            .findFirst();
-            if (forLoop.isPresent())
-                variableReference.fillIndex(forLoop.get().getIterator().getIndex());
-
-            Optional<Declaration> declaration =
-                    Utils.getAllVisibleTagertClassNodes(variableReference, Declaration.class)
-                            .stream().filter(
-                            (x -> (x.getNewVariable().getVariable().getVarName()).
-                                    equals(variableReference.getVarName())))
-                            .findFirst();
-
-            if (declaration.isPresent()) variableReference.fillIndex(
-                    declaration.get().getNewVariable().getVariable().getIndex());
+            if (parent instanceof NewVariable)
+                variableReference.fillIndex(((NewVariable) parent).getVariable().getIndex());
+            else if (parent instanceof ForLoop)
+                variableReference.fillIndex(((ForLoop) parent).getIterator().getIndex());
+            else if (parent instanceof Declaration)
+                variableReference.fillIndex(
+                        ((Declaration) parent).getNewVariable().getVariable().getIndex());
+            else if (parent instanceof FunParameter)
+                variableReference.fillIndex(
+                        ((FunParameter) parent).getVariable().getIndex());
 
         }
     }
@@ -479,6 +531,7 @@ public class Analysis {
                     ((BinaryExpr) expr).getLeft(),
                     ((BinaryExpr) expr).getRight());
         } else if (expr.getClass().getSimpleName().equals(NewVariable.class.getSimpleName()))
+            //TODO: fix it
             return ((NewVariable) expr).getType();
         else if (expr.getClass().getSimpleName().equals(VariableReference.class.getSimpleName()))
             return exploreType((VariableReference) expr);

@@ -49,6 +49,16 @@ public class Utils {
         return result;
     }
 
+public static <T extends Node> T getClosestTargetClassParent(Node node,  Class<T> targetNodesClass){
+        if (node!=null) {
+            Node parent = node.getParent();
+            while (parent != null && (!parent.getClass().getName().equals(targetNodesClass.getName()))) {
+                parent = parent.getParent();
+            }
+            if (parent!=null) return (T)parent;
+        }
+        return  null;
+}
     // это все, что выше или на том же уровне
     public static <T extends Node> List<T> getAllVisibleTagertClassNodes(Node node, Class<T> targetNodesClass) {
         List<T> result = new ArrayList<>();

@@ -1,17 +1,15 @@
  ── program 
     └── fun fun10(a:Boolean index:0, b:Int index:1, c:Double index:2, e:Boolean index:3) :Unit
         ├── =
-        │   └── var d type:String index:0
+        │   └── var d4 type:Int index:0
         ├── =
-        │   ├── d type:String index:0
-        │   └── "qwerty" type:String const -2
+        │   ├── d4 type:Int index:0
+        │   └── 4 type:Int const 4
         ├── =
-        │   └── var d1 type:Char index:1
+        │   ├── a index:0
+        │   └── true type:Boolean const 1
         ├── =
-        │   ├── d1 type:Char index:1
-        │   └── "qwerty" type:String const -2
-        ├── =
-        │   ├── d1 type:Char index:1
-        │   └── 'd' type:Char const 100
-        └── print( )
-            └── d type:String index:0
+        │   └── var b type:String index:1
+        └── =
+            ├── b type:String index:1
+            └── "sdgd" type:String const "sdgd"
