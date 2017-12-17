@@ -63,7 +63,7 @@ public class CodeGenerator {
         }
 
         try {
-           resultStr.append(new String(Files.readAllBytes(Paths.get("CSharpStandartFuns.il"))));
+            resultStr.append(new String(Files.readAllBytes(Paths.get("CSharpStandartFuns.il"))));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,7 +77,7 @@ public class CodeGenerator {
                 "    extends [mscorlib]System.Object\n" +
                 "        {\n");
 
-        if(classDeclaration.getFunDeclarations()!=null ) {
+        if (classDeclaration.getFunDeclarations() != null) {
             for (FunDeclaration funDeclaration : classDeclaration.getFunDeclarations()) {
                 resultStr.append(generateCode(funDeclaration));
             }
@@ -100,11 +100,11 @@ public class CodeGenerator {
         resultStr.append(" .method private hidebysig static void " + funDeclaration.getFunName().getVarName() +
                 "(\n");
 
-        StringBuilder paramsStr=new StringBuilder();
+        StringBuilder paramsStr = new StringBuilder();
         funDeclaration.getFunParametersList().forEach(
                 x -> paramsStr.append(generateCode(x) + ", "));
-        if (paramsStr.toString().length()>2)
-       resultStr.append(paramsStr.toString().substring(0, paramsStr.length() - 2));
+        if (paramsStr.toString().length() > 2)
+            resultStr.append(paramsStr.toString().substring(0, paramsStr.length() - 2));
 
         resultStr.append(") cil managed \n" + "  {");
 
@@ -142,13 +142,13 @@ public class CodeGenerator {
 
 
     private static String generateCode(Type type) {
-        if (type instanceof  Integer) return "int32";
-        else if (type instanceof  Double) return "float64";
+        if (type instanceof Integer) return "int32";
+        else if (type instanceof Double) return "float64";
         else if (type instanceof com.end.compiler.Boolean) return "bool";
         else if (type instanceof Char) return "char";
-        else if (type instanceof  StringType)
+        else if (type instanceof StringType)
             return "string";
-        else if (type instanceof Unit || type ==null) return "void";
+        else if (type instanceof Unit || type == null) return "void";
         else if (type instanceof Array)//.name().equals(new Array().name()))
             return generateCode(((Array) type).getNestedType()) + "[]";
         else throw new UnsupportedOperationException();
@@ -189,31 +189,31 @@ public class CodeGenerator {
 
     private static String generateCSharpFunCallCode(FunCall funCall, FunDeclaration funDeclaration) {
         StringBuilder resultStr = new StringBuilder();
-        resultStr.append("ldstr "+((StringVar)funCall.getParameters().get(0)).getValue());
+        if (funCall.getParameters().size() > 0)
+            resultStr.append("ldstr " + ((StringVar) funCall.getParameters().get(0)).getValue());
         resultStr.append("\n call ");
-        resultStr.append(generateCode(funDeclaration.getReturnType())+
-                " CSharpFunctions::"+funDeclaration.getFunName().getVarName()+"(");
+        resultStr.append(generateCode(funDeclaration.getReturnType()) +
+                " CSharpFunctions::" + funDeclaration.getFunName().getVarName() + "(");
 
-        StringBuilder paramsStr=new StringBuilder();
+        StringBuilder paramsStr = new StringBuilder();
         funDeclaration.getFunParametersList().forEach(
                 x -> paramsStr.append(generateCode(x) + ", "));
-        if (paramsStr.toString().length()>2)
-        resultStr.append(paramsStr.substring(0, paramsStr.length() - 2));
+        if (paramsStr.toString().length() > 2)
+            resultStr.append(paramsStr.substring(0, paramsStr.length() - 2));
 
         resultStr.append(")");
         return resultStr.toString();
     }
 
 
-
     //TODO:  сделать что-то. если функция все класса, токласс-родитель никогда не найдется
     private static String generateCustomFunCallCode(FunCall funCall, FunDeclaration funDeclaration) {
         StringBuilder resultStr = new StringBuilder();
         resultStr.append("call ");
-        resultStr.append(generateCode(funDeclaration.getReturnType())+" "+
+        resultStr.append(generateCode(funDeclaration.getReturnType()) + " " +
                 Utils.getClosestTargetClassParent(funDeclaration, ClassDeclaration.class).getClassName().getVarName()
-                +"::"+
-                funDeclaration.getFunName().getVarName()+"(");
+                + "::" +
+                funDeclaration.getFunName().getVarName() + "(");
         funDeclaration.getFunParametersList().forEach(
                 x -> resultStr.append(generateCode(x.getType()) + ", "));
         resultStr.substring(0, resultStr.length() - 2);

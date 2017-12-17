@@ -27,6 +27,7 @@ public class Main {
         Program cSharpFunDeclProgram=parse("CSharpFunDeclarations.vl");
         cSharpFunDeclarationList= cSharpFunDeclProgram.getFunDeclarationList();
         printAstTree(cSharpFunDeclProgram, "astCsharpFunDecl.txt");
+        PrintableErrors.setIsErrorOccurred(false);
 
         Program program=parse("try.vl");
 

@@ -1,2 +1,39 @@
+fun readKey ():Unit{}
 
- fun print(str: String):Unit{}
+fun print (str: String):Unit{}
+fun print (str: Int):Unit{}
+fun print (str: Boolean):Unit{}
+fun print (str: Double):Unit{}
+fun print (str: Char):Unit{}
+
+fun println (str: String):Unit{}
+fun println (str: Int):Unit{}
+fun println (str: Boolean):Unit{}
+fun println (str: Double):Unit{}
+fun println (str: Char):Unit{}
+
+fun readInt ():Int{}
+fun readString ():String{}
+fun readDouble ():Double{}
+fun readChar ():Char{}
+fun readBoolean ():Boolean{}
+
+fun readlnInt ():Int{}
+fun readlnString ():String{}
+fun readlnDouble ():Double{}
+fun readlnChar ():Char{}
+fun readlnBoolean ():Boolean{}
+
+fun sqrt (number:Double):Double{}
+fun power (numberBase:Double, power:Double):Double{}
+fun e ():Double{}
+fun pi ():Double{}
+fun abs (number:Double):Double{}
+fun abs (number:Int):Int{}
+fun round (number:Double):Double{}
+fun trunk (number:Double):Double{}
+fun remainder(divider:Int, dividend:Int):Double{}
+fun expr (number:Double):Double{}
+fun cos (number:Double):Double{}
+fun sin (number:Double):Double{}
+fun tan (number:Double):Double{}

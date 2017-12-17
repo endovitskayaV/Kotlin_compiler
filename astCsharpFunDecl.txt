@@ -1,2 +1,35 @@
  ── program 
-    └── fun print(str:String index:0) :Unit
+    ├── fun readKey() :Unit
+    ├── fun print(str:String index:0) :Unit
+    ├── fun print(str:Int index:0) :Unit
+    ├── fun print(str:Boolean index:0) :Unit
+    ├── fun print(str:Double index:0) :Unit
+    ├── fun print(str:Char index:0) :Unit
+    ├── fun println(str:String index:0) :Unit
+    ├── fun println(str:Int index:0) :Unit
+    ├── fun println(str:Boolean index:0) :Unit
+    ├── fun println(str:Double index:0) :Unit
+    ├── fun println(str:Char index:0) :Unit
+    ├── fun readInt() :Int
+    ├── fun readString() :String
+    ├── fun readDouble() :Double
+    ├── fun readChar() :Char
+    ├── fun readBoolean() :Boolean
+    ├── fun readlnInt() :Int
+    ├── fun readlnString() :String
+    ├── fun readlnDouble() :Double
+    ├── fun readlnChar() :Char
+    ├── fun readlnBoolean() :Boolean
+    ├── fun sqrt(number:Double index:0) :Double
+    ├── fun power(numberBase:Double index:0, power:Double index:1) :Double
+    ├── fun e() :Double
+    ├── fun pi() :Double
+    ├── fun abs(number:Double index:0) :Double
+    ├── fun abs(number:Int index:0) :Int
+    ├── fun round(number:Double index:0) :Double
+    ├── fun trunk(number:Double index:0) :Double
+    ├── fun remainder(divider:Int index:0, dividend:Int index:1) :Double
+    ├── fun expr(number:Double index:0) :Double
+    ├── fun cos(number:Double index:0) :Double
+    ├── fun sin(number:Double index:0) :Double
+    └── fun tan(number:Double index:0) :Double

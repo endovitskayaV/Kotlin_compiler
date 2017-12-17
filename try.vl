@@ -1,6 +1,7 @@
 class Program{
     fun main(args:Array<String>): Unit {
-      print("Hello")
+      print("Hello world")
+      readKey()
     }
 }
 

@@ -13,7 +13,7 @@ public class PrintableErrors {
         return isErrorOccurred;
     }
 
-    private static void setIsErrorOccurred(boolean errorOccurred) {
+    public static void setIsErrorOccurred(boolean errorOccurred) {
         PrintableErrors.isErrorOccurred = errorOccurred;
     }
 
