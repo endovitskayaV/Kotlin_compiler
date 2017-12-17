@@ -1,8 +1,14 @@
-fun fun10(a:Boolean, b:Int, c:Double, e:Boolean):Unit{
-    var d4:Int
-    d4=4
-    a=true
-
-var b:String
-b="sdgd"
+class Program{
+    fun main(args:Array<String>): Unit {
+      print("Hello")
     }
+}
+
+/*
+ class Test{
+  fun fun4() : Boolean{
+    var a:String="Hello"
+  return 7
+  }
+  }
+  */

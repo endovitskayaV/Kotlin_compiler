@@ -28,9 +28,9 @@ public class Main {
         cSharpFunDeclarationList= cSharpFunDeclProgram.getFunDeclarationList();
         printAstTree(cSharpFunDeclProgram, "astCsharpFunDecl.txt");
 
-
-
         Program program=parse("try.vl");
+
+        printAstTree(program,"astTree.txt");
 
         //if no errors -> generate code
         if (!PrintableErrors.isErrorOccurred()) {
@@ -38,9 +38,10 @@ public class Main {
             String byteCodeFileName = "bytecode.il";
             printInFile(byteCodeFileName, byteCode);
             System.out.println("Printed in " + byteCodeFileName + ":\n" + byteCode);
+
         } else System.out.println("\nCannot generate code. Error(s) occurred\n");
 
-       printAstTree(program,"astTree.txt");
+
     }
 
     private static void printInFile(String fileName, String outputStr) {

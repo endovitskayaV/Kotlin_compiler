@@ -1,15 +1,5 @@
  ── program 
-    └── fun fun10(a:Boolean index:0, b:Int index:1, c:Double index:2, e:Boolean index:3) :Unit
-        ├── =
-        │   └── var d4 type:Int index:0
-        ├── =
-        │   ├── d4 type:Int index:0
-        │   └── 4 type:Int const 4
-        ├── =
-        │   ├── a index:0
-        │   └── true type:Boolean const 1
-        ├── =
-        │   └── var b type:String index:1
-        └── =
-            ├── b type:String index:1
-            └── "sdgd" type:String const "sdgd"
+    └── class Program
+        └── fun main(args:Array<String> index:0) :Unit
+            └── print( )
+                └── "Hello" type:String const "Hello"

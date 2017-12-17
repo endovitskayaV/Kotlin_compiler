@@ -365,17 +365,25 @@ public class Analysis {
         // }
     }
 
-    private static void analyze(FunCall funCall) {
-        List<FunDeclaration> funDeclarationList = Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class);
-        if (Main.cSharpFunDeclarationList != null)
-            funDeclarationList.addAll(Main.cSharpFunDeclarationList);
-        //was fun declared
-        if (!(funDeclarationList.stream().filter(
-                x -> (
+    public static FunDeclaration wasFunDeclared(List<FunDeclaration> funDeclarationList, FunCall funCall ){
+        Optional<FunDeclaration> funDeclarationOptional=funDeclarationList.stream()
+                .filter(x -> (
                         (x.getFunName().getVarName().equals(funCall.getName()))
                                 &&
                                 (areFormalAndActualParamsEqual(x.getFunParametersList(), funCall.getParameters()))
-                )).findFirst().isPresent()))
+                )).findFirst();
+       if (funDeclarationOptional.isPresent()) return  funDeclarationOptional.get();
+        else return null;
+    }
+
+    private static void analyze(FunCall funCall) {
+        List<FunDeclaration> funDeclarationList =
+                Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class);
+        if (Main.cSharpFunDeclarationList != null)
+            funDeclarationList.addAll(Main.cSharpFunDeclarationList);
+
+        //was fun declared
+        if (wasFunDeclared(funDeclarationList, funCall)==null)
             PrintableErrors.printNoSuchFunctionError(funCall, funCall.position);
 
         funCall.getParameters().forEach(Analysis::analyze);

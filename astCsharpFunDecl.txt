@@ -1,0 +1,2 @@
+ ── program 
+    └── fun print(str:String index:0) :Unit

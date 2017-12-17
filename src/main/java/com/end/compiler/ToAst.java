@@ -582,7 +582,28 @@ class ToAst {
 
     @NotNull
     private static ClassDeclaration toAst(com.end.compiler.KParser.Class_declarationContext classDeclarationContext) {
-        if (classDeclarationContext.class_body().declaration() != null) {
+        if (classDeclarationContext.class_body().fun_declaration() != null
+                && classDeclarationContext.class_body().declaration()!=null) {
+            ClassDeclaration classDeclaration = new ClassDeclaration(
+                    toAst(classDeclarationContext.ident()),
+                    classDeclarationContext.class_body().declaration()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
+                    classDeclarationContext.class_body().fun_declaration()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()));
+            Utils.setPosition(classDeclaration, classDeclarationContext);
+            Utils.setChildrensParent(classDeclaration);
+            return classDeclaration;
+        } else if (classDeclarationContext.class_body().fun_declaration() != null ){ //decl == null
+            ClassDeclaration classDeclaration = new ClassDeclaration(
+                    toAst(classDeclarationContext.ident()),
+                    null,
+                    classDeclarationContext.class_body().fun_declaration()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()) );
+            Utils.setPosition(classDeclaration, classDeclarationContext);
+            Utils.setChildrensParent(classDeclaration);
+            return classDeclaration;
+        }
+        else {//if fun_decl==null && decl!=null
             ClassDeclaration classDeclaration = new ClassDeclaration(
                     toAst(classDeclarationContext.ident()),
                     classDeclarationContext.class_body().declaration()
@@ -591,16 +612,7 @@ class ToAst {
             Utils.setPosition(classDeclaration, classDeclarationContext);
             Utils.setChildrensParent(classDeclaration);
             return classDeclaration;
-        } else {
-            ClassDeclaration classDeclaration = new ClassDeclaration(
-                    toAst(classDeclarationContext.ident()),
-                    null,
-                    classDeclarationContext.class_body().fun_declaration()
-                            .stream().map(ToAst::toAst).collect(Collectors.toList()));
-            Utils.setPosition(classDeclaration, classDeclarationContext);
-            Utils.setChildrensParent(classDeclaration);
-            return classDeclaration;
-        }
+            }
     }
 
     @NotNull
