@@ -271,7 +271,8 @@ public class Analysis {
         else if (expr.getClass().getSimpleName().equals(ArrayInitailization.class.getSimpleName()))
             analyze((ArrayInitailization) expr);
         else if (expr.getClass().getSimpleName().equals(ReturnExpr.class.getSimpleName()))
-            analyze(((ReturnExpr) expr).getExpr());
+            //TODO: это вообще когда-нибудь вызывется??
+             analyze(((ReturnExpr) expr).getExpr());
         else if (expr.getClass().getSimpleName().equals(IntegerVar.class.getSimpleName()))
             analyze(((IntegerVar) expr));
         else if (expr.getClass().getSimpleName().equals(BooleanVar.class.getSimpleName()))
@@ -450,6 +451,7 @@ public class Analysis {
             PrintableErrors.printUnresolvedReferenceError(variableReference.getVarName(), variableReference.position);
 
         else {
+            variableReference.setVisibility(Visibility.LOCAL);
             //variable declared
             //need to find where variable was declared to fill index
             if (parent instanceof NewVariable)
@@ -459,9 +461,11 @@ public class Analysis {
             else if (parent instanceof Declaration)
                 variableReference.fillIndex(
                         ((Declaration) parent).getNewVariable().getVariable().getIndex());
-            else if (parent instanceof FunParameter)
+            else if (parent instanceof FunParameter) {
                 variableReference.fillIndex(
                         ((FunParameter) parent).getVariable().getIndex());
+                variableReference.setVisibility(Visibility.ARG);
+            }
 
         }
     }

@@ -36,31 +36,7 @@
 .stackreserve 0x00100000
 .subsystem 0x0003       
 .corflags 0x00020003   
-.class private auto ansi beforefieldinit Program
-    extends [mscorlib]System.Object
-        {
- .method private hidebysig static void main(
-string[] args) cil managed 
-  { .entrypoint
-    .maxstack 2
-    .locals init (
-    )
- nop 
-  ldstr "I love you"
- call void CSharpFunctions::print(string str)
- call void CSharpFunctions::readKey()
- nop 
- ret 
-}.method public hidebysig specialname rtspecialname instance void 
-    .ctor() cil managed 
-  {
-    .maxstack 8
-
-ldarg.0 
-call         instance void [mscorlib]System.Object::.ctor()
-nop 
-ret
-  }}.class public auto ansi beforefieldinit CSharpFunctions
+.class public auto ansi beforefieldinit CSharpFunctions
        extends [mscorlib]System.Object
 {
   .method public hidebysig static void  readKey() cil managed
@@ -562,3 +538,76 @@ ret
   } // end of method CSharpFunctions::.ctor
 
 } // end of class CSharpFunctions
+.class private auto ansi beforefieldinit Program
+    extends [mscorlib]System.Object
+        {
+ .method public hidebysig static void main(
+string[] args) cil managed 
+  {.entrypoint
+ 
+    .maxstack 2
+    .locals init (
+[0] int32 s)
+ nop 
+  call int32 Program::fun2(call int32 Program::fun)
+ nop 
+stloc.s s
+
+ldloc.s s
+
+ call void CSharpFunctions::print(int32)
+ nop 
+
+
+ call void CSharpFunctions::readKey()
+ nop 
+
+
+ ret 
+} .method public hidebysig static int32 fun1(
+char c, string h) cil managed 
+  { 
+    .maxstack 2
+    .locals init (
+[0] int32 r, [1] int32 V_1)
+ nop 
+  
+ldc.i4.s 107
+starg.s c
+
+
+ldc.i4.s 1
+stloc.s V_1
+
+br.s   LABEL_0
+ LABEL_0:
+ldloc.s V_1
+
+ ret 
+} .method public hidebysig static int32 fun2(
+) cil managed 
+  { 
+    .maxstack 2
+    .locals init (
+[0] int32 V_0)
+ nop 
+  
+call int32 Program::fun1(char, string, call int32 Program::fun1(char, string)
+ nop 
+stloc.s V_0
+
+br.s   LABEL_0
+ LABEL_0:
+ldloc.s V_0
+
+ ret 
+}.method public hidebysig specialname rtspecialname instance void 
+    .ctor() cil managed 
+  {
+    .maxstack 8
+
+ldarg.0 
+call         instance void [mscorlib]System.Object::.ctor()
+nop 
+ret
+  }}

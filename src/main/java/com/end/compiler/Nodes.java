@@ -447,6 +447,8 @@ class ThenBlock extends Expression {
     }
 }
 
+enum Visibility{LOCAL, ARG}
+
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=true)
@@ -457,6 +459,7 @@ class FunParameter extends Expr {
     public FunParameter(VariableReference variable, Type type) {
         setVariable(variable);
         setType(type);
+        this.variable.visibility=Visibility.ARG;
     }
 
     @Override
@@ -530,6 +533,7 @@ class NewVariable extends Expr {
 class VariableReference extends Expr implements Indexable {
     private String varName;
     private String index = "-1";
+    Visibility visibility;
 
     public VariableReference(String varName) {
         setVarName(varName);
@@ -537,7 +541,9 @@ class VariableReference extends Expr implements Indexable {
 
     @Override
     public String name() {
-        return varName + typeOrNull() + castToIfNeed() + indexStr();
+        String name= varName + typeOrNull() + castToIfNeed() + indexStr();
+        if (visibility!=null) name+=visibility.toString();
+        return name;
     }
 
     @Override

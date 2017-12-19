@@ -1,6 +1,22 @@
  ── program 
     └── class Program
-        └── fun main(args:Array<String> index:0) :Unit
-            ├── print( )
-            │   └── "I love you" type:String const "I love you"
-            └── readKey( )
+        ├── fun main(args:Array<String> index:0) :Unit
+        │   ├── =
+        │   │   ├── var s type:Int index:0
+        │   │   └── fun2( ) type:Int
+        │   ├── print( )
+        │   │   └── s type:Int index:0LOCAL
+        │   └── readKey( )
+        ├── fun fun1(c:Char index:0, h:String index:1) :Int
+        │   ├── =
+        │   │   └── var r type:Int index:0
+        │   ├── =
+        │   │   ├── c index:0ARG
+        │   │   └── 'k' type:Char const 107
+        │   └── return type:Int
+        │       └── 1 type:Int const 1
+        └── fun fun2() :Int
+            └── return type:Int
+                └── fun1( ) type:Int
+                    ├── 'l' type:Char const 108
+                    └── "fgk" type:String const "fgk"

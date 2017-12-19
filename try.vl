@@ -1,15 +1,20 @@
 class Program{
-    fun main(args:Array<String>): Unit {
-      print("Hello world")
-      readKey()
-    }
+fun main(args:Array<String>): Unit {
+var s:Int=fun2();
+print(s)
+readKey()
 }
 
-/*
- class Test{
-  fun fun4() : Boolean{
-    var a:String="Hello"
-  return 7
-  }
-  }
-  */
+fun fun1(c:Char, h:String):Int{
+var r:Int
+c='k'
+return 1
+}
+
+
+fun fun2():Int
+    {
+        return fun1('l', "fgk");
+    }
+
+    }
