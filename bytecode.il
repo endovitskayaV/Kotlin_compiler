@@ -549,7 +549,7 @@ string[] args) cil managed
     .locals init (
 [0] int32 s)
  nop 
-  call int32 Program::fun2(call int32 Program::fun)
+  call int32 Program::fun2()
  nop 
 stloc.s s
 
@@ -592,7 +592,9 @@ ldloc.s V_1
 [0] int32 V_0)
  nop 
   
-call int32 Program::fun1(char, string, call int32 Program::fun1(char, string)
+ldc.i4.s 108
+ldstr "fgk"
+call int32 Program::fun1(char, string)
  nop 
 stloc.s V_0
 

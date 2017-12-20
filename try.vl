@@ -1,6 +1,6 @@
 class Program{
 fun main(args:Array<String>): Unit {
-var s:Int=fun2();
+var s:Int=fun2()
 print(s)
 readKey()
 }
@@ -14,7 +14,7 @@ return 1
 
 fun fun2():Int
     {
-        return fun1('l', "fgk");
+        return fun1('l', "fgk")
     }
 
     }

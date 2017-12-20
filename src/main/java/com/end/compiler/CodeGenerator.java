@@ -337,14 +337,24 @@ public class CodeGenerator {
     //TODO:  сделать что-то. если функция все класса, токласс-родитель никогда не найдется
     private static String generateCustomFunCallCode(FunCall funCall, FunDeclaration funDeclaration) {
         StringBuilder resultStr = new StringBuilder();
+        if (funCall.getParameters().size() > 0)
+            for (Expr funParam : funCall.getParameters()) {
+                resultStr.append(generateCode(funParam));
+            }
         resultStr.append("call ");
         resultStr.append(generateCode(funDeclaration.getReturnType()) + " " +
-                Utils.getClosestTargetClassParent(funDeclaration, ClassDeclaration.class).getClassName().getVarName()
+                Utils.getClosestTargetClassParent
+                        (funDeclaration, ClassDeclaration.class).getClassName().getVarName()
                 + "::" +
                 funDeclaration.getFunName().getVarName() + "(");
+
+
+        StringBuilder paramsStr = new StringBuilder();
         funDeclaration.getFunParametersList().forEach(
-                x -> resultStr.append(generateCode(x.getType()) + ", "));
-        resultStr.append(resultStr.substring(0, resultStr.toString().length() - 2));
+                x -> paramsStr.append(generateCode(x.getType()) + ", "));
+        if (paramsStr.toString().length() > 2)
+            resultStr.append(paramsStr.toString().substring(0, paramsStr.length() - 2));
+
         resultStr.append(")\n nop \n");
         return resultStr.toString();
     }
