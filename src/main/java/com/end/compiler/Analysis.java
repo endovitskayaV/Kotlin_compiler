@@ -4,6 +4,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Analysis {
+
+    //TODO: check if variable was initialized
+
     private static int index;
 
     //---------------------------------NODE analysis---------------------------------------//
@@ -33,6 +36,9 @@ public class Analysis {
     }
 
     private static void analyze(FunDeclaration funDeclaration) {
+
+        //TODO: check if there are no expressions after return
+
         //fill index for fun parameters
         index = 0; //for each fun index starts again from 0
         fillIndex(funDeclaration.getFunParametersList());
@@ -149,7 +155,8 @@ public class Analysis {
     private static Type getType(Expression expression) {
         if (expression instanceof Expr) return getType((Expr) expression);
         else if (expression instanceof ForLoop) return getType(((ForLoop) expression).getIterator());
-        else /*if (expression instanceof Declaration)*/ return getType(((Declaration) expression).getNewVariable());
+        else /*if (expression instanceof Declaration)*/
+            return getType(((Declaration) expression).getNewVariable());
     }
 
     private static void analyze(Assignment assignment) {
@@ -336,15 +343,6 @@ public class Analysis {
     }
 
     private static void analyzeOperation(BinaryExpr binaryExpr, Type resolvedType) {
-
-//        switch (binaryExpr.getSign()){
-//            case ">=":
-//            case "<=":
-//            case "<":
-//            case ">":
-//            case "==":
-//            case "!=":
-//
         //Char подерживает все операции
         if (typesAreEqual(resolvedType, new Array()) || typesAreEqual(resolvedType, new Boolean()))
             PrintableErrors.printOperationDoesNotSupportError

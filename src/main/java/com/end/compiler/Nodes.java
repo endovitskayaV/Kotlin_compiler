@@ -383,13 +383,22 @@ class Declaration extends Expression {
 }
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=true)
 class IfOper extends Expression {
     private Expr condition;
     private ThenBlock thenBlock;
     private ElseBlock elseBlock;
+    private VariableReference conditionVar;
+
+    public  IfOper(Expr condition, ThenBlock thenBlock, ElseBlock elseBlock){
+        this.condition=condition;
+        this.thenBlock=thenBlock;
+        this.elseBlock=elseBlock;
+        conditionVar=new VariableReference("");
+        conditionVar.setVisibility(Visibility.LOCAL);
+        conditionVar.setType(new Boolean());
+    }
 
     @Override
     public String name() {
@@ -542,7 +551,7 @@ class VariableReference extends Expr implements Indexable {
     @Override
     public String name() {
         String name= varName + typeOrNull() + castToIfNeed() + indexStr();
-        if (visibility!=null) name+=visibility.toString();
+        if (visibility!=null) name+=" "+visibility.toString().toLowerCase();
         return name;
     }
 

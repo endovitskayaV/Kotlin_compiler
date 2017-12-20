@@ -2,21 +2,44 @@
     └── class Program
         ├── fun main(args:Array<String> index:0) :Unit
         │   ├── =
-        │   │   ├── var s type:Int index:0
-        │   │   └── fun2( ) type:Int
+        │   │   ├── var f type:Int index:0
+        │   │   └── 6 type:Int const 6
+        │   ├── =
+        │   │   ├── var arr type:Array<Int> index:1
+        │   │   └──  type:Array<Int>
+        │   │       └── + type:Int
+        │   │           ├── f type:Int index:0 local
+        │   │           └── f type:Int index:0 local
+        │   ├── =
+        │   │   ├── [ ] type:Int
+        │   │   │   ├── arr type:Array<Int> index:1 local
+        │   │   │   └── 5 type:Int const 5
+        │   │   └── 9 type:Int const 9
+        │   ├── =
+        │   │   ├── var s type:Int index:2
+        │   │   └── [ ] type:Int
+        │   │       ├── arr type:Array<Int> index:1 local
+        │   │       └── 5 type:Int const 5
         │   ├── print( )
-        │   │   └── s type:Int index:0LOCAL
+        │   │   └── [ ] type:Int
+        │   │       ├── arr type:Array<Int> index:1 local
+        │   │       └── 5 type:Int const 5
+        │   ├── =
+        │   │   ├── [ ] type:Int
+        │   │   │   ├── arr type:Array<Int> index:1 local
+        │   │   │   └── 5 type:Int const 5
+        │   │   └── fun1( ) type:Int
         │   └── readKey( )
-        ├── fun fun1(c:Char index:0, h:String index:1) :Int
-        │   ├── =
-        │   │   └── var r type:Int index:0
-        │   ├── =
-        │   │   ├── c index:0ARG
-        │   │   └── 'k' type:Char const 107
-        │   └── return type:Int
-        │       └── 1 type:Int const 1
-        └── fun fun2() :Int
+        └── fun fun1() :Int
+            ├── =
+            │   └── var arr type:Array<Int> index:0
+            ├── 8 type:Int const 8
+            ├── =
+            │   ├── [ ] type:Int
+            │   │   ├── arr type:Array<Int> index:0 local
+            │   │   └── 7 type:Int const 7
+            │   └── 80 type:Int const 80
             └── return type:Int
-                └── fun1( ) type:Int
-                    ├── 'l' type:Char const 108
-                    └── "fgk" type:String const "fgk"
+                └── [ ] type:Int
+                    ├── arr type:Array<Int> index:0 local
+                    └── 7 type:Int const 7

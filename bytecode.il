@@ -545,18 +545,40 @@
 string[] args) cil managed 
   {.entrypoint
  
-    .maxstack 2
+    .maxstack 8
     .locals init (
-[0] int32 s)
+[0] int32 f, [1] int32[] arr, [2] int32 s)
  nop 
-  call int32 Program::fun2()
- nop 
+  ldc.i4.s 6
+stloc.s f
+
+ldloc.s f
+
+ldloc.s f
+
+add
+
+newarr int32
+stloc.s arr
+
+ldc.i4.s 9
+stelem.i4
+
+ldloc.s arr
+ldc.i4.s 5
+ ldelem.i4 
 stloc.s s
 
-ldloc.s s
+ldloc.s arr
+ldc.i4.s 5
+ ldelem.i4 
 
  call void CSharpFunctions::print(int32)
  nop 
+
+call int32 Program::fun1()
+ nop 
+stelem.i4
 
 
  call void CSharpFunctions::readKey()
@@ -565,42 +587,26 @@ ldloc.s s
 
  ret 
 } .method public hidebysig static int32 fun1(
-char c, string h) cil managed 
+) cil managed 
   { 
-    .maxstack 2
+    .maxstack 8
     .locals init (
-[0] int32 r, [1] int32 V_1)
+[0] int32[] arr, [1] int32 V_1)
  nop 
   
-ldc.i4.s 107
-starg.s c
+ldc.i4.s 8
 
+ldc.i4.s 80
+stelem.i4
 
-ldc.i4.s 1
+ldloc.s arr
+ldc.i4.s 7
+ ldelem.i4 
 stloc.s V_1
 
 br.s   LABEL_0
  LABEL_0:
 ldloc.s V_1
-
- ret 
-} .method public hidebysig static int32 fun2(
-) cil managed 
-  { 
-    .maxstack 2
-    .locals init (
-[0] int32 V_0)
- nop 
-  
-ldc.i4.s 108
-ldstr "fgk"
-call int32 Program::fun1(char, string)
- nop 
-stloc.s V_0
-
-br.s   LABEL_0
- LABEL_0:
-ldloc.s V_0
 
  ret 
 }.method public hidebysig specialname rtspecialname instance void 

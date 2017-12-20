@@ -1,15 +1,19 @@
 package com.end.compiler;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CodeGenerator {
 
     private static int counter;
     private static VariableReference returnVariable;
+    private static List<Declaration> localVarList;
 
     public static String generateCode(Program program) {
         StringBuilder resultStr = new StringBuilder();
@@ -93,12 +97,10 @@ public class CodeGenerator {
     }
 
     private static void addReturnExprToLocalVarList(FunDeclaration funDeclaration) {
-        List<Declaration> declarationList =
-                Utils.getAllTargetClassChildren(funDeclaration, Declaration.class);
         int index;
-        if (declarationList.size() > 0) {
+        if (localVarList.size() > 0) {
             index = java.lang.Integer.parseInt(
-                    declarationList.get((declarationList.size() - 1))
+                    localVarList.get((localVarList.size() - 1))
                             .getNewVariable().getVariable().getIndex())+1;
         }
         else index = 0;
@@ -117,13 +119,26 @@ public class CodeGenerator {
         Declaration declaration = new Declaration(
                 new NewVariable("var", variableReference, funDeclaration.getReturnType()), null);
 
-        List<Expression> expressionList=funDeclaration.getExpressionList();
-        expressionList.add(declaration);
-        funDeclaration.setExpressionList(expressionList);
+        localVarList.add(declaration);
+    }
+
+    private static void addIfConditionToLocalVarList(IfOper ifOper){
+        int index;
+        if (localVarList.size() > 0) {
+            index = java.lang.Integer.parseInt(
+                    localVarList.get((localVarList.size() - 1))
+                            .getNewVariable().getVariable().getIndex())+1;
+        }
+        else index = 0;
+        ifOper.getConditionVar().setVarName("V_" + index);
+        ifOper.getConditionVar().setIndex(java.lang.Integer.toString(index));
+
+        Declaration declaration = new Declaration(
+                new NewVariable("var",  ifOper.getConditionVar(), new Boolean()), ifOper.getCondition());
+        localVarList.add(declaration);
     }
 
     private static String generateCode(FunDeclaration funDeclaration) {
-        if (funDeclaration.getReturnExpr() != null) addReturnExprToLocalVarList(funDeclaration);
 
         StringBuilder resultStr = new StringBuilder();
         resultStr.append(" .method public hidebysig static " +
@@ -143,18 +158,21 @@ public class CodeGenerator {
             resultStr.append(".entrypoint\n");
 
         resultStr.append(" \n" +
-                "    .maxstack 2\n" +
+                "    .maxstack 8\n" +
                 "    .locals init (\n");
 
-        List<Declaration> declarationList =
-                Utils.getAllTargetClassChildren(funDeclaration, Declaration.class);
+        localVarList =new ArrayList<>();
+        localVarList.addAll(Utils.getAllTargetClassChildren(funDeclaration, Declaration.class));
+        Utils.getAllTargetClassChildren(funDeclaration, IfOper.class)
+                .forEach(CodeGenerator::addIfConditionToLocalVarList);
+        if (funDeclaration.getReturnExpr() != null) addReturnExprToLocalVarList(funDeclaration);
 
         StringBuilder paramsStr1 = new StringBuilder();
-        for (int i = 0; i < declarationList.size(); i++) {
+        for (int i = 0; i < localVarList.size(); i++) {
             paramsStr1.append(
-                    "[" + declarationList.get(i).getNewVariable().getVariable().getIndex() + "] " +
-                            generateCode(declarationList.get(i).getNewVariable().getType()) + " " +
-                            declarationList.get(i).getNewVariable().getVariable().getVarName() + ", ");
+                    "[" + localVarList.get(i).getNewVariable().getVariable().getIndex() + "] " +
+                            generateCode(localVarList.get(i).getNewVariable().getType()) + " " +
+                            localVarList.get(i).getNewVariable().getVariable().getVarName() + ", ");
         }
         if (paramsStr1.toString().length() > 2)
             resultStr.append(paramsStr1.toString().substring(0, paramsStr1.length() - 2));
@@ -205,14 +223,44 @@ public class CodeGenerator {
         else if (expression.getClass().getSimpleName().equals(Declaration.class.getSimpleName()))
             generateCode((Declaration) expression);
         else if (expression.getClass().getSimpleName().equals(IfOper.class.getSimpleName()))
-            generateCode((IfOper) expression);
-        else if (expression.getClass().getSimpleName().equals(ElseBlock.class.getSimpleName()))
-            generateCode((ElseBlock) expression);
-        else if (expression.getClass().getSimpleName().equals(ThenBlock.class.getSimpleName()))
-            generateCode((ThenBlock) expression);
+           return generateCode((IfOper) expression);
         else if (expression instanceof Expr)
             return generateCode((Expr) expression);
         return "";
+    }
+
+    private static String generateCode(IfOper ifOper){
+        StringBuilder resultStr=new StringBuilder();
+        resultStr.append(generateCode(ifOper.getCondition()));
+        resultStr.append(generateSaveVariableCode(ifOper.getConditionVar()));
+        resultStr.append(generateCode(ifOper.getConditionVar()));
+        String labelStartName="LABEL_"+counter;
+        counter++;
+        resultStr.append("brfalse.s "+labelStartName+"\n");
+
+        String labelFinishName="LABEL_"+counter;
+        counter++;
+
+        resultStr.append(generateCode(ifOper.getThenBlock(), labelFinishName));
+        if (ifOper.getElseBlock()!=null)
+            resultStr.append(generateCode(ifOper.getElseBlock(), labelStartName, labelFinishName));
+        return  resultStr.toString();
+
+    }
+
+    private static String generateCode(ThenBlock thenBlock, String labelFinishName){
+        StringBuilder resultStr=new StringBuilder();
+        thenBlock.getExpressions().forEach(x->resultStr.append(generateCode(x)));
+        resultStr.append("br.s "+labelFinishName+"\n");
+        return  resultStr.toString();
+    }
+
+    private static String generateCode(ElseBlock elseBlock, String labelStartName, String labelFinishName){
+        StringBuilder resultStr=new StringBuilder();
+        resultStr.append(labelStartName+":\n");
+        elseBlock.getExpressions().forEach(x->resultStr.append(generateCode(x)+"\n"));
+        resultStr.append(labelFinishName+":\n");
+        return  resultStr.toString();
     }
 
     private static String generateCode(Declaration declaration) {
@@ -224,16 +272,20 @@ public class CodeGenerator {
         if (assignment.getValue() != null) {
             StringBuilder resultStr = new StringBuilder();
             resultStr.append(generateCode(assignment.getValue()));
-            resultStr.append(saveVariable((VariableReference) assignment.getLeft()));
+            resultStr.append(generateSaveVariableCode(assignment.getLeft()));
             return resultStr.toString();
         }
         return "";
     }
 
-    private static String saveVariable(VariableReference variableReference) {
-        if (variableReference.getVisibility() == Visibility.ARG)
-            return "starg.s " + variableReference.getVarName() + "\n";
-        else return "stloc.s " + variableReference.getVarName() + "\n";
+    private static String generateSaveVariableCode(Expr expr) {
+        if (expr instanceof VariableReference) {
+            if (((VariableReference) expr).getVisibility() == Visibility.ARG)
+                return "starg.s " + ((VariableReference) expr).getVarName() + "\n";
+            else return "stloc.s " + ((VariableReference) expr).getVarName() + "\n";
+        }
+        else /*if (expr instance of ArrayAccess)*/
+        return "stelem.i4\n";
     }
 
     private static String generateCode(Expr expr) {
@@ -262,20 +314,64 @@ public class CodeGenerator {
         return "";
     }
 
+    private  static String generateCode(ArrayInitailization arrayInitailization){
+        return generateCode(arrayInitailization.getExpr())+"\n"+
+         "newarr "+ generateCode(arrayInitailization.getNestedType())+"\n";
+    }
+
+    private  static String generateCode(ArrayAccess arrayAccess){
+        return generateLoadCode(arrayAccess)+"\n";
+    }
+
+    private static String generateCode(BinaryExpr binaryExpr){
+        StringBuilder resultStr=new StringBuilder();
+        resultStr.append(generateCode(binaryExpr.getLeft())+"\n");
+        resultStr.append(generateCode(binaryExpr.getRight())+"\n");
+        resultStr.append(generateSignCode(binaryExpr.getSign())+"\n");
+        return resultStr.toString();
+    }
+
+    private  static String generateSignCode(String sign){
+        switch (sign){
+            case "+": return "add";
+            case "-": return "sub";
+            case "*": return "mul";
+            case "/": return "div";
+            case ">=": return "clt\n" + "ldc.i4.0\n" + "ceq\n";
+            case "<=": return "cgt\n" + "ldc.i4.0\n" +"ceq\n";
+            case "<": return "clt";
+            case ">": return "cgt";
+            case "==": return "ceq";
+            case "!=": return "ceq\n" +"ldc.i4.0\n" +"ceq\n";
+        }
+        return "";
+    }
+
     private static String generate(ReturnExpr returnExpr) {
         StringBuilder resultStr = new StringBuilder();
         resultStr.append(generateCode(returnExpr.getExpr()));
-        resultStr.append(saveVariable(returnVariable) + "\n");
+        resultStr.append(generateSaveVariableCode(returnVariable) + "\n");
         resultStr.append("br.s   LABEL_" + counter + "\n " +
                 "LABEL_" + counter + ":\n");
+        counter++;
         resultStr.append(generateCode(returnVariable));
         return resultStr.toString();
     }
 
     private static String generateCode(VariableReference variableReference) {
-        if (variableReference.getVisibility() == Visibility.ARG)
-            return "ldarg.s " + variableReference.getVarName() + "\n";
-        else return "ldloc.s " + variableReference.getVarName() + "\n";
+        return generateLoadCode(variableReference);
+    }
+
+    @NotNull
+    private static String generateLoadCode(Expr expr){
+        if (expr instanceof VariableReference){
+            if (((VariableReference) expr).getVisibility() == Visibility.ARG)
+                return "ldarg.s " + ((VariableReference) expr).getVarName() + "\n";
+            else return "ldloc.s " + ((VariableReference) expr).getVarName() + "\n";
+        }
+        else return generateLoadCode(((ArrayAccess)expr).getVariableReference())+
+                generateCode(((ArrayAccess)expr).getExpr())+
+                " ldelem.i4 ";
     }
 
     private static String generateCode(StringVar stringVar) {

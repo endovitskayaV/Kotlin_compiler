@@ -1,20 +1,20 @@
 class Program{
 fun main(args:Array<String>): Unit {
-var s:Int=fun2()
-print(s)
-readKey()
-}
+var f:Int=6
+ var arr: Array<Int> = Array<Int>(f+f)
+arr[5]=9
+       var s:Int = arr[5]
+       print(arr[5])
+        arr[5] = fun1()
+        readKey()
+    }
 
-fun fun1(c:Char, h:String):Int{
-var r:Int
-c='k'
-return 1
-}
-
-
-fun fun2():Int
+   fun fun1():Int
     {
-        return fun1('l', "fgk")
+       var arr:Array<Int>(8)
+        arr[7] = 80
+        return arr[7]
+
     }
 
     }
