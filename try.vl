@@ -1,20 +1,36 @@
 class Program{
 fun main(args:Array<String>): Unit {
-var f:Int=6
- var arr: Array<Int> = Array<Int>(f+f)
-arr[5]=9
-       var s:Int = arr[5]
-       print(arr[5])
-        arr[5] = fun1()
-        readKey()
+ var ar:Array<String> =Array<String>(78)
+ ar[6] = "we"
+ println(ar[6])
+ var g:String=ar[6]
+ println(g)
+
+  var ar1:Array<Char> =Array<Char>(78)
+   ar1[6] = 'j'
+   println(ar1[6])
+   var g1:Char=ar1[6]
+   println(g1)
+
+   var arr:Array<Boolean> =Array<Boolean>(8)
+    arr[7] = false
+    println(arr[7])
+    var g2:Boolean=1>987
+    println(g2)
+    if (arr[7]) println("shit")
+                else println("cool")
+
+                var arr1:Array<Double> =Array<Double>(50)
+                arr1[11] = 5.6
+                arr1[15] = 7.8
+                if (arr1[11] <= arr1[15])
+                { print("co")
+                    println("ol") }
+                else
+                { print("sh")
+                    println("it") }
+
+
+      readKey()
     }
-
-   fun fun1():Int
-    {
-       var arr:Array<Int>(8)
-        arr[7] = 80
-        return arr[7]
-
-    }
-
     }

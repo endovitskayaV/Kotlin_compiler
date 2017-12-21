@@ -1,5 +1,7 @@
 lexer grammar KLexer;
 
+//TODO: external keyword-> no body
+
 //? 0 1
 //* 0-..
 //+ 1-..

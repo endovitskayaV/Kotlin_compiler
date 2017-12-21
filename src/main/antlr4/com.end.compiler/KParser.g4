@@ -25,6 +25,8 @@ variable:
     concrete_var    #concreteVariable
     |ident          #Identifier
     ;
+
+    //TODO: negotoiation
 //могут быть записаны как condition, так и при присвоении
 expr: RBO+ expr RBC+            #parenExpr
      | fun_call                 #funcCall

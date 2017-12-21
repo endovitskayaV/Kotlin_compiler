@@ -606,7 +606,7 @@ public class Analysis {
         }
     }
 
-    private static boolean typesAreEqual(Type type1, Type type2) {
+    public static boolean typesAreEqual(Type type1, Type type2) {
         if (type1 == null || type2 == null) return false;
         else return (type1.getClass().getSimpleName().equals(type2.getClass().getSimpleName()));
     }

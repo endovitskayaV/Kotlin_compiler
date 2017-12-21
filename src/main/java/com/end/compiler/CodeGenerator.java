@@ -264,18 +264,9 @@ public class CodeGenerator {
     }
 
     private static String generateCode(Declaration declaration) {
+        if (declaration.getExpr()!=null) //если объявление без инициализации
         return generateCode(new Assignment(declaration.getNewVariable().getVariable(), declaration.getExpr()));
-    }
-
-    private static String generateCode(Assignment assignment) {
-        // если это просто var s: String, то код не генерировать
-        if (assignment.getValue() != null) {
-            StringBuilder resultStr = new StringBuilder();
-            resultStr.append(generateCode(assignment.getValue()));
-            resultStr.append(generateSaveVariableCode(assignment.getLeft()));
-            return resultStr.toString();
-        }
-        return "";
+        else return "";
     }
 
     private static String generateSaveVariableCode(Expr expr) {
@@ -285,7 +276,7 @@ public class CodeGenerator {
             else return "stloc.s " + ((VariableReference) expr).getVarName() + "\n";
         }
         else /*if (expr instance of ArrayAccess)*/
-        return "stelem.i4\n";
+        return generateSaveElemCode((ArrayAccess) expr)+"\n";
     }
 
     private static String generateCode(Expr expr) {
@@ -319,8 +310,62 @@ public class CodeGenerator {
          "newarr "+ generateCode(arrayInitailization.getNestedType())+"\n";
     }
 
+    private static String generateCode(Assignment assignment) {
+        StringBuilder resultStr = new StringBuilder();
+        if (assignment.getLeft() instanceof ArrayAccess){
+            resultStr.append(generateLoadCode(assignment.getLeft())+"\n");
+        }
+        resultStr.append(generateCode(assignment.getValue()));
+        if (assignment.getValue() instanceof ArrayAccess)
+            resultStr.append(generateLoadElemCode((ArrayAccess) assignment.getValue())+"\n");
+        resultStr.append(generateSaveVariableCode(assignment.getLeft()));
+        return resultStr.toString();
+    }
+
     private  static String generateCode(ArrayAccess arrayAccess){
-        return generateLoadCode(arrayAccess)+"\n";
+        StringBuilder resultStr=new StringBuilder();
+        resultStr.append(generateLoadCode(arrayAccess)+"\n");
+
+        //проверить binary, if, cycles
+        if (arrayAccess.getParent() instanceof FunCall ||
+                arrayAccess.getParent() instanceof ReturnExpr ||
+                arrayAccess.getParent() instanceof BinaryExpr||
+                arrayAccess.getParent() instanceof IfOper)
+            resultStr.append(generateLoadElemCode(arrayAccess)+"\n");
+        return resultStr.toString();
+    }
+
+    private static String generateSaveElemCode(ArrayAccess arrayAccess){
+        StringBuilder resultStr=new StringBuilder();
+        resultStr.append("stelem.");
+        if (arrayAccess.getType().getClass().getSimpleName().equals(Integer.class.getSimpleName()))
+            resultStr.append("i4");
+        else if (arrayAccess.getType().getClass().getSimpleName().equals(Double.class.getSimpleName()))
+            resultStr.append("r8");
+        else if (arrayAccess.getType().getClass().getSimpleName().equals(Char.class.getSimpleName()))
+            resultStr.append("i2");
+        else if (arrayAccess.getType().getClass().getSimpleName().equals(StringType.class.getSimpleName()))
+            resultStr.append("ref");
+        else //Boolean
+            resultStr.append("i1");
+        return  resultStr.toString();
+    }
+
+    private static String generateLoadElemCode(ArrayAccess arrayAccess){
+        StringBuilder resultStr=new StringBuilder();
+        resultStr.append("ldelem.");
+        if (arrayAccess.getType().getClass().getSimpleName().equals(Integer.class.getSimpleName()))
+            resultStr.append("i4");
+        else if (arrayAccess.getType().getClass().getSimpleName().equals(Double.class.getSimpleName()))
+            resultStr.append("r8");
+        else if (arrayAccess.getType().getClass().getSimpleName().equals(Char.class.getSimpleName()))
+            resultStr.append("u2");
+        else if (arrayAccess.getType().getClass().getSimpleName().equals(StringType.class.getSimpleName()))
+            resultStr.append("ref");
+        else //Boolean
+            resultStr.append("u1");
+        return  resultStr.toString();
+
     }
 
     private static String generateCode(BinaryExpr binaryExpr){
@@ -370,8 +415,7 @@ public class CodeGenerator {
             else return "ldloc.s " + ((VariableReference) expr).getVarName() + "\n";
         }
         else return generateLoadCode(((ArrayAccess)expr).getVariableReference())+
-                generateCode(((ArrayAccess)expr).getExpr())+
-                " ldelem.i4 ";
+                generateCode(((ArrayAccess)expr).getExpr());
     }
 
     private static String generateCode(StringVar stringVar) {

@@ -547,66 +547,179 @@ string[] args) cil managed
  
     .maxstack 8
     .locals init (
-[0] int32 f, [1] int32[] arr, [2] int32 s)
+[0] string[] ar, [1] string g, [2] char[] ar1, [3] char g1, [4] bool[] arr, [5] bool g2, [6] float64[] arr1, [7] bool V_7, [8] bool V_8)
  nop 
-  ldc.i4.s 6
-stloc.s f
+  ldc.i4.s 78
 
-ldloc.s f
+newarr string
+stloc.s ar
 
-ldloc.s f
+ldloc.s ar
+ldc.i4.s 6
 
-add
+ldstr "we"
+stelem.ref
 
-newarr int32
+ldloc.s ar
+ldc.i4.s 6
+
+ldelem.ref
+
+ call void CSharpFunctions::println(string)
+ nop 
+
+ldloc.s ar
+ldc.i4.s 6
+
+ldelem.ref
+stloc.s g
+
+ldloc.s g
+
+ call void CSharpFunctions::println(string)
+ nop 
+
+ldc.i4.s 78
+
+newarr char
+stloc.s ar1
+
+ldloc.s ar1
+ldc.i4.s 6
+
+ldc.i4.s 106
+stelem.i2
+
+ldloc.s ar1
+ldc.i4.s 6
+
+ldelem.u2
+
+ call void CSharpFunctions::println(char)
+ nop 
+
+ldloc.s ar1
+ldc.i4.s 6
+
+ldelem.u2
+stloc.s g1
+
+ldloc.s g1
+
+ call void CSharpFunctions::println(char)
+ nop 
+
+ldc.i4.s 8
+
+newarr bool
 stloc.s arr
 
-ldc.i4.s 9
-stelem.i4
+ldloc.s arr
+ldc.i4.s 7
+
+ldc.i4.0
+stelem.i1
 
 ldloc.s arr
-ldc.i4.s 5
- ldelem.i4 
-stloc.s s
+ldc.i4.s 7
+
+ldelem.u1
+
+ call void CSharpFunctions::println(bool)
+ nop 
+
+ldc.i4.s 1
+
+ldc.i4.s 987
+
+cgt
+stloc.s g2
+
+ldloc.s g2
+
+ call void CSharpFunctions::println(bool)
+ nop 
 
 ldloc.s arr
-ldc.i4.s 5
- ldelem.i4 
+ldc.i4.s 7
 
- call void CSharpFunctions::print(int32)
+ldelem.u1
+stloc.s V_7
+ldloc.s V_7
+brfalse.s LABEL_0
+ldstr "shit"
+
+ call void CSharpFunctions::println(string)
+ nop 
+br.s LABEL_1
+LABEL_0:
+ldstr "cool"
+
+ call void CSharpFunctions::println(string)
  nop 
 
-call int32 Program::fun1()
+LABEL_1:
+
+ldc.i4.s 50
+
+newarr float64
+stloc.s arr1
+
+ldloc.s arr1
+ldc.i4.s 11
+
+ldc.r8 5.6
+stelem.r8
+
+ldloc.s arr1
+ldc.i4.s 15
+
+ldc.r8 7.8
+stelem.r8
+
+ldloc.s arr1
+ldc.i4.s 11
+
+ldelem.r8
+
+ldloc.s arr1
+ldc.i4.s 15
+
+ldelem.r8
+
+cgt
+ldc.i4.0
+ceq
+
+stloc.s V_8
+ldloc.s V_8
+brfalse.s LABEL_2
+ldstr "co"
+
+ call void CSharpFunctions::print(string)
  nop 
-stelem.i4
+ldstr "ol"
+
+ call void CSharpFunctions::println(string)
+ nop 
+br.s LABEL_3
+LABEL_2:
+ldstr "sh"
+
+ call void CSharpFunctions::print(string)
+ nop 
+
+ldstr "it"
+
+ call void CSharpFunctions::println(string)
+ nop 
+
+LABEL_3:
 
 
  call void CSharpFunctions::readKey()
  nop 
 
-
- ret 
-} .method public hidebysig static int32 fun1(
-) cil managed 
-  { 
-    .maxstack 8
-    .locals init (
-[0] int32[] arr, [1] int32 V_1)
- nop 
-  
-ldc.i4.s 8
-
-ldc.i4.s 80
-stelem.i4
-
-ldloc.s arr
-ldc.i4.s 7
- ldelem.i4 
-stloc.s V_1
-
-br.s   LABEL_0
- LABEL_0:
-ldloc.s V_1
 
  ret 
 }.method public hidebysig specialname rtspecialname instance void 
