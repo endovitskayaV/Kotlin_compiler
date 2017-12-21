@@ -75,12 +75,12 @@ while_loop: KEYWORD_while  RBO (expr) RBC (expression | block);
 for_loop:KEYWORD_for  RBO (variable KEYWORD_in expr) RBC  (expression | block);
 do_while_loop:KEYWORD_do block  NL* KEYWORD_while RBO expr RBC;
 
-
+ fun_modificator: KEYWORD_external;
  annotation: AT SimpleName (RBO ident RBC)?;
  fun_parameter: ident COLON type;
  fun_parameters: RBO (fun_parameter (COMMA fun_parameter)*)? RBC;
- fun_declaration: annotation? KEYWORD_fun ident fun_parameters COLON (type|KEYWORD_Unit)
-                  CBO expressions (KEYWORD_return expr)? CBC;
+ fun_declaration: (annotation|fun_modificator)* KEYWORD_fun ident fun_parameters COLON (type|KEYWORD_Unit)
+                  (CBO expressions (KEYWORD_return expr)? CBC)?;
  fun_call: ident RBO (expr (COMMA expr)* )? RBC;
 
  class_body: CBO (declaration| fun_declaration)*  CBC;

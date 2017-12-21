@@ -85,7 +85,8 @@ interface Constantable {
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper=true)
 class FunDeclaration extends Node {
-    private Annotation annotation;
+    private List<Annotation> annotationList;
+    private List<Modificator> modificatorList;
     private VariableReference funName;
     private Type returnType;
     private List<FunParameter> funParametersList;
@@ -109,7 +110,8 @@ class FunDeclaration extends Node {
     @Override
     public List<? extends PrintableTreeNode> children() {
         ArrayList<PrintableTreeNode> children = new ArrayList<>();
-        if (annotation!=null) children.add(annotation);
+        if (annotationList !=null) children.addAll(annotationList);
+        if (modificatorList !=null) children.addAll(modificatorList);
        if (expressionList!=null) children.addAll(0, expressionList);
         if (returnExpr != null)
             children.add(returnExpr);
@@ -250,13 +252,27 @@ class Annotation extends Node{
     private String parameter;
 
     @Override
-    public void setParent(Node parent){
-        this.parent=null;
+    public String name() {
+        return "@"+name;
     }
 
     @Override
+    public List<? extends PrintableTreeNode> children() {
+        return new ArrayList<>();
+    }
+}
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper=true)
+class Modificator extends Node{
+    private String name;
+
+    @Override
     public String name() {
-        return "@"+name;
+        return name;
     }
 
     @Override

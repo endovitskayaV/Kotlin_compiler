@@ -260,8 +260,8 @@ class ToAst {
         } else throw new UnsupportedOperationException();
     }
 
-    @Contract("null -> fail")
     private static Expression toAst(com.end.compiler.KParser.ExpressionContext expressionContext) {
+        if (expressionContext==null) return null;
         if (expressionContext instanceof com.end.compiler.KParser.AssigContext)
             return toAst(((com.end.compiler.KParser.AssigContext) expressionContext).assignment());
         else if (expressionContext instanceof com.end.compiler.KParser.DeclContext)
@@ -452,6 +452,15 @@ class ToAst {
         return funParameter;
     }
 
+    private static Modificator toAst(com.end.compiler.KParser.Fun_modificatorContext funModificatorContext) {
+        if (funModificatorContext == null) return null;
+    else{
+        Modificator modificator=new Modificator(funModificatorContext.getText());
+            Utils.setPosition(modificator, funModificatorContext);
+            Utils.setChildrensParent(modificator);
+            return modificator;
+        }
+    }
 
     private static Annotation toAst(com.end.compiler.KParser.AnnotationContext annotationContext) {
         if (annotationContext == null) return null;
@@ -517,14 +526,17 @@ class ToAst {
 
     @NotNull
     private static FunDeclaration toAst(com.end.compiler.KParser.Fun_declarationContext funDeclarationContext) {
+
         if (funDeclarationContext.type() != null && funDeclarationContext.KEYWORD_return() != null) {
             ReturnExpr returnExpr = new ReturnExpr(toAst(funDeclarationContext.expr()));
             Utils.setPosition(returnExpr, funDeclarationContext.expr());
             Utils.setChildrensParent(returnExpr);
 
-
             FunDeclaration funDeclaration = new FunDeclaration(
-                    toAst(funDeclarationContext.annotation()),
+                    funDeclarationContext.annotation()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
+                    funDeclarationContext.fun_modificator()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
                     toAst(funDeclarationContext.ident()),
                     toAst(funDeclarationContext.type()),
                     funDeclarationContext.fun_parameters().fun_parameter()
@@ -537,7 +549,10 @@ class ToAst {
 
         } else if (funDeclarationContext.type() != null && funDeclarationContext.KEYWORD_return() == null) {
             FunDeclaration funDeclaration = new FunDeclaration(
-                    toAst(funDeclarationContext.annotation()),
+                    funDeclarationContext.annotation()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
+                    funDeclarationContext.fun_modificator()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
                     toAst(funDeclarationContext.ident()),
                     toAst(funDeclarationContext.type()),
                     funDeclarationContext.fun_parameters().fun_parameter()
@@ -554,7 +569,10 @@ class ToAst {
             Utils.setChildrensParent(returnExpr);
 
             FunDeclaration funDeclaration = new FunDeclaration(
-                    toAst(funDeclarationContext.annotation()),
+                    funDeclarationContext.annotation()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
+                    funDeclarationContext.fun_modificator()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
                     toAst(funDeclarationContext.ident()),
                     null,
                     funDeclarationContext.fun_parameters().fun_parameter()
@@ -567,7 +585,10 @@ class ToAst {
 
         } else if (funDeclarationContext.type() == null && funDeclarationContext.KEYWORD_return() == null) {
             FunDeclaration funDeclaration = new FunDeclaration(
-                    toAst(funDeclarationContext.annotation()),
+                    funDeclarationContext.annotation()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
+                    funDeclarationContext.fun_modificator()
+                            .stream().map(ToAst::toAst).collect(Collectors.toList()),
                     toAst(funDeclarationContext.ident()),
                     null,
                     funDeclarationContext.fun_parameters().fun_parameter()

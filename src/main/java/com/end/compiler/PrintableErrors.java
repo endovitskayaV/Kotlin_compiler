@@ -79,4 +79,9 @@ public class PrintableErrors {
                 " at: " + position.startLine + ": " + position.startIndexInLine);
     }
 
+    public static void printExternalFunctionBodyError(Position position){
+        printlnError("External function must not have a body" +
+                " at: " + position.startLine + ": " + position.startIndexInLine);
+    }
+
 }

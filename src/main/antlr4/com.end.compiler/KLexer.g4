@@ -32,6 +32,7 @@ KEYWORD_for: 'for';
 KEYWORD_in: 'in';
 
 KEYWORD_interface: 'interface';
+KEYWORD_external: 'external';
 
 AT: '@';
 

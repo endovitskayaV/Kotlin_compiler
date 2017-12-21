@@ -1,5 +1,6 @@
 package com.end.compiler;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ public class CodeGenerator {
     private static VariableReference returnVariable;
     private static List<Declaration> localVarList;
 
+    @NotNull
     public static String generateCode(Program program) {
         StringBuilder resultStr = new StringBuilder();
         resultStr.append(".assembly extern mscorlib\n" +
@@ -71,6 +73,7 @@ public class CodeGenerator {
         return resultStr.toString();
     }
 
+    @NotNull
     private static String generateCode(ClassDeclaration classDeclaration) {
         StringBuilder resultStr = new StringBuilder();
         resultStr.append(".class private auto ansi beforefieldinit " +
@@ -138,6 +141,7 @@ public class CodeGenerator {
         localVarList.add(declaration);
     }
 
+    @NotNull
     private static String generateCode(FunDeclaration funDeclaration) {
 
         StringBuilder resultStr = new StringBuilder();
@@ -191,11 +195,13 @@ public class CodeGenerator {
         return resultStr.toString();
     }
 
+    @NotNull
     private static String generateCode(FunParameter funParameter) {
         return generateCode(funParameter.getType()) + " "
                 + funParameter.getVariable().getVarName();
     }
 
+    @NotNull
     private static String generateCode(Type type) {
         if (type instanceof Integer) return "int32";
         else if (type instanceof Double) return "float64";
@@ -226,9 +232,11 @@ public class CodeGenerator {
            return generateCode((IfOper) expression);
         else if (expression instanceof Expr)
             return generateCode((Expr) expression);
+        //TODO: clean it
         return "";
     }
 
+    @NotNull
     private static String generateCode(IfOper ifOper){
         StringBuilder resultStr=new StringBuilder();
         resultStr.append(generateCode(ifOper.getCondition()));
@@ -248,6 +256,7 @@ public class CodeGenerator {
 
     }
 
+    @NotNull
     private static String generateCode(ThenBlock thenBlock, String labelFinishName){
         StringBuilder resultStr=new StringBuilder();
         thenBlock.getExpressions().forEach(x->resultStr.append(generateCode(x)));
@@ -255,6 +264,7 @@ public class CodeGenerator {
         return  resultStr.toString();
     }
 
+    @NotNull
     private static String generateCode(ElseBlock elseBlock, String labelStartName, String labelFinishName){
         StringBuilder resultStr=new StringBuilder();
         resultStr.append(labelStartName+":\n");
@@ -263,12 +273,14 @@ public class CodeGenerator {
         return  resultStr.toString();
     }
 
+    @NotNull
     private static String generateCode(Declaration declaration) {
         if (declaration.getExpr()!=null) //если объявление без инициализации
         return generateCode(new Assignment(declaration.getNewVariable().getVariable(), declaration.getExpr()));
         else return "";
     }
 
+    @NotNull
     private static String generateSaveVariableCode(Expr expr) {
         if (expr instanceof VariableReference) {
             if (((VariableReference) expr).getVisibility() == Visibility.ARG)
@@ -305,11 +317,13 @@ public class CodeGenerator {
         return "";
     }
 
+    @NotNull
     private  static String generateCode(ArrayInitailization arrayInitailization){
         return generateCode(arrayInitailization.getExpr())+"\n"+
          "newarr "+ generateCode(arrayInitailization.getNestedType())+"\n";
     }
 
+    @NotNull
     private static String generateCode(Assignment assignment) {
         StringBuilder resultStr = new StringBuilder();
         if (assignment.getLeft() instanceof ArrayAccess){
@@ -322,6 +336,7 @@ public class CodeGenerator {
         return resultStr.toString();
     }
 
+    @NotNull
     private  static String generateCode(ArrayAccess arrayAccess){
         StringBuilder resultStr=new StringBuilder();
         resultStr.append(generateLoadCode(arrayAccess)+"\n");
@@ -335,6 +350,7 @@ public class CodeGenerator {
         return resultStr.toString();
     }
 
+    @NotNull
     private static String generateSaveElemCode(ArrayAccess arrayAccess){
         StringBuilder resultStr=new StringBuilder();
         resultStr.append("stelem.");
@@ -351,6 +367,7 @@ public class CodeGenerator {
         return  resultStr.toString();
     }
 
+    @NotNull
     private static String generateLoadElemCode(ArrayAccess arrayAccess){
         StringBuilder resultStr=new StringBuilder();
         resultStr.append("ldelem.");
@@ -368,6 +385,7 @@ public class CodeGenerator {
 
     }
 
+    @NotNull
     private static String generateCode(BinaryExpr binaryExpr){
         StringBuilder resultStr=new StringBuilder();
         resultStr.append(generateCode(binaryExpr.getLeft())+"\n");
@@ -376,6 +394,8 @@ public class CodeGenerator {
         return resultStr.toString();
     }
 
+    @NotNull
+    @Contract(pure = true)
     private  static String generateSignCode(String sign){
         switch (sign){
             case "+": return "add";
@@ -392,6 +412,7 @@ public class CodeGenerator {
         return "";
     }
 
+    @NotNull
     private static String generate(ReturnExpr returnExpr) {
         StringBuilder resultStr = new StringBuilder();
         resultStr.append(generateCode(returnExpr.getExpr()));
@@ -403,6 +424,7 @@ public class CodeGenerator {
         return resultStr.toString();
     }
 
+    @NotNull
     private static String generateCode(VariableReference variableReference) {
         return generateLoadCode(variableReference);
     }
@@ -418,22 +440,27 @@ public class CodeGenerator {
                 generateCode(((ArrayAccess)expr).getExpr());
     }
 
+    @NotNull
     private static String generateCode(StringVar stringVar) {
         return "ldstr " + stringVar.getCILValue() + "\n";
     }
 
+    @NotNull
     private static String generateCode(IntegerVar integerVar) {
         return "ldc.i4.s " + integerVar.getCILValue() + "\n";
     }
 
+    @NotNull
     private static String generateCode(DoubleVar doubleVar) {
         return "ldc.r8 " + doubleVar.getCILValue() + "\n";
     }
 
+    @NotNull
     private static String generateCode(BooleanVar booleanVar) {
         return "ldc.i4." + booleanVar.getCILValue() + "\n";
     }
 
+    @NotNull
     private static String generateCode(CharVar charVar) {
         return "ldc.i4.s " + charVar.getCILValue() + "\n";
     }
@@ -453,6 +480,7 @@ public class CodeGenerator {
         }
     }
 
+    @NotNull
     private static String generateCSharpFunCallCode(FunCall funCall, FunDeclaration funDeclaration) {
         StringBuilder resultStr = new StringBuilder();
         if (funCall.getParameters().size() > 0)
@@ -475,6 +503,7 @@ public class CodeGenerator {
     }
 
     //TODO:  сделать что-то. если функция все класса, токласс-родитель никогда не найдется
+    @NotNull
     private static String generateCustomFunCallCode(FunCall funCall, FunDeclaration funDeclaration) {
         StringBuilder resultStr = new StringBuilder();
         if (funCall.getParameters().size() > 0)
@@ -499,6 +528,7 @@ public class CodeGenerator {
         return resultStr.toString();
     }
 
+    @NotNull
     private static String counterToString(int counter) {
         return new DecimalFormat("000").format(counter);
     }

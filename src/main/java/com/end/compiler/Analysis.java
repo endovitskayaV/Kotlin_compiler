@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 public class Analysis {
 
+    //TODO: enum Modificators{EXTERNAL}
     //TODO: check if variable was initialized
 
     private static int index;
@@ -59,30 +60,39 @@ public class Analysis {
             });
         }
 
-        if (funDeclaration.getExpressionList() != null)
-            funDeclaration.getExpressionList().forEach(Analysis::analyze);
+        if (funDeclaration.getModificatorList() != null &&
+                funDeclaration.getModificatorList().stream().anyMatch(x -> x.getName().equals("external")) &&
+                (funDeclaration.getExpressionList() != null
+                        || funDeclaration.getReturnExpr() != null))
+            PrintableErrors.printExternalFunctionBodyError(funDeclaration.position);
 
-        if (funDeclaration.getReturnExpr() != null) analyze(funDeclaration.getReturnExpr());
+        if (funDeclaration.getModificatorList().stream().noneMatch(x -> x.getName().equals("external"))) {
+            //analyse body
+            if (funDeclaration.getExpressionList() != null)
+                funDeclaration.getExpressionList().forEach(Analysis::analyze);
 
-        //Type: returnExpr and declared
-        //wrong returnExpr nestedType?
-        if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() != null) {
-            Type returnExprType = getType(funDeclaration.getReturnExpr());
+            if (funDeclaration.getReturnExpr() != null) analyze(funDeclaration.getReturnExpr());
 
-            if (returnExprType != null &&
-                    !typesAreEqual(funDeclaration.getReturnType(), getType(funDeclaration.getReturnExpr())))
-                PrintableErrors.printTypeMismatchError(
-                        funDeclaration.getReturnType(),
-                        returnExprType,
+            //Type: returnExpr and declared
+            //wrong returnExpr nestedType?
+            if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() != null) {
+                Type returnExprType = getType(funDeclaration.getReturnExpr());
+
+                if (returnExprType != null &&
+                        !typesAreEqual(funDeclaration.getReturnType(), getType(funDeclaration.getReturnExpr())))
+                    PrintableErrors.printTypeMismatchError(
+                            funDeclaration.getReturnType(),
+                            returnExprType,
+                            funDeclaration.getReturnExpr().getPosition());
+            }
+            //no return statement?
+            else if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() == null)
+                PrintableErrors.printNoReturnStatement(funDeclaration.position);
+                //return statement when Unit declared
+            else if (funDeclaration.getReturnType() == null && funDeclaration.getReturnExpr() != null)
+                PrintableErrors.printTypeMismatchError(new Unit(), getType(funDeclaration.getReturnExpr()),
                         funDeclaration.getReturnExpr().getPosition());
         }
-        //no return statement?
-        else if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() == null)
-            PrintableErrors.printNoReturnStatement(funDeclaration.position);
-            //return statement when Unit declared
-        else if (funDeclaration.getReturnType() == null && funDeclaration.getReturnExpr() != null)
-            PrintableErrors.printTypeMismatchError(new Unit(), getType(funDeclaration.getReturnExpr()),
-                    funDeclaration.getReturnExpr().getPosition());
     }
     //-------------------------------------------------------------------------------------------------------------//
 
@@ -278,8 +288,7 @@ public class Analysis {
         else if (expr.getClass().getSimpleName().equals(ArrayInitailization.class.getSimpleName()))
             analyze((ArrayInitailization) expr);
         else if (expr.getClass().getSimpleName().equals(ReturnExpr.class.getSimpleName()))
-            //TODO: это вообще когда-нибудь вызывется??
-             analyze(((ReturnExpr) expr).getExpr());
+            analyze(((ReturnExpr) expr).getExpr());
         else if (expr.getClass().getSimpleName().equals(IntegerVar.class.getSimpleName()))
             analyze(((IntegerVar) expr));
         else if (expr.getClass().getSimpleName().equals(BooleanVar.class.getSimpleName()))
@@ -364,14 +373,14 @@ public class Analysis {
         // }
     }
 
-    public static FunDeclaration wasFunDeclared(List<FunDeclaration> funDeclarationList, FunCall funCall ){
-        Optional<FunDeclaration> funDeclarationOptional=funDeclarationList.stream()
+    public static FunDeclaration wasFunDeclared(List<FunDeclaration> funDeclarationList, FunCall funCall) {
+        Optional<FunDeclaration> funDeclarationOptional = funDeclarationList.stream()
                 .filter(x -> (
                         (x.getFunName().getVarName().equals(funCall.getName()))
                                 &&
                                 (areFormalAndActualParamsEqual(x.getFunParametersList(), funCall.getParameters()))
                 )).findFirst();
-       if (funDeclarationOptional.isPresent()) return  funDeclarationOptional.get();
+        if (funDeclarationOptional.isPresent()) return funDeclarationOptional.get();
         else return null;
     }
 
@@ -382,7 +391,7 @@ public class Analysis {
             funDeclarationList.addAll(Main.cSharpFunDeclarationList);
 
         //was fun declared
-        if (wasFunDeclared(funDeclarationList, funCall)==null)
+        if (wasFunDeclared(funDeclarationList, funCall) == null)
             PrintableErrors.printNoSuchFunctionError(funCall, funCall.position);
 
         funCall.getParameters().forEach(Analysis::analyze);
@@ -412,9 +421,9 @@ public class Analysis {
         if (declaration.size() > 0) return ((T) declaration.get(0));
         //-------------------------------------------------------------------------------------------//
         List<FunParameter> funParameterList = new ArrayList<>();
-       FunDeclaration funDeclaration = Utils.getClosestTargetClassParent(node, FunDeclaration.class);
-        if (funDeclaration!=null)
-       funParameterList.addAll(funDeclaration.getFunParametersList());
+        FunDeclaration funDeclaration = Utils.getClosestTargetClassParent(node, FunDeclaration.class);
+        if (funDeclaration != null)
+            funParameterList.addAll(funDeclaration.getFunParametersList());
 
         funParameterList.remove(node);
         if (funParameterList.size() > 0) {
@@ -506,9 +515,6 @@ public class Analysis {
         Utils.getAllTargetClassChildren(arrayInitailization, Expr.class).forEach(Analysis::analyze);
     }
 
-    private static void analyze(ReturnExpr returnExpr) {
-        analyze(returnExpr.getExpr());
-    }
     //------------------------------------------------------------------------------------------//
 
     //----------------------TYPE analysis----------------------------------------------//
