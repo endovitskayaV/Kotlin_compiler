@@ -52,7 +52,7 @@ class Test{}
        var a: Int=9;
               while (a!=23){}
 
-              while(a-89){
+              while(a - 89){
               b=6-5
               }
 
@@ -100,6 +100,14 @@ var b:Int=5
       arr[2]=1.5
       arr[3.4]=true
 
+      var arr12:Array<Int> = Array<Int>(-8)
+
+         var arrQ:Array<Int> = Array<Int>(0)
+      if (arr[0]> -9)
+      {
+      arr[-8]= -9
+      }
+
        var arr5:Array<Int>
             var arr5:Boolean
     }
@@ -134,8 +142,13 @@ fun fun8(param:Int):Int{
     e=false
     }
 
-    fun fun67(arr:Array<Int>):Unit{
+   external fun fun67(arr:Array<Int>):Unit{
+    var arr12:Array<Int> = Array<Int>(fun5656())
+    var c:Int="svfs"
     var a:String="печатает))"
     print(a)
     print (1)
     }
+
+fun fun5656 ():String{return ""}
+      external fun fun676(arr:Array<Int>):Unit

@@ -29,7 +29,7 @@ public class Main {
         printAstTree(cSharpFunDeclProgram, "astCsharpFunDecl.txt");
         PrintableErrors.setIsErrorOccurred(false);
 
-        Program program=parse("try.vl");
+        Program program=parse("PresentErrorsCode.vl");
 
         printAstTree(program,"astTree.txt");
 

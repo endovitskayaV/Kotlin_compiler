@@ -60,39 +60,43 @@ public class Analysis {
             });
         }
 
-        if (funDeclaration.getModificatorList() != null &&
-                funDeclaration.getModificatorList().stream().anyMatch(x -> x.getName().equals("external")) &&
+        if (funDeclaration.getModificatorList().stream().anyMatch(x -> x.getName().equals("external")) &&
                 (funDeclaration.getExpressionList() != null
                         || funDeclaration.getReturnExpr() != null))
             PrintableErrors.printExternalFunctionBodyError(funDeclaration.position);
 
-        if (funDeclaration.getModificatorList().stream().noneMatch(x -> x.getName().equals("external"))) {
-            //analyse body
-            if (funDeclaration.getExpressionList() != null)
-                funDeclaration.getExpressionList().forEach(Analysis::analyze);
 
-            if (funDeclaration.getReturnExpr() != null) analyze(funDeclaration.getReturnExpr());
+        //analyse body
+        if (funDeclaration.getExpressionList() != null)
+            funDeclaration.getExpressionList().forEach(Analysis::analyze);
 
-            //Type: returnExpr and declared
-            //wrong returnExpr nestedType?
-            if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() != null) {
-                Type returnExprType = getType(funDeclaration.getReturnExpr());
+        if (funDeclaration.getReturnExpr() != null) analyze(funDeclaration.getReturnExpr());
 
-                if (returnExprType != null &&
-                        !typesAreEqual(funDeclaration.getReturnType(), getType(funDeclaration.getReturnExpr())))
-                    PrintableErrors.printTypeMismatchError(
-                            funDeclaration.getReturnType(),
-                            returnExprType,
-                            funDeclaration.getReturnExpr().getPosition());
-            }
-            //no return statement?
-            else if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() == null)
+        //Type: returnExpr and declared
+        //wrong returnExpr nestedType?
+        if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() != null) {
+            Type returnExprType = getType(funDeclaration.getReturnExpr());
+
+            if (returnExprType != null &&
+                    !typesAreEqual(funDeclaration.getReturnType(), getType(funDeclaration.getReturnExpr())))
+                PrintableErrors.printTypeMismatchError(
+                        funDeclaration.getReturnType(),
+                        returnExprType,
+                        funDeclaration.getReturnExpr().getPosition());
+        }
+
+        //if not external check return
+        //no return statement?
+        else if (funDeclaration.getModificatorList().stream().noneMatch(x -> x.getName().equals("external"))) {
+            if (funDeclaration.getReturnType() != null && funDeclaration.getReturnExpr() == null)
                 PrintableErrors.printNoReturnStatement(funDeclaration.position);
+
                 //return statement when Unit declared
             else if (funDeclaration.getReturnType() == null && funDeclaration.getReturnExpr() != null)
                 PrintableErrors.printTypeMismatchError(new Unit(), getType(funDeclaration.getReturnExpr()),
                         funDeclaration.getReturnExpr().getPosition());
         }
+        //  }
     }
     //-------------------------------------------------------------------------------------------------------------//
 
@@ -385,6 +389,9 @@ public class Analysis {
     }
 
     private static void analyze(FunCall funCall) {
+
+        //TODO: check if it`s possible to call external function
+
         List<FunDeclaration> funDeclarationList =
                 Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class);
         if (Main.cSharpFunDeclarationList != null)
@@ -494,13 +501,12 @@ public class Analysis {
             if (list1.size() != list2.size()) return false;
             for (int i = 0; i < list1.size(); i++) {
                 if (!typesAreEqual(list1.get(i).getType(), list2.get(i).getType())) return false;
-                if (typesAreEqual(list1.get(i).getType(), new Array())){
-                    if (!typesAreEqual(((Array)list1.get(i).getType()).getNestedType(),
-                            ((Array)list2.get(i).getType()).getNestedType())) return false;
+                if (typesAreEqual(list1.get(i).getType(), new Array())) {
+                    if (!typesAreEqual(((Array) list1.get(i).getType()).getNestedType(),
+                            ((Array) list2.get(i).getType()).getNestedType())) return false;
                 }
             }
-        }
-        else return false;
+        } else return false;
         return true; //??
     }
 
@@ -514,10 +520,22 @@ public class Analysis {
 
         analyze(arrayAccess.getVariableReference());
         analyze(arrayAccess.getExpr());
+
+        //check if index is positive number
+        if (arrayAccess.getExpr() instanceof IntegerVar &&
+                java.lang.Integer.parseInt(((IntegerVar) arrayAccess.getExpr()).getValue()) < 0)
+            PrintableErrors.printNegativeNumberError(((IntegerVar) arrayAccess.getExpr()).position);
     }
 
     private static void analyze(ArrayInitailization arrayInitailization) {
-        Utils.getAllTargetClassChildren(arrayInitailization, Expr.class).forEach(Analysis::analyze);
+        analyze(arrayInitailization.getExpr());
+
+        //check if array size is positive number
+        if (arrayInitailization.getExpr() instanceof IntegerVar &&
+                java.lang.Integer.parseInt(((IntegerVar) arrayInitailization.getExpr()).getValue()) <= 0)
+            PrintableErrors.printNegativeOrZeroNumberError(((IntegerVar) arrayInitailization.getExpr()).position);
+
+        // Utils.getAllTargetClassChildren(arrayInitailization, Expr.class).forEach(Analysis::analyze);
     }
 
     //------------------------------------------------------------------------------------------//

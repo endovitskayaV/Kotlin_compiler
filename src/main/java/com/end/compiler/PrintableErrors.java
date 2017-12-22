@@ -84,4 +84,14 @@ public class PrintableErrors {
                 " at: " + position.startLine + ": " + position.startIndexInLine);
     }
 
+    public static void printNegativeNumberError(Position position){
+        printlnError("Negative number is not allowed" +
+                " at: " + position.startLine + ": " + position.startIndexInLine);
+    }
+
+    public static void printNegativeOrZeroNumberError(Position position){
+        printlnError("Negative number or 0 is not allowed" +
+                " at: " + position.startLine + ": " + position.startIndexInLine);
+    }
+
 }
