@@ -526,6 +526,120 @@
     IL_000b:  ret
   } // end of method CSharpFunctions::tan
 
+  
+
+  .method public hidebysig static float64 
+          factorial(float64 number) cil managed
+  {
+    // Размер кода:       52 (0x34)
+    .maxstack  3
+    .locals init ([0] bool V_0,
+             [1] float64 V_1)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldc.r8     1.
+    IL_000b:  cgt
+    IL_000d:  stloc.0
+    IL_000e:  ldloc.0
+    IL_000f:  brfalse.s  IL_0026
+
+    IL_0011:  ldarg.0
+    IL_0012:  ldarg.0
+    IL_0013:  ldc.r8     1.
+    IL_001c:  sub
+    IL_001d:  call       float64 CSharpFunctions::factorial(float64)
+    IL_0022:  mul
+    IL_0023:  stloc.1
+    IL_0024:  br.s       IL_0032
+
+    IL_0026:  ldc.r8     1.
+    IL_002f:  stloc.1
+    IL_0030:  br.s       IL_0032
+
+    IL_0032:  ldloc.1
+    IL_0033:  ret
+  } // end of method CSharpFunctions::factorial
+
+  .method public hidebysig static int32  size(int32[] arr) cil managed
+  {
+    // Размер кода:       9 (0x9)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldlen
+    IL_0003:  conv.i4
+    IL_0004:  stloc.0
+    IL_0005:  br.s       IL_0007
+
+    IL_0007:  ldloc.0
+    IL_0008:  ret
+  } // end of method CSharpFunctions::size
+
+  .method public hidebysig static int32  size(float64[] arr) cil managed
+  {
+    // Размер кода:       9 (0x9)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldlen
+    IL_0003:  conv.i4
+    IL_0004:  stloc.0
+    IL_0005:  br.s       IL_0007
+
+    IL_0007:  ldloc.0
+    IL_0008:  ret
+  } // end of method CSharpFunctions::size
+
+  .method public hidebysig static int32  size(char[] arr) cil managed
+  {
+    // Размер кода:       9 (0x9)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldlen
+    IL_0003:  conv.i4
+    IL_0004:  stloc.0
+    IL_0005:  br.s       IL_0007
+
+    IL_0007:  ldloc.0
+    IL_0008:  ret
+  } // end of method CSharpFunctions::size
+
+  .method public hidebysig static int32  size(string[] arr) cil managed
+  {
+    // Размер кода:       9 (0x9)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldlen
+    IL_0003:  conv.i4
+    IL_0004:  stloc.0
+    IL_0005:  br.s       IL_0007
+
+    IL_0007:  ldloc.0
+    IL_0008:  ret
+  } // end of method CSharpFunctions::size
+
+  .method public hidebysig static int32  size(bool[] arr) cil managed
+  {
+    // Размер кода:       9 (0x9)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldlen
+    IL_0003:  conv.i4
+    IL_0004:  stloc.0
+    IL_0005:  br.s       IL_0007
+
+    IL_0007:  ldloc.0
+    IL_0008:  ret
+  } // end of method CSharpFunctions::size
+  
   .method public hidebysig specialname rtspecialname 
           instance void  .ctor() cil managed
   {
@@ -547,174 +661,30 @@ string[] args) cil managed
  
     .maxstack 8
     .locals init (
-[0] string[] ar, [1] string g, [2] char[] ar1, [3] char g1, [4] bool[] arr, [5] bool g2, [6] float64[] arr1, [7] bool V_7, [8] bool V_8)
+[0] int32[] arr, [1] bool V_1)
  nop 
-  ldc.i4.s 78
+  ldc.i4.s 9
 
-newarr string
-stloc.s ar
-
-ldloc.s ar
-ldc.i4.s 6
-
-ldstr "we"
-stelem.ref
-
-ldloc.s ar
-ldc.i4.s 6
-
-ldelem.ref
-
- call void CSharpFunctions::println(string)
- nop 
-
-ldloc.s ar
-ldc.i4.s 6
-
-ldelem.ref
-stloc.s g
-
-ldloc.s g
-
- call void CSharpFunctions::println(string)
- nop 
-
-ldc.i4.s 78
-
-newarr char
-stloc.s ar1
-
-ldloc.s ar1
-ldc.i4.s 6
-
-ldc.i4.s 106
-stelem.i2
-
-ldloc.s ar1
-ldc.i4.s 6
-
-ldelem.u2
-
- call void CSharpFunctions::println(char)
- nop 
-
-ldloc.s ar1
-ldc.i4.s 6
-
-ldelem.u2
-stloc.s g1
-
-ldloc.s g1
-
- call void CSharpFunctions::println(char)
- nop 
-
-ldc.i4.s 8
-
-newarr bool
+newarr int32
 stloc.s arr
 
 ldloc.s arr
-ldc.i4.s 7
+ldc.i4.s 0
 
-ldc.i4.0
-stelem.i1
+ldelem.i4
 
-ldloc.s arr
-ldc.i4.s 7
-
-ldelem.u1
-
- call void CSharpFunctions::println(bool)
- nop 
-
-ldc.i4.s 1
-
-ldc.i4.s 987
+ldc.i4.s -9
 
 cgt
-stloc.s g2
-
-ldloc.s g2
-
- call void CSharpFunctions::println(bool)
- nop 
-
-ldloc.s arr
-ldc.i4.s 7
-
-ldelem.u1
-stloc.s V_7
-ldloc.s V_7
+stloc.s V_1
+ldloc.s V_1
 brfalse.s LABEL_0
-ldstr "shit"
+ldloc.s arr
+ldc.i4.s 0
 
- call void CSharpFunctions::println(string)
- nop 
-br.s LABEL_1
+ldc.i4.s -9
+stelem.i4
 LABEL_0:
-ldstr "cool"
-
- call void CSharpFunctions::println(string)
- nop 
-
-LABEL_1:
-
-ldc.i4.s 50
-
-newarr float64
-stloc.s arr1
-
-ldloc.s arr1
-ldc.i4.s 11
-
-ldc.r8 5.6
-stelem.r8
-
-ldloc.s arr1
-ldc.i4.s 15
-
-ldc.r8 7.8
-stelem.r8
-
-ldloc.s arr1
-ldc.i4.s 11
-
-ldelem.r8
-
-ldloc.s arr1
-ldc.i4.s 15
-
-ldelem.r8
-
-cgt
-ldc.i4.0
-ceq
-
-stloc.s V_8
-ldloc.s V_8
-brfalse.s LABEL_2
-ldstr "co"
-
- call void CSharpFunctions::print(string)
- nop 
-ldstr "ol"
-
- call void CSharpFunctions::println(string)
- nop 
-br.s LABEL_3
-LABEL_2:
-ldstr "sh"
-
- call void CSharpFunctions::print(string)
- nop 
-
-ldstr "it"
-
- call void CSharpFunctions::println(string)
- nop 
-
-LABEL_3:
 
 
  call void CSharpFunctions::readKey()

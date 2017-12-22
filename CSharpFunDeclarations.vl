@@ -37,3 +37,10 @@ external fun expr (number:Double):Double
 external fun cos (number:Double):Double
 external fun sin (number:Double):Double
 external fun tan (number:Double):Double
+external fun factorial (number:Double):Double
+
+external fun size(arr: Array<Int>):Int
+external fun size(arr: Array<Double>):Int
+external fun size(arr: Array<Boolean>):Int
+external fun size(arr: Array<Char>):Int
+external fun size(arr: Array<String>):Int

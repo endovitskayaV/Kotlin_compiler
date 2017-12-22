@@ -2,105 +2,19 @@
     └── class Program
         └── fun main(args:Array<String> index:0) :Unit
             ├── =
-            │   ├── var ar type:Array<String> index:0
-            │   └──  type:Array<String>
-            │       └── 78 type:Int const 78
-            ├── =
-            │   ├── [ ] type:String
-            │   │   ├── ar type:Array<String> index:0 local
-            │   │   └── 6 type:Int const 6
-            │   └── "we" type:String const "we"
-            ├── println( )
-            │   └── [ ] type:String
-            │       ├── ar type:Array<String> index:0 local
-            │       └── 6 type:Int const 6
-            ├── =
-            │   ├── var g type:String index:1
-            │   └── [ ] type:String
-            │       ├── ar type:Array<String> index:0 local
-            │       └── 6 type:Int const 6
-            ├── println( )
-            │   └── g type:String index:1 local
-            ├── =
-            │   ├── var ar1 type:Array<Char> index:2
-            │   └──  type:Array<Char>
-            │       └── 78 type:Int const 78
-            ├── =
-            │   ├── [ ] type:Char
-            │   │   ├── ar1 type:Array<Char> index:2 local
-            │   │   └── 6 type:Int const 6
-            │   └── 'j' type:Char const 106
-            ├── println( )
-            │   └── [ ] type:Char
-            │       ├── ar1 type:Array<Char> index:2 local
-            │       └── 6 type:Int const 6
-            ├── =
-            │   ├── var g1 type:Char index:3
-            │   └── [ ] type:Char
-            │       ├── ar1 type:Array<Char> index:2 local
-            │       └── 6 type:Int const 6
-            ├── println( )
-            │   └── g1 type:Char index:3 local
-            ├── =
-            │   ├── var arr type:Array<Boolean> index:4
-            │   └──  type:Array<Boolean>
-            │       └── 8 type:Int const 8
-            ├── =
-            │   ├── [ ] type:Boolean
-            │   │   ├── arr type:Array<Boolean> index:4 local
-            │   │   └── 7 type:Int const 7
-            │   └── false type:Boolean const 0
-            ├── println( )
-            │   └── [ ] type:Boolean
-            │       ├── arr type:Array<Boolean> index:4 local
-            │       └── 7 type:Int const 7
-            ├── =
-            │   ├── var g2 type:Boolean index:5
-            │   └── > type:Boolean
-            │       ├── 1 type:Int const 1
-            │       └── 987 type:Int const 987
-            ├── println( )
-            │   └── g2 type:Boolean index:5 local
+            │   ├── var arr type:Array<Int> index:0
+            │   └──  type:Array<Int>
+            │       └── 9 type:Int const 9
             ├── if
-            │   ├── [ ] type:Boolean
-            │   │   ├── arr type:Array<Boolean> index:4 local
-            │   │   └── 7 type:Int const 7
-            │   ├── then
-            │   │   └── println( )
-            │   │       └── "shit" type:String const "shit"
-            │   └── else
-            │       └── println( )
-            │           └── "cool" type:String const "cool"
-            ├── =
-            │   ├── var arr1 type:Array<Double> index:6
-            │   └──  type:Array<Double>
-            │       └── 50 type:Int const 50
-            ├── =
-            │   ├── [ ] type:Double
-            │   │   ├── arr1 type:Array<Double> index:6 local
-            │   │   └── 11 type:Int const 11
-            │   └── 5.6 type:Double const 5.6
-            ├── =
-            │   ├── [ ] type:Double
-            │   │   ├── arr1 type:Array<Double> index:6 local
-            │   │   └── 15 type:Int const 15
-            │   └── 7.8 type:Double const 7.8
-            ├── if
-            │   ├── <= type:Boolean
-            │   │   ├── [ ] type:Double
-            │   │   │   ├── arr1 type:Array<Double> index:6 local
-            │   │   │   └── 11 type:Int const 11
-            │   │   └── [ ] type:Double
-            │   │       ├── arr1 type:Array<Double> index:6 local
-            │   │       └── 15 type:Int const 15
-            │   ├── then
-            │   │   ├── print( )
-            │   │   │   └── "co" type:String const "co"
-            │   │   └── println( )
-            │   │       └── "ol" type:String const "ol"
-            │   └── else
-            │       ├── print( )
-            │       │   └── "sh" type:String const "sh"
-            │       └── println( )
-            │           └── "it" type:String const "it"
+            │   ├── > type:Boolean
+            │   │   ├── [ ] type:Int
+            │   │   │   ├── arr type:Array<Int> index:0 local
+            │   │   │   └── 0 type:Int const 0
+            │   │   └── -9 type:Int const -9
+            │   └── then
+            │       └── =
+            │           ├── [ ] type:Int
+            │           │   ├── arr type:Array<Int> index:0 local
+            │           │   └── 0 type:Int const 0
+            │           └── -9 type:Int const -9
             └── readKey( )

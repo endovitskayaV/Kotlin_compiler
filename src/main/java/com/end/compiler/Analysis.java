@@ -494,8 +494,13 @@ public class Analysis {
             if (list1.size() != list2.size()) return false;
             for (int i = 0; i < list1.size(); i++) {
                 if (!typesAreEqual(list1.get(i).getType(), list2.get(i).getType())) return false;
+                if (typesAreEqual(list1.get(i).getType(), new Array())){
+                    if (!typesAreEqual(((Array)list1.get(i).getType()).getNestedType(),
+                            ((Array)list2.get(i).getType()).getNestedType())) return false;
+                }
             }
-        } else return false;
+        }
+        else return false;
         return true; //??
     }
 

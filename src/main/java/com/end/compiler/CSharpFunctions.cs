@@ -187,4 +187,17 @@ public class CSharpFunctions
           return Math.Tan(number);
     }
 
+    public static double factorial(double number)
+    {
+         if (number > 1) return number * factorial(number - 1);
+         else return 1;
+    }
+
+    //------------------------------------------------------//
+
+    public static int size(Array arr)
+    {
+        return arr.Length;
+    }
+
 }

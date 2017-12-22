@@ -65,5 +65,17 @@
     │   └── external
     ├── fun sin(number:Double index:0) :Double
     │   └── external
-    └── fun tan(number:Double index:0) :Double
+    ├── fun tan(number:Double index:0) :Double
+    │   └── external
+    ├── fun factorial(number:Double index:0) :Double
+    │   └── external
+    ├── fun size(arr:Array<Int> index:0) :Int
+    │   └── external
+    ├── fun size(arr:Array<Double> index:0) :Int
+    │   └── external
+    ├── fun size(arr:Array<Boolean> index:0) :Int
+    │   └── external
+    ├── fun size(arr:Array<Char> index:0) :Int
+    │   └── external
+    └── fun size(arr:Array<String> index:0) :Int
         └── external

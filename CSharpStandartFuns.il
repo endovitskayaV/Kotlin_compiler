@@ -488,6 +488,120 @@
     IL_000b:  ret
   } // end of method CSharpFunctions::tan
 
+  
+
+  .method public hidebysig static float64 
+          factorial(float64 number) cil managed
+  {
+    // Размер кода:       52 (0x34)
+    .maxstack  3
+    .locals init ([0] bool V_0,
+             [1] float64 V_1)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldc.r8     1.
+    IL_000b:  cgt
+    IL_000d:  stloc.0
+    IL_000e:  ldloc.0
+    IL_000f:  brfalse.s  IL_0026
+
+    IL_0011:  ldarg.0
+    IL_0012:  ldarg.0
+    IL_0013:  ldc.r8     1.
+    IL_001c:  sub
+    IL_001d:  call       float64 CSharpFunctions::factorial(float64)
+    IL_0022:  mul
+    IL_0023:  stloc.1
+    IL_0024:  br.s       IL_0032
+
+    IL_0026:  ldc.r8     1.
+    IL_002f:  stloc.1
+    IL_0030:  br.s       IL_0032
+
+    IL_0032:  ldloc.1
+    IL_0033:  ret
+  } // end of method CSharpFunctions::factorial
+
+  .method public hidebysig static int32  size(int32[] arr) cil managed
+  {
+    // Размер кода:       9 (0x9)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldlen
+    IL_0003:  conv.i4
+    IL_0004:  stloc.0
+    IL_0005:  br.s       IL_0007
+
+    IL_0007:  ldloc.0
+    IL_0008:  ret
+  } // end of method CSharpFunctions::size
+
+  .method public hidebysig static int32  size(float64[] arr) cil managed
+  {
+    // Размер кода:       9 (0x9)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldlen
+    IL_0003:  conv.i4
+    IL_0004:  stloc.0
+    IL_0005:  br.s       IL_0007
+
+    IL_0007:  ldloc.0
+    IL_0008:  ret
+  } // end of method CSharpFunctions::size
+
+  .method public hidebysig static int32  size(char[] arr) cil managed
+  {
+    // Размер кода:       9 (0x9)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldlen
+    IL_0003:  conv.i4
+    IL_0004:  stloc.0
+    IL_0005:  br.s       IL_0007
+
+    IL_0007:  ldloc.0
+    IL_0008:  ret
+  } // end of method CSharpFunctions::size
+
+  .method public hidebysig static int32  size(string[] arr) cil managed
+  {
+    // Размер кода:       9 (0x9)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldlen
+    IL_0003:  conv.i4
+    IL_0004:  stloc.0
+    IL_0005:  br.s       IL_0007
+
+    IL_0007:  ldloc.0
+    IL_0008:  ret
+  } // end of method CSharpFunctions::size
+
+  .method public hidebysig static int32  size(bool[] arr) cil managed
+  {
+    // Размер кода:       9 (0x9)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldlen
+    IL_0003:  conv.i4
+    IL_0004:  stloc.0
+    IL_0005:  br.s       IL_0007
+
+    IL_0007:  ldloc.0
+    IL_0008:  ret
+  } // end of method CSharpFunctions::size
+  
   .method public hidebysig specialname rtspecialname 
           instance void  .ctor() cil managed
   {

@@ -49,8 +49,8 @@ fragment
 //цифра будет распрознаваться только в совокупности с другими цифрами
 DIGIT: '0'..'9';
 
-INTEGER: ('0'| ('1'..'9' DIGIT*));
-DOUBLE : DIGIT+ (DOT DIGIT+)?;
+INTEGER: ('-')? ('0'| ('1'..'9' DIGIT*));
+DOUBLE : ('-')? DIGIT+ (DOT DIGIT+)?;
 CHAR: '\'' (EscapeSeq | .) '\'' ;
 STRING: UnterminatedStringLiteral DOUBLE_QUOTES;
 

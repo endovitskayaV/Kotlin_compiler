@@ -141,6 +141,38 @@ public class CodeGenerator {
         localVarList.add(declaration);
     }
 
+    private static void addWhileLoopToLocalVarList(WhileLoop whileLoop){
+        int index;
+        if (localVarList.size() > 0) {
+            index = java.lang.Integer.parseInt(
+                    localVarList.get((localVarList.size() - 1))
+                            .getNewVariable().getVariable().getIndex())+1;
+        }
+        else index = 0;
+       whileLoop.getConditionVar().setVarName("V_" + index);
+        whileLoop.getConditionVar().setIndex(java.lang.Integer.toString(index));
+
+        Declaration declaration = new Declaration(
+                new NewVariable("var",  whileLoop.getConditionVar(), new Boolean()), whileLoop.getCondition());
+        localVarList.add(declaration);
+    }
+
+    private static void addDoWhileLoopToLocalVarList(DoWhileLoop doWhileLoop){
+        int index;
+        if (localVarList.size() > 0) {
+            index = java.lang.Integer.parseInt(
+                    localVarList.get((localVarList.size() - 1))
+                            .getNewVariable().getVariable().getIndex())+1;
+        }
+        else index = 0;
+        doWhileLoop.getConditionVar().setVarName("V_" + index);
+        doWhileLoop.getConditionVar().setIndex(java.lang.Integer.toString(index));
+
+        Declaration declaration = new Declaration(
+                new NewVariable("var",  doWhileLoop.getConditionVar(), new Boolean()), doWhileLoop.getCondition());
+        localVarList.add(declaration);
+    }
+
     @NotNull
     private static String generateCode(FunDeclaration funDeclaration) {
 
@@ -169,6 +201,11 @@ public class CodeGenerator {
         localVarList.addAll(Utils.getAllTargetClassChildren(funDeclaration, Declaration.class));
         Utils.getAllTargetClassChildren(funDeclaration, IfOper.class)
                 .forEach(CodeGenerator::addIfConditionToLocalVarList);
+        Utils.getAllTargetClassChildren(funDeclaration, WhileLoop.class)
+                .forEach(CodeGenerator::addWhileLoopToLocalVarList);
+        Utils.getAllTargetClassChildren(funDeclaration, DoWhileLoop.class)
+                .forEach(CodeGenerator::addDoWhileLoopToLocalVarList);
+
         if (funDeclaration.getReturnExpr() != null) addReturnExprToLocalVarList(funDeclaration);
 
         StringBuilder paramsStr1 = new StringBuilder();
@@ -182,8 +219,6 @@ public class CodeGenerator {
             resultStr.append(paramsStr1.toString().substring(0, paramsStr1.length() - 2));
 
         resultStr.append(")\n");
-
-
         resultStr.append(" nop \n  ");
 
         funDeclaration.getExpressionList().forEach(x -> resultStr.append(generateCode(x) + "\n"));
@@ -221,19 +256,60 @@ public class CodeGenerator {
         else if (expression.getClass().getSimpleName().equals(Assignment.class.getSimpleName()))
             return generateCode((Assignment) expression);
         else if (expression.getClass().getSimpleName().equals(WhileLoop.class.getSimpleName()))
-            generateCode((WhileLoop) expression);
+            return generateCode((WhileLoop) expression);
         else if (expression.getClass().getSimpleName().equals(ForLoop.class.getSimpleName()))
-            generateCode((ForLoop) expression);
+            return generateCode((ForLoop) expression);
         else if (expression.getClass().getSimpleName().equals(DoWhileLoop.class.getSimpleName()))
-            generateCode((DoWhileLoop) expression);
+            return generateCode((DoWhileLoop) expression);
         else if (expression.getClass().getSimpleName().equals(Declaration.class.getSimpleName()))
-            generateCode((Declaration) expression);
+           return generateCode((Declaration) expression);
         else if (expression.getClass().getSimpleName().equals(IfOper.class.getSimpleName()))
            return generateCode((IfOper) expression);
         else if (expression instanceof Expr)
             return generateCode((Expr) expression);
         //TODO: clean it
         return "";
+    }
+
+    @NotNull
+    private static String generateCode(WhileLoop whileLoop){
+        StringBuilder resultStr=new StringBuilder();
+        String labelConditionName="LABEL_"+counter;
+        counter++;
+        resultStr.append("br.s "+labelConditionName+"\n");
+
+        String labelLoopBodyName="LABEL_"+counter;
+        counter++;
+
+        resultStr.append(labelLoopBodyName+":\n nop \n");
+        whileLoop.getExpressions().forEach(x->resultStr.append(generateCode(x)+"\n"));
+        resultStr.append("nop\n");
+
+        resultStr.append(labelConditionName+":\n");
+        resultStr.append(generateCode(whileLoop.getCondition())+"\n");
+
+        resultStr.append(generateSaveVariableCode(whileLoop.getConditionVar())+"\n");
+        resultStr.append(generateLoadCode(whileLoop.getConditionVar())+"\n");
+        resultStr.append("brtrue.s "+labelLoopBodyName+"\n");
+        return resultStr.toString();
+    }
+
+    @NotNull
+    private static String generateCode(DoWhileLoop doWhileLoop){
+        StringBuilder resultStr=new StringBuilder();
+        String labelLoopBodyName="LABEL_"+counter;
+        counter++;
+
+        resultStr.append(labelLoopBodyName+":\n nop \n");
+        doWhileLoop.getExpressions().forEach(x->resultStr.append(generateCode(x)+"\n"));
+        resultStr.append("nop\n");
+
+        resultStr.append(generateCode(doWhileLoop.getCondition())+"\n");
+
+        resultStr.append(generateSaveVariableCode(doWhileLoop.getConditionVar())+"\n");
+        resultStr.append(generateLoadCode(doWhileLoop.getConditionVar())+"\n");
+        resultStr.append("brtrue.s "+labelLoopBodyName+"\n");
+        return resultStr.toString();
     }
 
     @NotNull
@@ -246,12 +322,15 @@ public class CodeGenerator {
         counter++;
         resultStr.append("brfalse.s "+labelStartName+"\n");
 
-        String labelFinishName="LABEL_"+counter;
+        String labelFinishName=null;
+        if (ifOper.getElseBlock()!=null)
+        labelFinishName="LABEL_"+counter;
         counter++;
 
         resultStr.append(generateCode(ifOper.getThenBlock(), labelFinishName));
         if (ifOper.getElseBlock()!=null)
             resultStr.append(generateCode(ifOper.getElseBlock(), labelStartName, labelFinishName));
+        else  resultStr.append(labelStartName+":\n");
         return  resultStr.toString();
 
     }
@@ -260,7 +339,8 @@ public class CodeGenerator {
     private static String generateCode(ThenBlock thenBlock, String labelFinishName){
         StringBuilder resultStr=new StringBuilder();
         thenBlock.getExpressions().forEach(x->resultStr.append(generateCode(x)));
-        resultStr.append("br.s "+labelFinishName+"\n");
+        if (labelFinishName!=null) //if there was no else block
+            resultStr.append("br.s "+labelFinishName+"\n");
         return  resultStr.toString();
     }
 
@@ -341,11 +421,9 @@ public class CodeGenerator {
         StringBuilder resultStr=new StringBuilder();
         resultStr.append(generateLoadCode(arrayAccess)+"\n");
 
-        //проверить binary, if, cycles
         if (arrayAccess.getParent() instanceof FunCall ||
                 arrayAccess.getParent() instanceof ReturnExpr ||
-                arrayAccess.getParent() instanceof BinaryExpr||
-                arrayAccess.getParent() instanceof IfOper)
+                arrayAccess.getParent() instanceof BinaryExpr)
             resultStr.append(generateLoadElemCode(arrayAccess)+"\n");
         return resultStr.toString();
     }
