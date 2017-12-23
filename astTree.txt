@@ -1,125 +1,212 @@
  ── program 
     └── class Program
-        └── fun main(args:Array<String> index:0) :Unit
-            ├── =
-            │   ├── var arr type:Array<Int> index:0
-            │   └──  type:Array<Int>
-            │       └── 6 type:Int const 6
-            ├── =
-            │   ├── [ ] type:Int
-            │   │   ├── arr type:Array<Int> index:0 local
-            │   │   └── 5 type:Int const 5
-            │   └── 7 type:Int const 7
-            ├── =
-            │   ├── var i type:Int index:1
-            │   └── 8 type:Int const 8
-            ├── =
-            │   ├── var d type:Double index:2
-            │   └── 9.0 type:Double const 9.0
-            ├── =
-            │   ├── d type:Double index:2 local
-            │   └── + type:Double
-            │       ├── [ ] type:Int cast to:Double
-            │       │   ├── arr type:Array<Int> index:0 local
-            │       │   └── 5 type:Int const 5
-            │       └── 1.0 type:Double const 1.0
-            ├── println( )
-            │   └── d type:Double index:2 local
-            ├── =
-            │   ├── d type:Double index:2 local
-            │   └── + type:Double
-            │       ├── + type:Int cast to:Double
-            │       │   ├── [ ] type:Int
-            │       │   │   ├── arr type:Array<Int> index:0 local
-            │       │   │   └── 5 type:Int const 5
-            │       │   └── [ ] type:Int
-            │       │       ├── arr type:Array<Int> index:0 local
-            │       │       └── 5 type:Int const 5
-            │       └── 1.0 type:Double const 1.0
-            ├── println( )
-            │   └── d type:Double index:2 local
-            ├── =
-            │   ├── d type:Double index:2 local
-            │   └── + type:Double
-            │       ├── [ ] type:Int cast to:Double
-            │       │   ├── arr type:Array<Int> index:0 local
-            │       │   └── 5 type:Int const 5
-            │       └── d type:Double index:2 local
-            ├── println( )
-            │   └── d type:Double index:2 local
-            ├── =
-            │   ├── var arr1 type:Array<Double> index:3
-            │   └──  type:Array<Double>
-            │       └── 6 type:Int const 6
-            ├── =
-            │   ├── [ ] type:Double
-            │   │   ├── arr1 type:Array<Double> index:3 local
-            │   │   └── 5 type:Int const 5
-            │   └── + type:Double
-            │       ├── 7 type:Int cast to:Double const 7
-            │       └── 9.7 type:Double const 9.7
-            ├── =
-            │   ├── [ ] type:Double
-            │   │   ├── arr1 type:Array<Double> index:3 local
-            │   │   └── 0 type:Int const 0
-            │   └── 7.8 type:Double const 7.8
-            ├── =
-            │   ├── [ ] type:Int
-            │   │   ├── arr type:Array<Int> index:0 local
-            │   │   └── 1 type:Int const 1
-            │   └── i type:Int index:1 local
-            ├── =
-            │   ├── d type:Double index:2 local
-            │   └── + type:Double
-            │       ├── + type:Int cast to:Double
-            │       │   ├── i type:Int index:1 local
-            │       │   └── i type:Int index:1 local
-            │       └── 7.0 type:Double const 7.0
-            ├── println( )
-            │   └── d type:Double index:2 local
-            ├── =
-            │   ├── d type:Double index:2 local
-            │   └── + type:Double
-            │       ├── i type:Int cast to:Double index:1 local
-            │       └── d type:Double index:2 local
-            ├── println( )
-            │   └── d type:Double index:2 local
-            ├── =
-            │   ├── d type:Double index:2 local
-            │   └── / type:Double
-            │       ├── i type:Int cast to:Double index:1 local
-            │       └── 8.0 type:Double const 8.0
-            ├── println( )
-            │   └── d type:Double index:2 local
-            ├── =
-            │   ├── d type:Double index:2 local
-            │   └── + type:Double
-            │       ├── i type:Int cast to:Double index:1 local
-            │       └── 1.0 type:Double const 1.0
-            ├── println( )
-            │   └── d type:Double index:2 local
-            ├── =
-            │   ├── d type:Double index:2 local
-            │   └── sqrt( ) type:Double
-            │       └── + type:Double
-            │           ├── i type:Int cast to:Double index:1 local
-            │           └── 0.0 type:Double const 0.0
-            ├── println( )
-            │   └── d type:Double index:2 local
-            ├── =
-            │   ├── var e type:Int index:4
-            │   └── 2 type:Int const 2
-            ├── =
-            │   ├── d type:Double index:2 local
-            │   └── power( ) type:Double
-            │       ├── + type:Double
-            │       │   ├── i type:Int cast to:Double index:1 local
-            │       │   └── 0.0 type:Double const 0.0
-            │       └── + type:Double
-            │           ├── e type:Int cast to:Double index:4 local
-            │           └── 0.0 type:Double const 0.0
-            ├── println( )
-            │   └── d type:Double index:2 local
-            ├── println( )
-            │   └── i type:Int index:1 local
-            └── readKey( )
+        ├── fun main(args:Array<String> index:0) :Unit
+        │   ├── =
+        │   │   ├── var arr type:Array<Int> index:0
+        │   │   └──  type:Array<Int>
+        │   │       └── 10 type:Int const 10
+        │   ├── println( )
+        │   │   └── " mass sort\nEnter  mass (10 numbers)" type:String const " mass sort\nEnter  mass (10 numbers)"
+        │   ├── =
+        │   │   ├── var i type:Int index:1
+        │   │   └── 9 type:Int const 9
+        │   ├── while
+        │   │   ├── >= type:Boolean
+        │   │   │   ├── i type:Int index:1 local
+        │   │   │   └── 0 type:Int const 0
+        │   │   ├── =
+        │   │   │   ├── [ ] type:Int
+        │   │   │   │   ├── arr type:Array<Int> index:0 local
+        │   │   │   │   └── i type:Int index:1 local
+        │   │   │   └── readlnInt( ) type:Int
+        │   │   └── =
+        │   │       ├── i type:Int index:1 local
+        │   │       └── - type:Int
+        │   │           ├── i type:Int index:1 local
+        │   │           └── 1 type:Int const 1
+        │   ├── quickSort( )
+        │   │   ├── arr type:Array<Int> index:0 local
+        │   │   ├── 0 type:Int const 0
+        │   │   └── - type:Int
+        │   │       ├── size( ) type:Int
+        │   │       │   └── arr type:Array<Int> index:0 local
+        │   │       └── 1 type:Int const 1
+        │   ├── println( )
+        │   │   └── "Result" type:String const "Result"
+        │   ├── for
+        │   │   ├── variable type:Int index:2 local
+        │   │   ├── arr type:Array<Int> index:0 local
+        │   │   ├── print( )
+        │   │   │   └── variable type:Int index:2 local
+        │   │   └── println( )
+        │   │       └── " " type:String const " "
+        │   └── readKey( )
+        ├── fun bubleSort(arr:Array<Int> index:0) :Unit
+        │   ├── =
+        │   │   ├── var i type:Int index:0
+        │   │   └── - type:Int
+        │   │       ├── size( ) type:Int
+        │   │       │   └── arr type:Array<Int> index:0 arg
+        │   │       └── 1 type:Int const 1
+        │   ├── =
+        │   │   ├── var j type:Int index:1
+        │   │   └── 0 type:Int const 0
+        │   └── while
+        │       ├── > type:Boolean
+        │       │   ├── i type:Int index:0 local
+        │       │   └── 0 type:Int const 0
+        │       ├── while
+        │       │   ├── < type:Boolean
+        │       │   │   ├── j type:Int index:1 local
+        │       │   │   └── i type:Int index:0 local
+        │       │   ├── if
+        │       │   │   ├── > type:Boolean
+        │       │   │   │   ├── [ ] type:Int
+        │       │   │   │   │   ├── arr type:Array<Int> index:0 arg
+        │       │   │   │   │   └── j type:Int index:1 local
+        │       │   │   │   └── [ ] type:Int
+        │       │   │   │       ├── arr type:Array<Int> index:0 arg
+        │       │   │   │       └── + type:Int
+        │       │   │   │           ├── j type:Int index:1 local
+        │       │   │   │           └── 1 type:Int const 1
+        │       │   │   └── then
+        │       │   │       ├── =
+        │       │   │       │   ├── var tmp type:Int index:2
+        │       │   │       │   └── [ ] type:Int
+        │       │   │       │       ├── arr type:Array<Int> index:0 arg
+        │       │   │       │       └── j type:Int index:1 local
+        │       │   │       ├── =
+        │       │   │       │   ├── [ ] type:Int
+        │       │   │       │   │   ├── arr type:Array<Int> index:0 arg
+        │       │   │       │   │   └── j type:Int index:1 local
+        │       │   │       │   └── [ ] type:Int
+        │       │   │       │       ├── arr type:Array<Int> index:0 arg
+        │       │   │       │       └── + type:Int
+        │       │   │       │           ├── j type:Int index:1 local
+        │       │   │       │           └── 1 type:Int const 1
+        │       │   │       └── =
+        │       │   │           ├── [ ] type:Int
+        │       │   │           │   ├── arr type:Array<Int> index:0 arg
+        │       │   │           │   └── + type:Int
+        │       │   │           │       ├── j type:Int index:1 local
+        │       │   │           │       └── 1 type:Int const 1
+        │       │   │           └── tmp type:Int index:2 local
+        │       │   └── =
+        │       │       ├── j type:Int index:1 local
+        │       │       └── + type:Int
+        │       │           ├── j type:Int index:1 local
+        │       │           └── 1 type:Int const 1
+        │       ├── =
+        │       │   ├── j type:Int index:1 local
+        │       │   └── 0 type:Int const 0
+        │       └── =
+        │           ├── i type:Int index:0 local
+        │           └── - type:Int
+        │               ├── i type:Int index:0 local
+        │               └── 1 type:Int const 1
+        └── fun quickSort(mass:Array<Int> index:0, low:Int index:1, high:Int index:2) :Unit
+            └── if
+                ├── != type:Boolean
+                │   ├── size( ) type:Int
+                │   │   └── mass type:Array<Int> index:0 arg
+                │   └── 0 type:Int const 0
+                └── then
+                    └── if
+                        ├── < type:Boolean
+                        │   ├── low type:Int index:1 arg
+                        │   └── high type:Int index:2 arg
+                        └── then
+                            ├── =
+                            │   ├── var middle type:Int index:0
+                            │   └── + type:Int
+                            │       ├── low type:Int index:1 arg
+                            │       └── / type:Int
+                            │           ├── - type:Int
+                            │           │   ├── high type:Int index:2 arg
+                            │           │   └── low type:Int index:1 arg
+                            │           └── 2 type:Int const 2
+                            ├── =
+                            │   ├── var opora type:Int index:1
+                            │   └── [ ] type:Int
+                            │       ├── mass type:Array<Int> index:0 arg
+                            │       └── middle type:Int index:0 local
+                            ├── =
+                            │   ├── var i type:Int index:2
+                            │   └── low type:Int index:1 arg
+                            ├── =
+                            │   ├── var j type:Int index:3
+                            │   └── high type:Int index:2 arg
+                            ├── while
+                            │   ├── <= type:Boolean
+                            │   │   ├── i type:Int index:2 local
+                            │   │   └── j type:Int index:3 local
+                            │   ├── while
+                            │   │   ├── < type:Boolean
+                            │   │   │   ├── [ ] type:Int
+                            │   │   │   │   ├── mass type:Array<Int> index:0 arg
+                            │   │   │   │   └── i type:Int index:2 local
+                            │   │   │   └── opora type:Int index:1 local
+                            │   │   └── =
+                            │   │       ├── i type:Int index:2 local
+                            │   │       └── + type:Int
+                            │   │           ├── i type:Int index:2 local
+                            │   │           └── 1 type:Int const 1
+                            │   ├── while
+                            │   │   ├── > type:Boolean
+                            │   │   │   ├── [ ] type:Int
+                            │   │   │   │   ├── mass type:Array<Int> index:0 arg
+                            │   │   │   │   └── j type:Int index:3 local
+                            │   │   │   └── opora type:Int index:1 local
+                            │   │   ├── =
+                            │   │   │   ├── j type:Int index:3 local
+                            │   │   │   └── j type:Int index:3 local
+                            │   │   └── -1 type:Int const -1
+                            │   └── if
+                            │       ├── <= type:Boolean
+                            │       │   ├── i type:Int index:2 local
+                            │       │   └── j type:Int index:3 local
+                            │       └── then
+                            │           ├── =
+                            │           │   ├── var temp type:Int index:4
+                            │           │   └── [ ] type:Int
+                            │           │       ├── mass type:Array<Int> index:0 arg
+                            │           │       └── i type:Int index:2 local
+                            │           ├── =
+                            │           │   ├── [ ] type:Int
+                            │           │   │   ├── mass type:Array<Int> index:0 arg
+                            │           │   │   └── i type:Int index:2 local
+                            │           │   └── [ ] type:Int
+                            │           │       ├── mass type:Array<Int> index:0 arg
+                            │           │       └── j type:Int index:3 local
+                            │           ├── =
+                            │           │   ├── [ ] type:Int
+                            │           │   │   ├── mass type:Array<Int> index:0 arg
+                            │           │   │   └── j type:Int index:3 local
+                            │           │   └── temp type:Int index:4 local
+                            │           ├── =
+                            │           │   ├── i type:Int index:2 local
+                            │           │   └── + type:Int
+                            │           │       ├── i type:Int index:2 local
+                            │           │       └── 1 type:Int const 1
+                            │           ├── =
+                            │           │   ├── j type:Int index:3 local
+                            │           │   └── j type:Int index:3 local
+                            │           └── -1 type:Int const -1
+                            ├── if
+                            │   ├── < type:Boolean
+                            │   │   ├── low type:Int index:1 arg
+                            │   │   └── j type:Int index:3 local
+                            │   └── then
+                            │       └── quickSort( )
+                            │           ├── mass type:Array<Int> index:0 arg
+                            │           ├── low type:Int index:1 arg
+                            │           └── j type:Int index:3 local
+                            └── if
+                                ├── > type:Boolean
+                                │   ├── high type:Int index:2 arg
+                                │   └── i type:Int index:2 local
+                                └── then
+                                    └── quickSort( )
+                                        ├── mass type:Array<Int> index:0 arg
+                                        ├── i type:Int index:2 local
+                                        └── high type:Int index:2 arg

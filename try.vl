@@ -1,39 +1,83 @@
 class Program{
+
 fun main(args:Array<String>): Unit {
-      var arr:Array<Int> = Array<Int>(6)
-      arr[5] = 7
-        var i:Int = 8
-        var d: Double= 9.0
 
-        d = arr[5]+1.0
-         println(d)
-        d = arr[5] + arr[5] + 1.0
-         println(d) 
-        d = arr[5] + d 
-         println(d) 
+    var arr: Array<Int> =  Array<Int>(10)
+    println(" mass sort\nEnter  mass (10 numbers)")
+    var i:Int=9
 
-       var arr1: Array<Double> = Array<Double>(6)
-        arr1[5] = 7 +9.7
-        arr1[0] = 7.8 
-        arr[1] = i 
+    while(i >= 0){
 
-        d = i + i+ 7.0
-         println(d) 
-        d = i + d 
-         println(d) 
-        d = i / 8.0
-         println(d) 
-        d = i + 1.0
-         println(d)
-           d = sqrt(i+0.0)
-                  println(d)
-
-
-       var e:Int = 2
-        d = power(i+0.0, e+0.0)
-         println(d)
-
-       println(i)
-      readKey()
+        arr[i]=readlnInt()
+        i=i - 1
     }
+  //  bubleSort(arr)
+quickSort(arr, 0, size(arr) - 1)
+    println("Result")
+    for (variable in arr){
+        print(variable)
+        println(" ")
     }
+
+    readKey()
+    }
+
+fun bubleSort(arr:  Array<Int>): Unit {
+var i:Int= size(arr) - 1
+var j:Int=0
+  while(i>0){
+  while (j<i){
+
+            if( arr[j] > arr[j+1] ){
+               var tmp:Int = arr[j]
+                arr[j] = arr[j+1]
+                arr[j+1] = tmp
+            }
+       j=j+1
+       }
+       j=0
+   i=i - 1
+   }
+
+}
+
+fun quickSort( mass: Array<Int>, low:Int, high:Int):Unit {
+        if (size( mass) != 0){
+ 
+        if (low < high){
+           
+ 
+        // выбрать опорный элемент
+        var middle:Int = low + (high - low) / 2
+        var opora:Int =  mass[middle]
+ 
+        // разделить на подмассивы, который больше и меньше опорного элемента
+        var i:Int = low
+         var j:Int = high
+        while (i <= j) {
+            while ( mass[i] < opora) {
+                i=i+1
+            }
+ 
+            while ( mass[j] > opora) {
+                j=j-1
+            }
+ 
+            if (i <= j) {//меняем местами
+               var temp:Int =  mass[i] 
+                 mass[i] =  mass[j] 
+                 mass[j] = temp 
+                i=i+1
+                j=j-1
+            }
+        }
+ 
+        // вызов рекурсии для сортировки левой и правой части
+        if (low < j)
+            quickSort( mass, low, j) 
+ 
+        if (high > i)
+            quickSort( mass, i, high) 
+    }
+}}
+}

@@ -490,7 +490,7 @@ public class Analysis {
         if (list1 != null && list2 != null) {
             if (list1.size() != list2.size()) return false;
             for (int i = 0; i < list1.size(); i++) {
-                if (!typesAreEqual(list1.get(i).getType(), list2.get(i).getType())) return false;
+                if (!typesAreEqual(getType(list1.get(i)), getType(list2.get(i)))) return false;
             }
         } else return false;
         return true;
@@ -610,6 +610,27 @@ public class Analysis {
             //return nested nestedType assumig than declaration nestedType is Array
             return ((Array) declaration.get().getNewVariable().getType()).getNestedType();
         //else
+
+        List<FunDeclaration> f=
+                Utils.getAllVisibleTagertClassNodes(arrayAccess, FunDeclaration.class);
+        Optional<FunDeclaration> funDecl=f.stream().
+                filter(decl->
+                        decl.getFunParametersList()
+                                .stream().anyMatch(
+                                x->x.getVariable().getVarName().equals(arrayAccess.getVariableReference().getVarName()))).findFirst();
+        if (funDecl.isPresent()){
+            Optional<FunParameter> funParam= funDecl.get().getFunParametersList().stream()
+                    .filter(x->x.getVariable().getVarName().equals(arrayAccess.getVariableReference().getVarName())).findFirst();
+//        Optional<FunParameter> funParam=
+//                Utils.getAllVisibleTagertClassNodes(variableReference, FunParameter.class)
+//                .stream().filter(x->x.getVariable().getVarName().equals(variableReference.getVarName()))
+//                .findFirst();
+            if (funParam.isPresent()){
+                   Type  type = (((Array) funParam.get().getType()).getNestedType());
+                    return type;
+
+
+            }}
         return null;
     }
 
@@ -747,6 +768,28 @@ public class Analysis {
                 }
             }
         } //does not exist
+
+        List<FunDeclaration> f=
+                Utils.getAllVisibleTagertClassNodes(variableReference, FunDeclaration.class);
+        Optional<FunDeclaration> funDecl=f.stream().
+                filter(decl->
+                decl.getFunParametersList()
+                        .stream().anyMatch(
+        x->x.getVariable().getVarName().equals(variableReference.getVarName()))).findFirst();
+        if (funDecl.isPresent()){
+        Optional<FunParameter> funParam= funDecl.get().getFunParametersList().stream()
+              .filter(x->x.getVariable().getVarName().equals(variableReference.getVarName())).findFirst();
+//        Optional<FunParameter> funParam=
+//                Utils.getAllVisibleTagertClassNodes(variableReference, FunParameter.class)
+//                .stream().filter(x->x.getVariable().getVarName().equals(variableReference.getVarName()))
+//                .findFirst();
+        if (funParam.isPresent()){
+            if (funParam.get().getType() instanceof Array) {
+              Array  type = new Array(((Array) funParam.get().getType()).getNestedType());
+                return type;
+            }
+            else return funParam.get().getType();
+        }}
         return null;
     }
 
