@@ -401,7 +401,7 @@ public class CodeGenerator {
         resultStr.append(generateCode(ifOper.getConditionVar()));
         String labelStartName="LABEL_"+counter;
         counter++;
-        resultStr.append("brfalse.s "+labelStartName+"\n");
+        resultStr.append("brfalse "+labelStartName+"\n");
 
         String labelFinishName=null;
         if (ifOper.getElseBlock()!=null)

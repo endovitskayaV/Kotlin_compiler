@@ -1,24 +1,33 @@
 class Program{
 
-fun main(args:Array<String>): Unit {
-
-    var arr: Array<Int> =  Array<Int>(10)
-    println(" mass sort\nEnter  mass (10 numbers)")
-    var i:Int=9
-
-    while(i >= 0){
-
+fun enterArr(arr:Array<Int>, sortType:String):Unit{
+println(concat("Enter  array (10 numbers)\nArray sort:", sortType))
+    var i:Int=0
+    while(i < 10){
         arr[i]=readlnInt()
-        i=i - 1
+        i=i + 1
     }
-  //  bubleSort(arr)
-quickSort(arr, 0, size(arr) - 1)
-    println("Result")
-    for (variable in arr){
-        print(variable)
-        println(" ")
     }
 
+    fun printResult(arr:Array<Int>):Unit{println("Result")
+     for (variable in arr){
+            print(variable)
+            println(" ")
+    }
+}
+
+fun main(args:Array<String>): Unit {
+    var arr: Array<Int> =  Array<Int>(10)
+
+  enterArr(arr, "bubble")
+  bubleSort(arr)
+  printResult(arr)
+
+  enterArr(arr, "quick")
+    quickSort(arr, 0, size(arr) - 1)
+    printResult(arr)
+
+println("")
     readKey()
     }
 
@@ -42,7 +51,7 @@ var j:Int=0
 }
 
 fun quickSort( mass: Array<Int>, low:Int, high:Int):Unit {
-        if (size( mass) != 0){
+        if (size(mass) != 0){
  
         if (low < high){
            
@@ -60,7 +69,7 @@ fun quickSort( mass: Array<Int>, low:Int, high:Int):Unit {
             }
  
             while ( mass[j] > opora) {
-                j=j-1
+                j=j - 1
             }
  
             if (i <= j) {//меняем местами
@@ -68,7 +77,7 @@ fun quickSort( mass: Array<Int>, low:Int, high:Int):Unit {
                  mass[i] =  mass[j] 
                  mass[j] = temp 
                 i=i+1
-                j=j-1
+                j=j - 1
             }
         }
  
@@ -79,5 +88,6 @@ fun quickSort( mass: Array<Int>, low:Int, high:Int):Unit {
         if (high > i)
             quickSort( mass, i, high) 
     }
-}}
+}
+}
 }

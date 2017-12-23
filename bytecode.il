@@ -689,31 +689,29 @@
 .class private auto ansi beforefieldinit Program
     extends [mscorlib]System.Object
         {
- .method public hidebysig static void main(
-string[] args) cil managed 
-  {.entrypoint
- 
+ .method public hidebysig static void enterArr(
+int32[] arr, string sortType) cil managed 
+  { 
     .maxstack 8
     .locals init (
-[0] int32[] arr, [1] int32 i, [2] bool V_2, [3] int32[] V_3, [4] int32 V_4, [5] int32 variable)
+[0] int32 i, [1] bool V_1)
  nop 
-  ldc.i4.s 10
+  ldstr "Enter  array (10 numbers)\nArray sort:"
+ldarg.s sortType
 
-newarr int32
-stloc.s arr
-
-ldstr " mass sort\nEnter  mass (10 numbers)"
+ call string CSharpFunctions::concat(string, string)
+ nop 
 
  call void CSharpFunctions::println(string)
  nop 
 
-ldc.i4.s 9
+ldc.i4.s 0
 stloc.s i
 
 br.s LABEL_0
 LABEL_1:
  nop 
-ldloc.s arr
+ldarg.s arr
 ldloc.s i
 
 
@@ -725,56 +723,49 @@ ldloc.s i
 
 ldc.i4.s 1
 
-sub
+add
 stloc.s i
 
 nop
 LABEL_0:
 ldloc.s i
 
-ldc.i4.s 0
+ldc.i4.s 10
 
 clt
-ldc.i4.0
-ceq
 
+stloc.s V_1
 
-stloc.s V_2
-
-ldloc.s V_2
+ldloc.s V_1
 
 brtrue.s LABEL_1
 
-ldloc.s arr
-ldc.i4.s 0
-ldloc.s arr
 
- call int32 CSharpFunctions::size(int32[])
+ ret 
+} .method public hidebysig static void printResult(
+int32[] arr) cil managed 
+  { 
+    .maxstack 8
+    .locals init (
+[0] int32[] V_0, [1] int32 V_1, [2] int32 variable)
  nop 
-
-ldc.i4.s 1
-
-sub
-call void Program::quickSort(int32[], int32, int32)
- nop 
-
-ldstr "Result"
+  ldstr "Result"
 
  call void CSharpFunctions::println(string)
  nop 
 
-ldloc.s arr
+ldarg.s arr
 
-stloc.s V_3
+stloc.s V_0
 
 ldc.i4.0 
-stloc.s V_4
+stloc.s V_1
 
 br.s LABEL_2
 LABEL_3:
-ldloc.s V_3
+ldloc.s V_0
 
-ldloc.s V_4
+ldloc.s V_1
 
 ldelem.i4
 stloc.s variable
@@ -789,20 +780,75 @@ ldstr " "
  call void CSharpFunctions::println(string)
  nop 
 
-ldloc.s V_4
+ldloc.s V_1
 
 ldc.i4.1 
  add
-stloc.s V_4
+stloc.s V_1
 
 LABEL_2:
-ldloc.s V_4
+ldloc.s V_1
 
-ldloc.s V_3
+ldloc.s V_0
 
 ldlen
  conv.i4 
 blt.s LABEL_3
+
+
+ ret 
+} .method public hidebysig static void main(
+string[] args) cil managed 
+  {.entrypoint
+ 
+    .maxstack 8
+    .locals init (
+[0] int32[] arr)
+ nop 
+  ldc.i4.s 10
+
+newarr int32
+stloc.s arr
+
+ldloc.s arr
+ldstr "bubble"
+call void Program::enterArr(int32[], string)
+ nop 
+
+ldloc.s arr
+call void Program::bubleSort(int32[])
+ nop 
+
+ldloc.s arr
+call void Program::printResult(int32[])
+ nop 
+
+ldloc.s arr
+ldstr "quick"
+call void Program::enterArr(int32[], string)
+ nop 
+
+ldloc.s arr
+ldc.i4.s 0
+ldloc.s arr
+
+ call int32 CSharpFunctions::size(int32[])
+ nop 
+
+ldc.i4.s 1
+
+sub
+call void Program::quickSort(int32[], int32, int32)
+ nop 
+
+ldloc.s arr
+call void Program::printResult(int32[])
+ nop 
+
+ldstr ""
+
+ call void CSharpFunctions::println(string)
+ nop 
 
 
  call void CSharpFunctions::readKey()
@@ -853,7 +899,7 @@ ldelem.i4
 cgt
 stloc.s V_3
 ldloc.s V_3
-brfalse.s LABEL_8
+brfalse LABEL_8
 ldarg.s arr
 ldloc.s j
 
@@ -949,7 +995,7 @@ ceq
 
 stloc.s V_9
 ldloc.s V_9
-brfalse.s LABEL_10
+brfalse LABEL_10
 ldarg.s low
 
 ldarg.s high
@@ -957,7 +1003,7 @@ ldarg.s high
 clt
 stloc.s V_8
 ldloc.s V_8
-brfalse.s LABEL_12
+brfalse LABEL_12
 ldarg.s low
 
 ldarg.s high
@@ -1015,9 +1061,11 @@ br.s LABEL_18
 LABEL_19:
  nop 
 ldloc.s j
-stloc.s j
 
-ldc.i4.s -1
+ldc.i4.s 1
+
+sub
+stloc.s j
 
 nop
 LABEL_18:
@@ -1046,7 +1094,7 @@ ceq
 
 stloc.s V_5
 ldloc.s V_5
-brfalse.s LABEL_20
+brfalse LABEL_20
 ldarg.s mass
 ldloc.s i
 
@@ -1072,8 +1120,11 @@ ldc.i4.s 1
 add
 stloc.s i
 ldloc.s j
+
+ldc.i4.s 1
+
+sub
 stloc.s j
-ldc.i4.s -1
 LABEL_20:
 
 nop
@@ -1099,7 +1150,7 @@ ldloc.s j
 clt
 stloc.s V_6
 ldloc.s V_6
-brfalse.s LABEL_22
+brfalse LABEL_22
 ldarg.s mass
 ldarg.s low
 ldloc.s j
@@ -1113,7 +1164,7 @@ ldloc.s i
 cgt
 stloc.s V_7
 ldloc.s V_7
-brfalse.s LABEL_24
+brfalse LABEL_24
 ldarg.s mass
 ldloc.s i
 ldarg.s high

@@ -1,29 +1,52 @@
  ── program 
     └── class Program
+        ├── fun enterArr(arr:Array<Int> index:0, sortType:String index:1) :Unit
+        │   ├── println( )
+        │   │   └── concat( ) type:String
+        │   │       ├── "Enter  array (10 numbers)\nArray sort:" type:String const "Enter  array (10 numbers)\nArray sort:"
+        │   │       └── sortType type:String index:1 arg
+        │   ├── =
+        │   │   ├── var i type:Int index:0
+        │   │   └── 0 type:Int const 0
+        │   └── while
+        │       ├── < type:Boolean
+        │       │   ├── i type:Int index:0 local
+        │       │   └── 10 type:Int const 10
+        │       ├── =
+        │       │   ├── [ ] type:Int
+        │       │   │   ├── arr type:Array<Int> index:0 arg
+        │       │   │   └── i type:Int index:0 local
+        │       │   └── readlnInt( ) type:Int
+        │       └── =
+        │           ├── i type:Int index:0 local
+        │           └── + type:Int
+        │               ├── i type:Int index:0 local
+        │               └── 1 type:Int const 1
+        ├── fun printResult(arr:Array<Int> index:0) :Unit
+        │   ├── println( )
+        │   │   └── "Result" type:String const "Result"
+        │   └── for
+        │       ├── variable type:Int index:0 local
+        │       ├── arr type:Array<Int> index:0 arg
+        │       ├── print( )
+        │       │   └── variable type:Int index:0 local
+        │       └── println( )
+        │           └── " " type:String const " "
         ├── fun main(args:Array<String> index:0) :Unit
         │   ├── =
         │   │   ├── var arr type:Array<Int> index:0
         │   │   └──  type:Array<Int>
         │   │       └── 10 type:Int const 10
-        │   ├── println( )
-        │   │   └── " mass sort\nEnter  mass (10 numbers)" type:String const " mass sort\nEnter  mass (10 numbers)"
-        │   ├── =
-        │   │   ├── var i type:Int index:1
-        │   │   └── 9 type:Int const 9
-        │   ├── while
-        │   │   ├── >= type:Boolean
-        │   │   │   ├── i type:Int index:1 local
-        │   │   │   └── 0 type:Int const 0
-        │   │   ├── =
-        │   │   │   ├── [ ] type:Int
-        │   │   │   │   ├── arr type:Array<Int> index:0 local
-        │   │   │   │   └── i type:Int index:1 local
-        │   │   │   └── readlnInt( ) type:Int
-        │   │   └── =
-        │   │       ├── i type:Int index:1 local
-        │   │       └── - type:Int
-        │   │           ├── i type:Int index:1 local
-        │   │           └── 1 type:Int const 1
+        │   ├── enterArr( )
+        │   │   ├── arr type:Array<Int> index:0 local
+        │   │   └── "bubble" type:String const "bubble"
+        │   ├── bubleSort( )
+        │   │   └── arr type:Array<Int> index:0 local
+        │   ├── printResult( )
+        │   │   └── arr type:Array<Int> index:0 local
+        │   ├── enterArr( )
+        │   │   ├── arr type:Array<Int> index:0 local
+        │   │   └── "quick" type:String const "quick"
         │   ├── quickSort( )
         │   │   ├── arr type:Array<Int> index:0 local
         │   │   ├── 0 type:Int const 0
@@ -31,15 +54,10 @@
         │   │       ├── size( ) type:Int
         │   │       │   └── arr type:Array<Int> index:0 local
         │   │       └── 1 type:Int const 1
+        │   ├── printResult( )
+        │   │   └── arr type:Array<Int> index:0 local
         │   ├── println( )
-        │   │   └── "Result" type:String const "Result"
-        │   ├── for
-        │   │   ├── variable type:Int index:2 local
-        │   │   ├── arr type:Array<Int> index:0 local
-        │   │   ├── print( )
-        │   │   │   └── variable type:Int index:2 local
-        │   │   └── println( )
-        │   │       └── " " type:String const " "
+        │   │   └── "" type:String const ""
         │   └── readKey( )
         ├── fun bubleSort(arr:Array<Int> index:0) :Unit
         │   ├── =
@@ -157,10 +175,11 @@
                             │   │   │   │   ├── mass type:Array<Int> index:0 arg
                             │   │   │   │   └── j type:Int index:3 local
                             │   │   │   └── opora type:Int index:1 local
-                            │   │   ├── =
-                            │   │   │   ├── j type:Int index:3 local
-                            │   │   │   └── j type:Int index:3 local
-                            │   │   └── -1 type:Int const -1
+                            │   │   └── =
+                            │   │       ├── j type:Int index:3 local
+                            │   │       └── - type:Int
+                            │   │           ├── j type:Int index:3 local
+                            │   │           └── 1 type:Int const 1
                             │   └── if
                             │       ├── <= type:Boolean
                             │       │   ├── i type:Int index:2 local
@@ -188,10 +207,11 @@
                             │           │   └── + type:Int
                             │           │       ├── i type:Int index:2 local
                             │           │       └── 1 type:Int const 1
-                            │           ├── =
-                            │           │   ├── j type:Int index:3 local
-                            │           │   └── j type:Int index:3 local
-                            │           └── -1 type:Int const -1
+                            │           └── =
+                            │               ├── j type:Int index:3 local
+                            │               └── - type:Int
+                            │                   ├── j type:Int index:3 local
+                            │                   └── 1 type:Int const 1
                             ├── if
                             │   ├── < type:Boolean
                             │   │   ├── low type:Int index:1 arg
