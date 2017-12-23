@@ -77,5 +77,9 @@
     │   └── external
     ├── fun size(arr:Array<Char> index:0) :Int
     │   └── external
-    └── fun size(arr:Array<String> index:0) :Int
+    ├── fun size(arr:Array<String> index:0) :Int
+    │   └── external
+    ├── fun concat(str1:String index:0, str2:String index:1) :String
+    │   └── external
+    └── fun length(str:String index:0) :Int
         └── external

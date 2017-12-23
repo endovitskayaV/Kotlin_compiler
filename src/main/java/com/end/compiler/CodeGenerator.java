@@ -173,6 +173,42 @@ public class CodeGenerator {
         localVarList.add(declaration);
     }
 
+    private static void addForLoopToLocalVarList(ForLoop forLoop){
+        int index;
+        if (localVarList.size() > 0) {
+            index = java.lang.Integer.parseInt(
+                    localVarList.get((localVarList.size() - 1))
+                            .getNewVariable().getVariable().getIndex())+1;
+        }
+        else index = 0;
+
+        //---------------array (iterable) copy-------------//
+        forLoop.getIterableCopy().setVarName("V_" + index);
+        forLoop.getIterableCopy().setIndex(java.lang.Integer.toString(index));
+        forLoop.getIterableCopy().fillType(forLoop.getIterable().getType());
+        Declaration declaration = new Declaration(
+                new NewVariable("var",  forLoop.getIterableCopy(),forLoop.getIterableCopy().getType()),
+                null);
+        localVarList.add(declaration);
+
+        //--------------current index--------------------//
+        index++;
+        forLoop.getCurrentIndex().setVarName("V_" + index);
+        forLoop.getCurrentIndex().setIndex(java.lang.Integer.toString(index));
+
+        declaration = new Declaration(
+                new NewVariable("var",  forLoop.getCurrentIndex(), new Integer()), null);
+        localVarList.add(declaration);
+
+        //-------------iterator-------------------------//
+        index++;
+        forLoop.getIterator().fillIndex(java.lang.Integer.toString(index));
+        declaration = new Declaration(
+                new NewVariable("var",  forLoop.getIterator(), forLoop.getIterator().getType()), null);
+        localVarList.add(declaration);
+
+    }
+
     @NotNull
     private static String generateCode(FunDeclaration funDeclaration) {
 
@@ -205,6 +241,8 @@ public class CodeGenerator {
                 .forEach(CodeGenerator::addWhileLoopToLocalVarList);
         Utils.getAllTargetClassChildren(funDeclaration, DoWhileLoop.class)
                 .forEach(CodeGenerator::addDoWhileLoopToLocalVarList);
+        Utils.getAllTargetClassChildren(funDeclaration, ForLoop.class)
+                .forEach(CodeGenerator::addForLoopToLocalVarList);
 
         if (funDeclaration.getReturnExpr() != null) addReturnExprToLocalVarList(funDeclaration);
 
@@ -269,6 +307,48 @@ public class CodeGenerator {
             return generateCode((Expr) expression);
         //TODO: clean it
         return "";
+    }
+
+    @NotNull
+    private static String generateCode(ForLoop forLoop){
+
+        ArrayAccess arrayAccess=new ArrayAccess(forLoop.getIterator(), null);
+        arrayAccess.fillType(forLoop.getIterator().getType());
+
+        String labelConditionName="LABEL_"+counter;
+        counter++;
+
+        String labelNextIterName="LABEL_"+counter;
+        counter++;
+
+
+        StringBuilder resultStr=new StringBuilder();
+        resultStr.append(generateLoadCode(forLoop.getIterable())+"\n");
+        resultStr.append(generateSaveVariableCode(forLoop.getIterableCopy())+"\n");
+        resultStr.append("ldc.i4.0 \n");
+        resultStr.append(generateSaveVariableCode(forLoop.getCurrentIndex())+"\n");
+
+        resultStr.append("br.s "+labelConditionName+"\n");
+
+        resultStr.append(labelNextIterName+":\n");
+        resultStr.append(generateLoadCode(forLoop.getIterableCopy())+"\n");
+        resultStr.append(generateLoadCode(forLoop.getCurrentIndex())+"\n");
+        resultStr.append(generateLoadElemCode(arrayAccess)+"\n");
+        resultStr.append(generateSaveVariableCode(forLoop.getIterator())+"\n");
+
+        forLoop.getExpressions().forEach(x->resultStr.append(generateCode(x)+"\n"));
+
+        resultStr.append(generateLoadCode(forLoop.getCurrentIndex())+"\n");
+        resultStr.append("ldc.i4.1 \n add\n");
+        resultStr.append(generateSaveVariableCode(forLoop.getCurrentIndex())+"\n");
+
+        resultStr.append(labelConditionName+":"+"\n");
+        resultStr.append(generateLoadCode(forLoop.getCurrentIndex())+"\n");
+        resultStr.append(generateLoadCode(forLoop.getIterableCopy())+"\n");
+        resultStr.append("ldlen\n conv.i4 \n");
+        resultStr.append("blt.s "+labelNextIterName+"\n");
+
+        return resultStr.toString();
     }
 
     @NotNull

@@ -336,13 +336,30 @@ class WhileLoop extends Expression {
 }
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 class ForLoop extends Expression {
     private VariableReference iterator;
     private Expr iterable;
     private List<Expression> expressions;
+    private VariableReference iterableCopy;
+    private VariableReference currentIndex;
+
+
+    public ForLoop(VariableReference iterator, Expr iterable, List<Expression> expressions){
+        setIterator(iterator);
+        setIterable(iterable);
+        setExpressions(expressions);
+
+        currentIndex = new VariableReference("");
+        currentIndex.setVisibility(Visibility.LOCAL);
+        currentIndex.setType(new Integer());
+
+        iterableCopy = new VariableReference("");
+        iterableCopy.setVisibility(Visibility.LOCAL);
+        iterableCopy.setType(Analysis.getType(iterable));
+
+    }
 
     @Override
     public String name() {

@@ -200,4 +200,15 @@ public class CSharpFunctions
         return arr.Length;
     }
 
+    public static string concat(string str1, string str2)
+    {
+        return str1 + str2;
+    }
+
+    public static int length(string str)
+    {
+        return str.Length;
+    }
+
+
 }

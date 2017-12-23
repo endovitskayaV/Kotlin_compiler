@@ -44,3 +44,6 @@ external fun size(arr: Array<Double>):Int
 external fun size(arr: Array<Boolean>):Int
 external fun size(arr: Array<Char>):Int
 external fun size(arr: Array<String>):Int
+
+external fun concat(str1:String, str2:String):String
+external fun length (str:String):Int

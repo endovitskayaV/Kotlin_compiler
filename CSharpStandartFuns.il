@@ -585,6 +585,40 @@
     IL_0007:  ldloc.0
     IL_0008:  ret
   } // end of method CSharpFunctions::size
+  
+   .method public hidebysig static string 
+          concat(string str1,
+                 string str2) cil managed
+  {
+    // Размер кода:       13 (0xd)
+    .maxstack  2
+    .locals init ([0] string V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldarg.1
+    IL_0003:  call       string [mscorlib]System.String::Concat(string,
+                                                                string)
+    IL_0008:  stloc.0
+    IL_0009:  br.s       IL_000b
+
+    IL_000b:  ldloc.0
+    IL_000c:  ret
+  } // end of method CSharpFunctions::concat
+
+  .method public hidebysig static int32  length(string str) cil managed
+  {
+    // Размер кода:       12 (0xc)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  callvirt   instance int32 [mscorlib]System.String::get_Length()
+    IL_0007:  stloc.0
+    IL_0008:  br.s       IL_000a
+
+    IL_000a:  ldloc.0
+    IL_000b:  ret
+  } // end of method CSharpFunctions::length
 
   .method public hidebysig static int32  size(bool[] arr) cil managed
   {

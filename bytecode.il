@@ -623,6 +623,40 @@
     IL_0007:  ldloc.0
     IL_0008:  ret
   } // end of method CSharpFunctions::size
+  
+   .method public hidebysig static string 
+          concat(string str1,
+                 string str2) cil managed
+  {
+    // Размер кода:       13 (0xd)
+    .maxstack  2
+    .locals init ([0] string V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldarg.1
+    IL_0003:  call       string [mscorlib]System.String::Concat(string,
+                                                                string)
+    IL_0008:  stloc.0
+    IL_0009:  br.s       IL_000b
+
+    IL_000b:  ldloc.0
+    IL_000c:  ret
+  } // end of method CSharpFunctions::concat
+
+  .method public hidebysig static int32  length(string str) cil managed
+  {
+    // Размер кода:       12 (0xc)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  callvirt   instance int32 [mscorlib]System.String::get_Length()
+    IL_0007:  stloc.0
+    IL_0008:  br.s       IL_000a
+
+    IL_000a:  ldloc.0
+    IL_000b:  ret
+  } // end of method CSharpFunctions::length
 
   .method public hidebysig static int32  size(bool[] arr) cil managed
   {
@@ -661,30 +695,89 @@ string[] args) cil managed
  
     .maxstack 8
     .locals init (
-[0] int32[] arr, [1] bool V_1)
+[0] string s, [1] string[] arr, [2] string[] V_2, [3] int32 V_3, [4] string fVar)
  nop 
-  ldc.i4.s 9
+  ldstr ""
+stloc.s s
 
-newarr int32
+ldc.i4.s 3
+
+newarr string
 stloc.s arr
 
 ldloc.s arr
 ldc.i4.s 0
 
-ldelem.i4
+ldstr "1"
+stelem.ref
 
-ldc.i4.s -9
-
-cgt
-stloc.s V_1
-ldloc.s V_1
-brfalse.s LABEL_0
 ldloc.s arr
-ldc.i4.s 0
+ldc.i4.s 1
 
-ldc.i4.s -9
-stelem.i4
+ldstr "2"
+stelem.ref
+
+ldloc.s arr
+ldc.i4.s 2
+
+ldstr "7"
+stelem.ref
+
+ldloc.s arr
+
+stloc.s V_2
+
+ldc.i4.0 
+stloc.s V_3
+
+br.s LABEL_0
+LABEL_1:
+ldloc.s V_2
+
+ldloc.s V_3
+
+ldelem.ref
+stloc.s fVar
+
+ldloc.s s
+ldloc.s fVar
+
+ call string CSharpFunctions::concat(string, string)
+ nop 
+stloc.s s
+
+ldloc.s fVar
+
+ call void CSharpFunctions::println(string)
+ nop 
+
+ldloc.s V_3
+
+ldc.i4.1 
+ add
+stloc.s V_3
+
 LABEL_0:
+ldloc.s V_3
+
+ldloc.s V_2
+
+ldlen
+ conv.i4 
+blt.s LABEL_1
+
+ldloc.s s
+
+ call void CSharpFunctions::println(string)
+ nop 
+
+ldloc.s s
+
+ call int32 CSharpFunctions::length(string)
+ nop 
+
+ call void CSharpFunctions::println(int32)
+ nop 
 
 
  call void CSharpFunctions::readKey()

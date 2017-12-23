@@ -1,15 +1,20 @@
 class Program{
 fun main(args:Array<String>): Unit {
-   var arr:Array<Int> = Array<Int>(9)
-if (arr[0]> -9)
-{
-arr[0]= -9
-}
+var s:String=""
+ var arr:Array<String> = Array<String>(3)
+  arr[0] = "1"
+         arr[1] = "2"
+         arr[2] = "7"
+
+             for (fVar in arr)
+             {
+             s=concat(s, fVar)
+             println(fVar)
+         }
 
 
-
-
-
+println(s)
+println(length(s))
       readKey()
     }
     }

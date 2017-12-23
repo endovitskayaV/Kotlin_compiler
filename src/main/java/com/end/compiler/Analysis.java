@@ -7,6 +7,7 @@ public class Analysis {
 
     //TODO: enum Modificators{EXTERNAL}
     //TODO: check if variable was initialized
+    //TODO: fix bug: variable declared in for cannot be used outside for body
 
     private static int index;
 
@@ -613,8 +614,11 @@ public class Analysis {
     }
 
     private static Type exploreType(FunCall funCall) {
-        Optional<FunDeclaration> funDeclaration =
-                Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class).stream()
+      List<FunDeclaration> funList= Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class);
+        if (Main.cSharpFunDeclarationList != null)
+            funList.addAll(Main.cSharpFunDeclarationList);
+
+        Optional<FunDeclaration> funDeclaration = funList .stream()
                         .filter(x -> (x.getFunName().getVarName().equals(funCall.getName())
                                 && (areFormalAndActualParamsEqual
                                 (x.getFunParametersList(), funCall.getParameters())))).
