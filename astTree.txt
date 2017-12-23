@@ -2,40 +2,100 @@
     └── class Program
         └── fun main(args:Array<String> index:0) :Unit
             ├── =
-            │   ├── var s type:String index:0
-            │   └── "" type:String const ""
+            │   ├── var arr type:Array<Int> index:0
+            │   └──  type:Array<Int>
+            │       └── 6 type:Int const 6
             ├── =
-            │   ├── var arr type:Array<String> index:1
-            │   └──  type:Array<String>
-            │       └── 3 type:Int const 3
+            │   ├── [ ] type:Int
+            │   │   ├── arr type:Array<Int> index:0 local
+            │   │   └── 5 type:Int const 5
+            │   └── 7 type:Int const 7
             ├── =
-            │   ├── [ ] type:String
-            │   │   ├── arr type:Array<String> index:1 local
+            │   ├── var i type:Int index:1
+            │   └── 8 type:Int const 8
+            ├── =
+            │   ├── var d type:Double index:2
+            │   └── 9.0 type:Double const 9.0
+            ├── =
+            │   ├── d type:Double index:2 local
+            │   └── + type:Double
+            │       ├── [ ] type:Int cast to:Double
+            │       │   ├── arr type:Array<Int> index:0 local
+            │       │   └── 5 type:Int const 5
+            │       └── 1.0 type:Double const 1.0
+            ├── println( )
+            │   └── d type:Double index:2 local
+            ├── =
+            │   ├── d type:Double index:2 local
+            │   └── + type:Double
+            │       ├── + type:Int cast to:Double
+            │       │   ├── [ ] type:Int
+            │       │   │   ├── arr type:Array<Int> index:0 local
+            │       │   │   └── 5 type:Int const 5
+            │       │   └── [ ] type:Int
+            │       │       ├── arr type:Array<Int> index:0 local
+            │       │       └── 5 type:Int const 5
+            │       └── 1.0 type:Double const 1.0
+            ├── println( )
+            │   └── d type:Double index:2 local
+            ├── =
+            │   ├── d type:Double index:2 local
+            │   └── + type:Double
+            │       ├── [ ] type:Int cast to:Double
+            │       │   ├── arr type:Array<Int> index:0 local
+            │       │   └── 5 type:Int const 5
+            │       └── d type:Double index:2 local
+            ├── println( )
+            │   └── d type:Double index:2 local
+            ├── =
+            │   ├── var arr1 type:Array<Double> index:3
+            │   └──  type:Array<Double>
+            │       └── 6 type:Int const 6
+            ├── =
+            │   ├── [ ] type:Double
+            │   │   ├── arr1 type:Array<Double> index:3 local
+            │   │   └── 5 type:Int const 5
+            │   └── + type:Double
+            │       ├── 7 type:Int cast to:Double const 7
+            │       └── 9.7 type:Double const 9.7
+            ├── =
+            │   ├── [ ] type:Double
+            │   │   ├── arr1 type:Array<Double> index:3 local
             │   │   └── 0 type:Int const 0
-            │   └── "1" type:String const "1"
+            │   └── 7.8 type:Double const 7.8
             ├── =
-            │   ├── [ ] type:String
-            │   │   ├── arr type:Array<String> index:1 local
+            │   ├── [ ] type:Int
+            │   │   ├── arr type:Array<Int> index:0 local
             │   │   └── 1 type:Int const 1
-            │   └── "2" type:String const "2"
+            │   └── i type:Int index:1 local
             ├── =
-            │   ├── [ ] type:String
-            │   │   ├── arr type:Array<String> index:1 local
-            │   │   └── 2 type:Int const 2
-            │   └── "7" type:String const "7"
-            ├── for
-            │   ├── fVar type:String index:2 local
-            │   ├── arr type:Array<String> index:1 local
-            │   ├── =
-            │   │   ├── s type:String index:0 local
-            │   │   └── concat( ) type:String
-            │   │       ├── s type:String index:0 local
-            │   │       └── fVar type:String index:2 local
-            │   └── println( )
-            │       └── fVar type:String index:2 local
+            │   ├── d type:Double index:2 local
+            │   └── + type:Double
+            │       ├── + type:Int cast to:Double
+            │       │   ├── i type:Int index:1 local
+            │       │   └── i type:Int index:1 local
+            │       └── 7.0 type:Double const 7.0
             ├── println( )
-            │   └── s type:String index:0 local
+            │   └── d type:Double index:2 local
+            ├── =
+            │   ├── d type:Double index:2 local
+            │   └── + type:Double
+            │       ├── i type:Int cast to:Double index:1 local
+            │       └── d type:Double index:2 local
             ├── println( )
-            │   └── length( ) type:Int
-            │       └── s type:String index:0 local
+            │   └── d type:Double index:2 local
+            ├── =
+            │   ├── d type:Double index:2 local
+            │   └── / type:Double
+            │       ├── i type:Int cast to:Double index:1 local
+            │       └── 8.0 type:Double const 8.0
+            ├── println( )
+            │   └── d type:Double index:2 local
+            ├── =
+            │   ├── d type:Double index:2 local
+            │   └── + type:Double
+            │       ├── i type:Int cast to:Double index:1 local
+            │       └── 1.0 type:Double const 1.0
+            ├── println( )
+            │   └── d type:Double index:2 local
             └── readKey( )

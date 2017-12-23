@@ -695,88 +695,160 @@ string[] args) cil managed
  
     .maxstack 8
     .locals init (
-[0] string s, [1] string[] arr, [2] string[] V_2, [3] int32 V_3, [4] string fVar)
+[0] int32[] arr, [1] int32 i, [2] float64 d, [3] float64[] arr1)
  nop 
-  ldstr ""
-stloc.s s
+  ldc.i4.s 6
 
-ldc.i4.s 3
-
-newarr string
+newarr int32
 stloc.s arr
 
 ldloc.s arr
+ldc.i4.s 5
+
+ldc.i4.s 7
+stelem.i4
+
+ldc.i4.s 8
+stloc.s i
+
+ldc.r8 9.0
+stloc.s d
+
+ldloc.s arr
+ldc.i4.s 5
+
+ldelem.i4
+conv.r8
+
+
+ldc.r8 1.0
+
+add
+stloc.s d
+
+ldloc.s d
+
+ call void CSharpFunctions::println(float64)
+ nop 
+
+ldloc.s arr
+ldc.i4.s 5
+
+ldelem.i4
+
+ldloc.s arr
+ldc.i4.s 5
+
+ldelem.i4
+
+add
+conv.r8
+
+ldc.r8 1.0
+
+add
+stloc.s d
+
+ldloc.s d
+
+ call void CSharpFunctions::println(float64)
+ nop 
+
+ldloc.s arr
+ldc.i4.s 5
+
+ldelem.i4
+conv.r8
+
+
+ldloc.s d
+
+add
+stloc.s d
+
+ldloc.s d
+
+ call void CSharpFunctions::println(float64)
+ nop 
+
+ldc.i4.s 6
+
+newarr float64
+stloc.s arr1
+
+ldloc.s arr1
+ldc.i4.s 5
+
+ldc.i4.s 7
+
+ldc.r8 9.7
+
+add
+stelem.r8
+
+ldloc.s arr1
 ldc.i4.s 0
 
-ldstr "1"
-stelem.ref
+ldc.r8 7.8
+stelem.r8
 
 ldloc.s arr
 ldc.i4.s 1
 
-ldstr "2"
-stelem.ref
+ldloc.s i
+stelem.i4
 
-ldloc.s arr
-ldc.i4.s 2
+ldloc.s i
 
-ldstr "7"
-stelem.ref
+ldloc.s i
 
-ldloc.s arr
+add
+conv.r8
 
-stloc.s V_2
+ldc.r8 7.0
 
-ldc.i4.0 
-stloc.s V_3
+add
+stloc.s d
 
-br.s LABEL_0
-LABEL_1:
-ldloc.s V_2
+ldloc.s d
 
-ldloc.s V_3
-
-ldelem.ref
-stloc.s fVar
-
-ldloc.s s
-ldloc.s fVar
-
- call string CSharpFunctions::concat(string, string)
- nop 
-stloc.s s
-
-ldloc.s fVar
-
- call void CSharpFunctions::println(string)
+ call void CSharpFunctions::println(float64)
  nop 
 
-ldloc.s V_3
+ldloc.s i
+conv.r8
+ldloc.s d
 
-ldc.i4.1 
- add
-stloc.s V_3
+add
+stloc.s d
 
-LABEL_0:
-ldloc.s V_3
+ldloc.s d
 
-ldloc.s V_2
-
-ldlen
- conv.i4 
-blt.s LABEL_1
-
-ldloc.s s
-
- call void CSharpFunctions::println(string)
+ call void CSharpFunctions::println(float64)
  nop 
 
-ldloc.s s
+ldloc.s i
+conv.r8
+ldc.r8 8.0
 
- call int32 CSharpFunctions::length(string)
+div
+stloc.s d
+
+ldloc.s d
+
+ call void CSharpFunctions::println(float64)
  nop 
 
- call void CSharpFunctions::println(int32)
+ldloc.s i
+conv.r8
+ldc.r8 1.0
+
+add
+stloc.s d
+
+ldloc.s d
+
+ call void CSharpFunctions::println(float64)
  nop 
 
 

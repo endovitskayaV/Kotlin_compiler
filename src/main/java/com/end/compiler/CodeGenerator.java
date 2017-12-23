@@ -539,8 +539,9 @@ public class CodeGenerator {
             resultStr.append("ref");
         else //Boolean
             resultStr.append("u1");
-        return  resultStr.toString();
 
+        if (arrayAccess.getCastTo()!=null) resultStr.append("\n"+generateCastCode(arrayAccess.getCastTo())+"\n");
+        return  resultStr.toString();
     }
 
     @NotNull
@@ -549,6 +550,7 @@ public class CodeGenerator {
         resultStr.append(generateCode(binaryExpr.getLeft())+"\n");
         resultStr.append(generateCode(binaryExpr.getRight())+"\n");
         resultStr.append(generateSignCode(binaryExpr.getSign())+"\n");
+        if (binaryExpr.getCastTo()!=null) resultStr.append(generateCastCode(binaryExpr.getCastTo())+"\n");
         return resultStr.toString();
     }
 
@@ -587,15 +589,40 @@ public class CodeGenerator {
         return generateLoadCode(variableReference);
     }
 
+    private static String generateCastCode(Type castToType){
+        StringBuilder resultStr=new StringBuilder();
+        resultStr.append("conv.");
+//        if (castToType.getClass().getSimpleName().equals(Integer.class.getSimpleName()))
+//            resultStr.append("i4");
+       // else
+            if (castToType.getClass().getSimpleName().equals(Double.class.getSimpleName()))
+            resultStr.append("r8");
+//        else if (castToType.getClass().getSimpleName().equals(Char.class.getSimpleName()))
+//            resultStr.append("u2");
+//        else if (castToType.getClass().getSimpleName().equals(StringType.class.getSimpleName()))
+//            resultStr.append("ref");
+//        else //Boolean
+//            resultStr.append("u1");
+
+        return  resultStr.toString();
+    }
+
     @NotNull
     private static String generateLoadCode(Expr expr){
+        StringBuilder resultStr=new StringBuilder();
+
         if (expr instanceof VariableReference){
             if (((VariableReference) expr).getVisibility() == Visibility.ARG)
-                return "ldarg.s " + ((VariableReference) expr).getVarName() + "\n";
-            else return "ldloc.s " + ((VariableReference) expr).getVarName() + "\n";
+                resultStr.append("ldarg.s " + ((VariableReference) expr).getVarName() + "\n");
+            else resultStr.append("ldloc.s " + ((VariableReference) expr).getVarName() + "\n");
+
+            if (expr.getCastTo()!=null) resultStr.append(generateCastCode(expr.getCastTo()));
         }
-        else return generateLoadCode(((ArrayAccess)expr).getVariableReference())+
-                generateCode(((ArrayAccess)expr).getExpr());
+        else resultStr.append( generateLoadCode(((ArrayAccess)expr).getVariableReference())+
+                generateCode(((ArrayAccess)expr).getExpr()));
+
+       // if (expr.getCastTo()!=null) resultStr.append(generateCastCode(expr.getCastTo()));
+        return resultStr.toString();
     }
 
     @NotNull
