@@ -98,4 +98,28 @@
             │       └── 1.0 type:Double const 1.0
             ├── println( )
             │   └── d type:Double index:2 local
+            ├── =
+            │   ├── d type:Double index:2 local
+            │   └── sqrt( ) type:Double
+            │       └── + type:Double
+            │           ├── i type:Int cast to:Double index:1 local
+            │           └── 0.0 type:Double const 0.0
+            ├── println( )
+            │   └── d type:Double index:2 local
+            ├── =
+            │   ├── var e type:Int index:4
+            │   └── 2 type:Int const 2
+            ├── =
+            │   ├── d type:Double index:2 local
+            │   └── power( ) type:Double
+            │       ├── + type:Double
+            │       │   ├── i type:Int cast to:Double index:1 local
+            │       │   └── 0.0 type:Double const 0.0
+            │       └── + type:Double
+            │           ├── e type:Int cast to:Double index:4 local
+            │           └── 0.0 type:Double const 0.0
+            ├── println( )
+            │   └── d type:Double index:2 local
+            ├── println( )
+            │   └── i type:Int index:1 local
             └── readKey( )

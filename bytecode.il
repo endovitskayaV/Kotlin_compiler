@@ -695,7 +695,7 @@ string[] args) cil managed
  
     .maxstack 8
     .locals init (
-[0] int32[] arr, [1] int32 i, [2] float64 d, [3] float64[] arr1)
+[0] int32[] arr, [1] int32 i, [2] float64 d, [3] float64[] arr1, [4] int32 e)
  nop 
   ldc.i4.s 6
 
@@ -721,6 +721,7 @@ ldelem.i4
 conv.r8
 
 
+conv.r8
 ldc.r8 1.0
 
 add
@@ -744,6 +745,7 @@ ldelem.i4
 add
 conv.r8
 
+conv.r8
 ldc.r8 1.0
 
 add
@@ -761,6 +763,7 @@ ldelem.i4
 conv.r8
 
 
+conv.r8
 ldloc.s d
 
 add
@@ -781,6 +784,7 @@ ldc.i4.s 5
 
 ldc.i4.s 7
 
+conv.r8
 ldc.r8 9.7
 
 add
@@ -805,6 +809,7 @@ ldloc.s i
 add
 conv.r8
 
+conv.r8
 ldc.r8 7.0
 
 add
@@ -817,6 +822,7 @@ ldloc.s d
 
 ldloc.s i
 conv.r8
+conv.r8
 ldloc.s d
 
 add
@@ -828,6 +834,7 @@ ldloc.s d
  nop 
 
 ldloc.s i
+conv.r8
 conv.r8
 ldc.r8 8.0
 
@@ -841,6 +848,7 @@ ldloc.s d
 
 ldloc.s i
 conv.r8
+conv.r8
 ldc.r8 1.0
 
 add
@@ -849,6 +857,52 @@ stloc.s d
 ldloc.s d
 
  call void CSharpFunctions::println(float64)
+ nop 
+
+ldloc.s i
+conv.r8
+conv.r8
+ldc.r8 0.0
+
+add
+
+ call float64 CSharpFunctions::sqrt(float64)
+ nop 
+stloc.s d
+
+ldloc.s d
+
+ call void CSharpFunctions::println(float64)
+ nop 
+
+ldc.i4.s 2
+stloc.s e
+
+ldloc.s i
+conv.r8
+conv.r8
+ldc.r8 0.0
+
+add
+ldloc.s e
+conv.r8
+conv.r8
+ldc.r8 0.0
+
+add
+
+ call float64 CSharpFunctions::power(float64, float64)
+ nop 
+stloc.s d
+
+ldloc.s d
+
+ call void CSharpFunctions::println(float64)
+ nop 
+
+ldloc.s i
+
+ call void CSharpFunctions::println(int32)
  nop 
 
 

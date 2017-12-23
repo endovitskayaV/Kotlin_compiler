@@ -309,6 +309,7 @@ public class CodeGenerator {
         return "";
     }
 
+    //TODO: comment this method
     @NotNull
     private static String generateCode(ForLoop forLoop){
 
@@ -548,8 +549,13 @@ public class CodeGenerator {
     private static String generateCode(BinaryExpr binaryExpr){
         StringBuilder resultStr=new StringBuilder();
         resultStr.append(generateCode(binaryExpr.getLeft())+"\n");
+        if (binaryExpr.getLeft().getCastTo()!=null)
+            resultStr.append(generateCastCode(binaryExpr.getLeft().getCastTo())+"\n");
         resultStr.append(generateCode(binaryExpr.getRight())+"\n");
+        if (binaryExpr.getRight().getCastTo()!=null)
+            resultStr.append(generateCastCode(binaryExpr.getRight().getCastTo())+"\n");
         resultStr.append(generateSignCode(binaryExpr.getSign())+"\n");
+        //this may cause double conv
         if (binaryExpr.getCastTo()!=null) resultStr.append(generateCastCode(binaryExpr.getCastTo())+"\n");
         return resultStr.toString();
     }
