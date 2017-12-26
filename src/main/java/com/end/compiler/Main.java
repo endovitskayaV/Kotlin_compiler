@@ -16,35 +16,68 @@ import javax.swing.JFrame;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 
 public class Main {
 
     static List<FunDeclaration> cSharpFunDeclarationList;
+    private static String codeFileName;
+    private static String funDeclLibName = "CSharpFunDeclarations.vl";
 
     public static void main(String[] args) {
 
-        Program cSharpFunDeclProgram=parse("CSharpFunDeclarations.vl");
-        cSharpFunDeclarationList= cSharpFunDeclProgram.getFunDeclarationList();
-        printAstTree(cSharpFunDeclProgram, "astCsharpFunDecl.txt");
-        PrintableErrors.setIsErrorOccurred(false);
+            if(readCommand()) {
+            Program cSharpFunDeclProgram = parse(funDeclLibName);
+            if (cSharpFunDeclProgram != null) {
+                cSharpFunDeclarationList = cSharpFunDeclProgram.getFunDeclarationList();
+                printAstTree(cSharpFunDeclProgram, "astCsharpFunDecl.txt");
+                PrintableErrors.setIsErrorOccurred(false);
 
-        Program program=parse("try.vl");
+                Program program = parse(codeFileName);
 
-        printAstTree(program,"astTree.txt");
+                if (program != null) {
+                    printAstTree(program, "astTree.txt");
 
-        //if no errors -> generate code
-        if (!PrintableErrors.isErrorOccurred()) {
-            String byteCode = CodeGenerator.generateCode(program);
-            String byteCodeFileName = "bytecode.il";
-            printInFile(byteCodeFileName, byteCode);
-            System.out.println("Printed in " + byteCodeFileName + ":\n" + byteCode);
+                    //if no errors -> generate code
+                    if (!PrintableErrors.isErrorOccurred()) {
+                        String byteCode = CodeGenerator.generateCode(program);
+                        String byteCodeFileName = "bytecode.il";
+                        printInFile(byteCodeFileName, byteCode);
 
-        } else System.out.println("\nCannot generate code. Error(s) occurred\n");
+                    } else System.out.println("\n***COMPILATION FAILED***\n");
 
-
+                }
+            }
+        } else System.out.println("wrong command");
+        new Scanner(System.in).nextLine();
     }
 
+
+    private static boolean readCommand() {
+        System.out.print(">");
+        String commandStr = new Scanner(System.in).useDelimiter("\n").nextLine();
+        String[] splitArr = commandStr.split("\\s+");
+
+
+        if ((splitArr.length >= 3) && (splitArr[0].equals("kotlin-compiler"))
+                && (splitArr[1].equals("compile")) &&
+                (Pattern.compile(".*\\.vl$").matcher(splitArr[2]).matches())) {
+
+             codeFileName = splitArr[2];
+
+            if (splitArr.length == 5) {
+                if ((splitArr[3].equals("-lib"))
+                        && (Pattern.compile(".*\\.vl").matcher(splitArr[4]).matches())) {
+                    funDeclLibName = splitArr[4];
+                } else return false;
+            } else if (splitArr.length > 5)  return false;
+
+        } else return false;
+
+        return true;
+    }
     private static void printInFile(String fileName, String outputStr) {
         try (PrintWriter printWriter = new PrintWriter(fileName)) {
             printWriter.write(outputStr);
@@ -53,21 +86,23 @@ public class Main {
         }
     }
 
-    private static void printAstTree(Program program, String fileName){
+    private static void printAstTree(Program program, String fileName) {
         String astTreeStr = TreePrinter.toString(program);
         String astTreeFileName = fileName;
         printInFile(astTreeFileName, astTreeStr);
-        System.out.println("Printed in " + astTreeFileName + ":\n" + astTreeStr);
+        //System.out.println("Printed in " + astTreeFileName + ":\n" + astTreeStr);
     }
 
-    private static Program parse(String fileName){
+    private static Program parse(String fileName) {
 
         //read code from file
         CharStream charStream = null;
         try {
             charStream = CharStreams.fromFileName(fileName);
         } catch (IOException e) {
-            e.printStackTrace();
+            //  e.printStackTrace();
+            System.out.println("no such file");
+            return null;
         }
 
         KLexer kLexer = new KLexer(charStream);

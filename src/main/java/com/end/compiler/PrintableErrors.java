@@ -9,6 +9,8 @@ public class PrintableErrors {
 
     private static boolean isErrorOccurred = false;
 
+
+
     public static boolean isErrorOccurred() {
         return isErrorOccurred;
     }
