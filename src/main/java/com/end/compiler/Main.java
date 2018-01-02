@@ -1,7 +1,5 @@
 package com.end.compiler;
 
-import com.end.compiler.KLexer;
-import com.end.compiler.KParser;
 import io.bretty.console.tree.TreePrinter;
 import org.antlr.v4.gui.TreeViewer;
 import org.antlr.v4.runtime.CharStream;
@@ -9,11 +7,10 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.Tree;
+import org.apache.tools.ant.taskdefs.optional.*;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 import javax.swing.JFrame;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -23,19 +20,23 @@ import java.util.regex.Pattern;
 public class Main {
 
     static List<FunDeclaration> cSharpFunDeclarationList;
-    private static String codeFileName;
-    private static String funDeclLibName = "CSharpFunDeclarations.vl";
+    private static File codeFile;
+    private static CharStream funDeclLib;// = "CSharpFunDeclarations.vl";
 
     public static void main(String[] args) {
 
             if(readCommand()) {
-            Program cSharpFunDeclProgram = parse(funDeclLibName);
-            if (cSharpFunDeclProgram != null) {
+                Program cSharpFunDeclProgram = null;
+                System.out.println("processing c# funs library...");
+                 cSharpFunDeclProgram = parse(funDeclLib);
+
+                if (cSharpFunDeclProgram != null) {
                 cSharpFunDeclarationList = cSharpFunDeclProgram.getFunDeclarationList();
                 printAstTree(cSharpFunDeclProgram, "astCsharpFunDecl.txt");
                 PrintableErrors.setIsErrorOccurred(false);
 
-                Program program = parse(codeFileName);
+                System.out.println("processing "+codeFile.getName()+"...");
+                Program program = parse(codeFile.getName());
 
                 if (program != null) {
                     printAstTree(program, "astTree.txt");
@@ -43,41 +44,104 @@ public class Main {
                     //if no errors -> generate code
                     if (!PrintableErrors.isErrorOccurred()) {
                         String byteCode = CodeGenerator.generateCode(program);
-                        String byteCodeFileName = "bytecode.il";
+                        String byteCodeFileName =codeFile.getName()
+                                .substring(0, codeFile.getName().length()-3)+ ".il";
+                        System.out.println("creating "+byteCodeFileName+"...");
                         printInFile(byteCodeFileName, byteCode);
-
+                        System.out.println("creating "
+                                +byteCodeFileName.substring(0, codeFile.getName().length()-3)+".exe ...");
+                        createExe(codeFile.getName().substring(0, codeFile.getName().length()-3));
+                        System.out.println("\n***COMPILATION SUCCEEDED***\n");
                     } else System.out.println("\n***COMPILATION FAILED***\n");
 
                 }
             }
         } else System.out.println("wrong command");
-        new Scanner(System.in).nextLine();
+        //new Scanner(System.in).nextLine();
     }
-
 
     private static boolean readCommand() {
         System.out.print(">");
         String commandStr = new Scanner(System.in).useDelimiter("\n").nextLine();
-        String[] splitArr = commandStr.split("\\s+");
+        List <String> splitList= Arrays.asList(commandStr.split("\\s+"));
 
 
-        if ((splitArr.length >= 3) && (splitArr[0].equals("kotlin-compiler"))
-                && (splitArr[1].equals("compile")) &&
-                (Pattern.compile(".*\\.vl$").matcher(splitArr[2]).matches())) {
+        if ((splitList.size() >= 3) && (splitList.get(0).equals("kotlin-compiler"))
+                && (splitList.get(1).equals("compile")) &&
+                (Pattern.compile(".*\\.vl$").matcher(splitList.get(2)).matches())) {
 
-             codeFileName = splitArr[2];
+             codeFile =new File(splitList.get(2));
 
-            if (splitArr.length == 5) {
-                if ((splitArr[3].equals("-lib"))
-                        && (Pattern.compile(".*\\.vl").matcher(splitArr[4]).matches())) {
-                    funDeclLibName = splitArr[4];
-                } else return false;
-            } else if (splitArr.length > 5)  return false;
+            try {
+                InputStream i=Main.class.getResourceAsStream("/CSharpStandartFuns.vl");
+                funDeclLib=CharStreams.fromStream(i);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (splitList.stream().anyMatch(x->x.equals("-lib"))
+                     && splitList.size()>splitList.lastIndexOf("-lib")+1
+                     &&  (Pattern.compile(".*\\.vl").matcher
+                     (splitList.get(splitList.lastIndexOf("-lib")+1)).matches())){
+                try {
+                    funDeclLib =CharStreams.fromFileName(
+                   new File(splitList.get(splitList.lastIndexOf("-lib")+1)).getName());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 
         } else return false;
 
         return true;
     }
+
+    private static void createExe(String name){
+       String cSharpToolsEnvVarPath= System.getenv("CSHARP_TOOLS");
+       String com="cd "+
+               cSharpToolsEnvVarPath+" && VsDevCmd.bat"+
+                "ilasm /exe "+
+                new File("").getAbsolutePath()+"\\"+name+".il"+
+                " /output="+ new File("").getAbsolutePath()+"\\"+name+".exe";
+
+        ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", com);
+
+        ProcessBuilder pB = new ProcessBuilder("cmd.exe", "/c",
+                "cd "+cSharpToolsEnvVarPath,"VsDevCmd.bat",
+                        "ilasm"," /exe "+
+                        new File("").getAbsolutePath()+"\\"+name+".il",
+                        " /output="+ new File("").getAbsolutePath()+"\\"+name+".exe");
+
+        try {
+            pB.redirectErrorStream(true);
+            Process process= pB.start();
+
+            InputStream stdout =
+                    process.getInputStream();
+            InputStreamReader isrStdout = new InputStreamReader(stdout,"utf-8");
+            BufferedReader brStdout = new BufferedReader(isrStdout);
+
+            String line = null;
+            System.out.println("\uFEFF");
+            try (PrintWriter printWriter = new PrintWriter("bla.txt")) {
+                printWriter.write("\uFEFF");
+                printWriter.write(brStdout.readLine());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            while((line = brStdout.readLine()) != null) {
+                System.out.println(line);
+            }
+
+             process.waitFor();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private static void printInFile(String fileName, String outputStr) {
         try (PrintWriter printWriter = new PrintWriter(fileName)) {
             printWriter.write(outputStr);
@@ -93,6 +157,21 @@ public class Main {
         //System.out.println("Printed in " + astTreeFileName + ":\n" + astTreeStr);
     }
 
+    private static Program parse(CharStream fileContent){
+        com.end.compiler.KLexer kLexer = new com.end.compiler.KLexer(fileContent);
+        TokenStream tokenStream = new CommonTokenStream(kLexer);
+        com.end.compiler.KParser kParser = new com.end.compiler.KParser(tokenStream);
+        Tree tree = kParser.program();
+
+        //build astTree (root=program)
+        Program program = ToAst.toAst((com.end.compiler.KParser.ProgramContext) tree);
+
+
+        //analyze tree(recursively, start from root)
+        Analysis.analyze(program);
+        return program;
+    }
+
     private static Program parse(String fileName) {
 
         //read code from file
@@ -105,22 +184,11 @@ public class Main {
             return null;
         }
 
-        KLexer kLexer = new KLexer(charStream);
-        TokenStream tokenStream = new CommonTokenStream(kLexer);
-        KParser kParser = new KParser(tokenStream);
-        Tree tree = kParser.program();
-
-        //build astTree (root=program)
-        Program program = ToAst.toAst((KParser.ProgramContext) tree);
-
-
-        //analyze tree(recursively, start from root)
-        Analysis.analyze(program);
-        return program;
+       return parse(charStream);
 
     }
 
-    private static void showSyntaxTree(Tree tree, KParser kParser) {
+    private static void showSyntaxTree(Tree tree, com.end.compiler.KParser kParser) {
         JFrame frame = new JFrame("Syntax tree");
         TreeViewer treeViewer = new TreeViewer(Arrays.asList(kParser.getRuleNames()), tree);
         treeViewer.setScale(1.5);
