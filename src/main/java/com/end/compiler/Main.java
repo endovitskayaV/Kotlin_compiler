@@ -20,13 +20,15 @@ import java.util.regex.Pattern;
 public class Main {
 
     static List<FunDeclaration> cSharpFunDeclarationList;
+    static File userFunLib = null;
     private static File codeFile;
-    private static CharStream funDeclLib;// = "CSharpFunDeclarations.vl";
-    public static File userFunLib = null;
+    private static CharStream funDeclLib;
+    private static String resPath=".\\res\\";
 
     public static void main(String[] args) {
 
         if (readCommand()) {
+
             Program cSharpFunDeclProgram = null;
             System.out.println("processing c# funs library...");
             cSharpFunDeclProgram = parse(funDeclLib);
@@ -116,62 +118,25 @@ public class Main {
         String com = "cd " +
                 cSharpToolsEnvVarPath + " && VsDevCmd.bat &&" +
                 "ilasm /exe " +
-                new File("").getAbsolutePath() + "\\" + name + ".il" +
+                new File("").getAbsolutePath() + "\\res\\" + name + ".il" +
                 " /output=" + new File("").getAbsolutePath() + "\\" + name + ".exe";
 
         ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", com);
 
-//        String firstArg = "/exe ";
-//        String exePath = new File("").getAbsolutePath()+"\\"+name+".il";
-////
-//        String secondArg =  " /output="+ new File("").getAbsolutePath()+"\\"+name+".exe";
-//
-//        System.out.println(firstArg + "\n" + secondArg);
-//
-//        ProcessBuilder vsTools = new ProcessBuilder("cmd.exe", "/c",
-//                "cd " +
-//             cSharpToolsEnvVarPath + " && VsDevCmd.bat && ilasm " + firstArg + exePath + secondArg
-//        );
 
-
-//
         try {
-//            //pB.redirectErrorStream(true);
-//            vsTools.redirectOutput(new File("output3.txt"));
-//            Process vsToolsPr = vsTools.start();
-//            vsToolsPr.waitFor();
-
-            processBuilder.redirectOutput(new File("ilToExeResult.txt"));
+            processBuilder.redirectOutput(new File(resPath+"ilasmResult.txt"));
             Process process = processBuilder.start();
             process.waitFor();
-
-
-//
-//
-////            //println
-////            InputStream stdo
-////                    process.getInputStream();
-////            InputStreamReader isrStdout = new InputStreamReader(stdout,",");
-////            BufferedReader brStdout = new BufferedReader(isrStdout);
-////
-////            String line = null;
-////
-////            while((line = brStdout.readLine()) != null) {
-////                System.out.println(line);
-////            }
-////
-////             process.waitFor();
         } catch (Exception e) {
             e.printStackTrace();
         }
-// catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
     }
 
-    private static void printInFile(String fileName, String outputStr) {
-        try (PrintWriter printWriter = new PrintWriter(fileName)) {
+    private static void printInFile(String fileNameExten, String outputStr) {
+        File file=new File(resPath+fileNameExten);
+        file.getParentFile().mkdir();
+        try (PrintWriter printWriter = new PrintWriter(file)) {
             printWriter.write(outputStr);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -179,9 +144,8 @@ public class Main {
     }
 
     private static void printAstTree(Program program, String fileName) {
-        String astTreeStr = TreePrinter.toString(program);
-        String astTreeFileName = fileName;
-        printInFile(astTreeFileName, astTreeStr);
+        printInFile(fileName+".txt",
+                TreePrinter.toString(program));
         //System.out.println("Printed in " + astTreeFileName + ":\n" + astTreeStr);
     }
 
