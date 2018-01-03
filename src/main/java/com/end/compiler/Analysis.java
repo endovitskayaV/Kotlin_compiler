@@ -52,6 +52,10 @@ public class Analysis {
         funList.addAll(Utils.getAllVisibleTagertClassNodes(funDeclaration, FunDeclaration.class));
         if (Main.cSharpFunDeclarationList != null)
             funList.addAll(Main.cSharpFunDeclarationList);
+
+        if (Main.userFunDeclList != null)
+            funList.addAll(Main.userFunDeclList);
+
         if (funList.size() > 0) { //check possibility to remove item
             funList.remove(funDeclaration); //remove this funDeclaeation
             funList.forEach(x -> {
@@ -379,6 +383,7 @@ public class Analysis {
     }
 
     public static FunDeclaration wasFunDeclared(List<FunDeclaration> funDeclarationList, FunCall funCall) {
+        if (funDeclarationList==null) return null;
         Optional<FunDeclaration> funDeclarationOptional = funDeclarationList.stream()
                 .filter(x -> (
                         (x.getFunName().getVarName().equals(funCall.getName()))
@@ -397,6 +402,8 @@ public class Analysis {
                 Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class);
         if (Main.cSharpFunDeclarationList != null)
             funDeclarationList.addAll(Main.cSharpFunDeclarationList);
+        if (Main.userFunDeclList != null)
+            funDeclarationList.addAll(Main.userFunDeclList);
 
         //was fun declared
         if (wasFunDeclared(funDeclarationList, funCall) == null)
@@ -638,6 +645,8 @@ public class Analysis {
       List<FunDeclaration> funList= Utils.getAllVisibleTagertClassNodes(funCall, FunDeclaration.class);
         if (Main.cSharpFunDeclarationList != null)
             funList.addAll(Main.cSharpFunDeclarationList);
+        if (Main.userFunDeclList != null)
+            funList.addAll(Main.userFunDeclList);
 
         Optional<FunDeclaration> funDeclaration = funList .stream()
                         .filter(x -> (x.getFunName().getVarName().equals(funCall.getName())

@@ -20,57 +20,57 @@ import java.util.regex.Pattern;
 public class Main {
 
     static List<FunDeclaration> cSharpFunDeclarationList;
+    static List<FunDeclaration> userFunDeclList;
     static File userFunLib = null;
     private static File codeFile;
     private static CharStream funDeclLib;
-    private static String resPath=".\\res\\";
+    private static String resPath = ".\\res\\";
 
     public static void main(String[] args) {
 
         if (readCommand()) {
-
             Program cSharpFunDeclProgram = null;
-            System.out.println("processing c# funs library...");
+            System.out.println("processing c sharp functions library...");
             cSharpFunDeclProgram = parse(funDeclLib);
-
 
             if (cSharpFunDeclProgram != null) {
                 cSharpFunDeclarationList = cSharpFunDeclProgram.getFunDeclarationList();
-                printAstTree(cSharpFunDeclProgram, "astCsharpFunDecl.txt");
+                printAstTree(cSharpFunDeclProgram, "astCsharpFunDecl");
+
 
                 if (userFunLib != null) {
                     Program userCSharpFunDeclProgram = null;
-                    System.out.println("processing user c# funs library...");
+                    System.out.println("processing user c sharp functions library...");
                     userCSharpFunDeclProgram = parse(userFunLib);
 
-
                     if (userCSharpFunDeclProgram != null) {
-                        cSharpFunDeclarationList = userCSharpFunDeclProgram.getFunDeclarationList();
-                        printAstTree(userCSharpFunDeclProgram, "astUserCsharpFunDecl.txt");
+                        userFunDeclList = userCSharpFunDeclProgram.getFunDeclarationList();
+                        printAstTree(userCSharpFunDeclProgram, "astUserCsharpFunDecl");
                     }
                 }
 
-                        PrintableErrors.setIsErrorOccurred(false);
 
-                        Program program = parse(codeFile);
+                Program program = parse(codeFile);
+                if (program != null) {
+                    printAstTree(program, "astTree");
 
-                        if (program != null) {
-                            printAstTree(program, "astTree.txt");
+                    //if no errors -> generate code
+                    if (!PrintableErrors.isErrorOccurred()) {
+                        String byteCode = CodeGenerator.generateCode(program);
+                        String byteCodeFileName = codeFile.getName()
+                                .substring(0, codeFile.getName().length() - 3) + ".il";
+                        System.out.println("creating " + byteCodeFileName + "...");
+                        printInFile(byteCodeFileName, byteCode);
+                        System.out.println("creating "
+                                + byteCodeFileName.substring(0, codeFile.getName().length() - 3) + ".exe ...");
+                        if (createExe(codeFile.getName().substring(0, codeFile.getName().length() - 3)))
+                            System.out.println("\n***COMPILATION SUCCEEDED***\n");
+                        else System.out.println("creating exe failed!\n" +
+                                " more information in \\res\\ilasmResult.txt " +
+                                "\n***COMPILATION FAILED***\n");
+                    } else System.out.println("\n***COMPILATION FAILED***\n");
 
-                            //if no errors -> generate code
-                            if (!PrintableErrors.isErrorOccurred()) {
-                                String byteCode = CodeGenerator.generateCode(program);
-                                String byteCodeFileName = codeFile.getName()
-                                        .substring(0, codeFile.getName().length() - 3) + ".il";
-                                System.out.println("creating " + byteCodeFileName + "...");
-                                printInFile(byteCodeFileName, byteCode);
-                                System.out.println("creating "
-                                        + byteCodeFileName.substring(0, codeFile.getName().length() - 3) + ".exe ...");
-                                createExe(codeFile.getName().substring(0, codeFile.getName().length() - 3));
-                                System.out.println("\n***COMPILATION SUCCEEDED***\n");
-                            } else System.out.println("\n***COMPILATION FAILED***\n");
-
-                        }
+                }
 
 
             }
@@ -91,18 +91,15 @@ public class Main {
             codeFile = new File(splitList.get(2));
 
             try {
-                InputStream i = Main.class.getResourceAsStream("/CSharpStandartFuns.vl");
+                InputStream i = Main.class.getResourceAsStream("/CSharpStandartFunctions.vl");
                 funDeclLib = CharStreams.fromStream(i);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             if (splitList.stream().anyMatch(x -> x.equals("-lib"))
-                    && splitList.size() > splitList.lastIndexOf("-lib") + 1
-                    && (Pattern.compile(".*\\.vl").matcher
-                    (splitList.get(splitList.lastIndexOf("-lib") + 1)).matches()))
-
-                userFunLib = new File(splitList.get(splitList.lastIndexOf("-lib") + 1));
+                    && splitList.size() > splitList.lastIndexOf("-lib") + 1)
+                userFunLib = new File(splitList.get(splitList.lastIndexOf("-lib") + 1) + ".vl");
 
 
         } else return false;
@@ -110,7 +107,7 @@ public class Main {
         return true;
     }
 
-    private static void createExe(String name) {
+    private static boolean createExe(String name) {
         String cSharpToolsEnvVarPath = System.getenv("CSHARP_TOOLS");
 
         String com = "cd " +
@@ -123,16 +120,18 @@ public class Main {
 
 
         try {
-            processBuilder.redirectOutput(new File(resPath+"ilasmResult.txt"));
+            processBuilder.redirectOutput(new File(resPath + "ilasmResult.txt"));
             Process process = processBuilder.start();
             process.waitFor();
+            return process.exitValue()==0;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 
     private static void printInFile(String fileNameExten, String outputStr) {
-        File file=new File(resPath+fileNameExten);
+        File file = new File(resPath + fileNameExten);
         file.getParentFile().mkdir();
         try (PrintWriter printWriter = new PrintWriter(file)) {
             printWriter.write(outputStr);
@@ -142,7 +141,7 @@ public class Main {
     }
 
     private static void printAstTree(Program program, String fileName) {
-        printInFile(fileName+".txt",
+        printInFile(fileName + ".txt",
                 TreePrinter.toString(program));
         //System.out.println("Printed in " + astTreeFileName + ":\n" + astTreeStr);
     }
@@ -166,8 +165,8 @@ public class Main {
         //read code from file
         CharStream charStream = null;
         try {
-            String s=file.getCanonicalPath();
-            System.out.println("processing "+s+"...");
+            String s = file.getCanonicalPath();
+            System.out.println("processing " + s + "...");
             charStream = CharStreams.fromFileName(file.getCanonicalPath());
         } catch (IOException e) {
             //  e.printStackTrace();
