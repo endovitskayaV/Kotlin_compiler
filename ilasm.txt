@@ -1,1 +1,0 @@
-ilasm /exe bytecode.il /output=NewProgram.exe

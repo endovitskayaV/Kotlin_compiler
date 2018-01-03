@@ -52,8 +52,6 @@ public class Main {
 
                         PrintableErrors.setIsErrorOccurred(false);
 
-
-                        System.out.println("processing " + codeFile.getName() + "...");
                         Program program = parse(codeFile);
 
                         if (program != null) {
@@ -169,7 +167,7 @@ public class Main {
         CharStream charStream = null;
         try {
             String s=file.getCanonicalPath();
-            System.out.println(s);
+            System.out.println("processing "+s+"...");
             charStream = CharStreams.fromFileName(file.getCanonicalPath());
         } catch (IOException e) {
             //  e.printStackTrace();

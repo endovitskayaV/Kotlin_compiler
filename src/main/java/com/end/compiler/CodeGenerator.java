@@ -608,18 +608,8 @@ public class CodeGenerator {
     private static String generateCastCode(Type castToType){
         StringBuilder resultStr=new StringBuilder();
         resultStr.append("conv.");
-//        if (castToType.getClass().getSimpleName().equals(Integer.class.getSimpleName()))
-//            resultStr.append("i4");
-       // else
             if (castToType.getClass().getSimpleName().equals(Double.class.getSimpleName()))
             resultStr.append("r8");
-//        else if (castToType.getClass().getSimpleName().equals(Char.class.getSimpleName()))
-//            resultStr.append("u2");
-//        else if (castToType.getClass().getSimpleName().equals(StringType.class.getSimpleName()))
-//            resultStr.append("ref");
-//        else //Boolean
-//            resultStr.append("u1");
-
         return  resultStr.toString();
     }
 

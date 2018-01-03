@@ -1,3 +1,5 @@
+// =============== CLASS MEMBERS DECLARATION ===================
+
 .class public auto ansi beforefieldinit CSharpFunctions
        extends [mscorlib]System.Object
 {
@@ -290,6 +292,23 @@
   } // end of method CSharpFunctions::sqrt
 
   .method public hidebysig static float64 
+          sqrt(int32 number) cil managed
+  {
+    // Размер кода:       13 (0xd)
+    .maxstack  1
+    .locals init ([0] float64 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  conv.r8
+    IL_0003:  call       float64 [mscorlib]System.Math::Sqrt(float64)
+    IL_0008:  stloc.0
+    IL_0009:  br.s       IL_000b
+
+    IL_000b:  ldloc.0
+    IL_000c:  ret
+  } // end of method CSharpFunctions::sqrt
+
+  .method public hidebysig static float64 
           power(float64 numberBase,
                 float64 power) cil managed
   {
@@ -306,6 +325,67 @@
 
     IL_000b:  ldloc.0
     IL_000c:  ret
+  } // end of method CSharpFunctions::power
+
+  .method public hidebysig static float64 
+          power(int32 numberBase,
+                int32 power) cil managed
+  {
+    // Размер кода:       15 (0xf)
+    .maxstack  2
+    .locals init ([0] float64 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  conv.r8
+    IL_0003:  ldarg.1
+    IL_0004:  conv.r8
+    IL_0005:  call       float64 [mscorlib]System.Math::Pow(float64,
+                                                            float64)
+    IL_000a:  stloc.0
+    IL_000b:  br.s       IL_000d
+
+    IL_000d:  ldloc.0
+    IL_000e:  ret
+  } // end of method CSharpFunctions::power
+
+  .method public hidebysig static float64 
+          power(int32 numberBase,
+                float64 power) cil managed
+  {
+    // Размер кода:       14 (0xe)
+    .maxstack  2
+    .locals init ([0] float64 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  conv.r8
+    IL_0003:  ldarg.1
+    IL_0004:  call       float64 [mscorlib]System.Math::Pow(float64,
+                                                            float64)
+    IL_0009:  stloc.0
+    IL_000a:  br.s       IL_000c
+
+    IL_000c:  ldloc.0
+    IL_000d:  ret
+  } // end of method CSharpFunctions::power
+
+  .method public hidebysig static float64 
+          power(float64 numberBase,
+                int32 power) cil managed
+  {
+    // Размер кода:       14 (0xe)
+    .maxstack  2
+    .locals init ([0] float64 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldarg.1
+    IL_0003:  conv.r8
+    IL_0004:  call       float64 [mscorlib]System.Math::Pow(float64,
+                                                            float64)
+    IL_0009:  stloc.0
+    IL_000a:  br.s       IL_000c
+
+    IL_000c:  ldloc.0
+    IL_000d:  ret
   } // end of method CSharpFunctions::power
 
   .method public hidebysig static float64 
@@ -386,6 +466,25 @@
   } // end of method CSharpFunctions::round
 
   .method public hidebysig static float64 
+          round(float64 number,
+                int32 numberPosition) cil managed
+  {
+    // Размер кода:       13 (0xd)
+    .maxstack  2
+    .locals init ([0] float64 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldarg.1
+    IL_0003:  call       float64 [mscorlib]System.Math::Round(float64,
+                                                              int32)
+    IL_0008:  stloc.0
+    IL_0009:  br.s       IL_000b
+
+    IL_000b:  ldloc.0
+    IL_000c:  ret
+  } // end of method CSharpFunctions::round
+
+  .method public hidebysig static float64 
           trunk(float64 number) cil managed
   {
     // Размер кода:       12 (0xc)
@@ -441,6 +540,23 @@
   } // end of method CSharpFunctions::exp
 
   .method public hidebysig static float64 
+          exp(int32 number) cil managed
+  {
+    // Размер кода:       13 (0xd)
+    .maxstack  1
+    .locals init ([0] float64 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  conv.r8
+    IL_0003:  call       float64 [mscorlib]System.Math::Exp(float64)
+    IL_0008:  stloc.0
+    IL_0009:  br.s       IL_000b
+
+    IL_000b:  ldloc.0
+    IL_000c:  ret
+  } // end of method CSharpFunctions::exp
+
+  .method public hidebysig static float64 
           cos(float64 number) cil managed
   {
     // Размер кода:       12 (0xc)
@@ -455,6 +571,40 @@
     IL_000a:  ldloc.0
     IL_000b:  ret
   } // end of method CSharpFunctions::cos
+
+  .method public hidebysig static float64 
+          cos(int32 number) cil managed
+  {
+    // Размер кода:       13 (0xd)
+    .maxstack  1
+    .locals init ([0] float64 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  conv.r8
+    IL_0003:  call       float64 [mscorlib]System.Math::Cos(float64)
+    IL_0008:  stloc.0
+    IL_0009:  br.s       IL_000b
+
+    IL_000b:  ldloc.0
+    IL_000c:  ret
+  } // end of method CSharpFunctions::cos
+
+  .method public hidebysig static float64 
+          sin(int32 number) cil managed
+  {
+    // Размер кода:       13 (0xd)
+    .maxstack  1
+    .locals init ([0] float64 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  conv.r8
+    IL_0003:  call       float64 [mscorlib]System.Math::Sin(float64)
+    IL_0008:  stloc.0
+    IL_0009:  br.s       IL_000b
+
+    IL_000b:  ldloc.0
+    IL_000c:  ret
+  } // end of method CSharpFunctions::sin
 
   .method public hidebysig static float64 
           sin(float64 number) cil managed
@@ -488,7 +638,22 @@
     IL_000b:  ret
   } // end of method CSharpFunctions::tan
 
-  
+  .method public hidebysig static float64 
+          tan(int32 number) cil managed
+  {
+    // Размер кода:       13 (0xd)
+    .maxstack  1
+    .locals init ([0] float64 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  conv.r8
+    IL_0003:  call       float64 [mscorlib]System.Math::Tan(float64)
+    IL_0008:  stloc.0
+    IL_0009:  br.s       IL_000b
+
+    IL_000b:  ldloc.0
+    IL_000c:  ret
+  } // end of method CSharpFunctions::tan
 
   .method public hidebysig static float64 
           factorial(float64 number) cil managed
@@ -520,6 +685,37 @@
 
     IL_0032:  ldloc.1
     IL_0033:  ret
+  } // end of method CSharpFunctions::factorial
+
+  .method public hidebysig static int32  factorial(int32 number) cil managed
+  {
+    // Размер кода:       28 (0x1c)
+    .maxstack  3
+    .locals init ([0] bool V_0,
+             [1] int32 V_1)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldc.i4.1
+    IL_0003:  cgt
+    IL_0005:  stloc.0
+    IL_0006:  ldloc.0
+    IL_0007:  brfalse.s  IL_0016
+
+    IL_0009:  ldarg.0
+    IL_000a:  ldarg.0
+    IL_000b:  ldc.i4.1
+    IL_000c:  sub
+    IL_000d:  call       int32 CSharpFunctions::factorial(int32)
+    IL_0012:  mul
+    IL_0013:  stloc.1
+    IL_0014:  br.s       IL_001a
+
+    IL_0016:  ldc.i4.1
+    IL_0017:  stloc.1
+    IL_0018:  br.s       IL_001a
+
+    IL_001a:  ldloc.1
+    IL_001b:  ret
   } // end of method CSharpFunctions::factorial
 
   .method public hidebysig static int32  size(int32[] arr) cil managed
@@ -585,8 +781,24 @@
     IL_0007:  ldloc.0
     IL_0008:  ret
   } // end of method CSharpFunctions::size
-  
-   .method public hidebysig static string 
+
+  .method public hidebysig static int32  size(bool[] arr) cil managed
+  {
+    // Размер кода:       9 (0x9)
+    .maxstack  1
+    .locals init ([0] int32 V_0)
+    IL_0000:  nop
+    IL_0001:  ldarg.0
+    IL_0002:  ldlen
+    IL_0003:  conv.i4
+    IL_0004:  stloc.0
+    IL_0005:  br.s       IL_0007
+
+    IL_0007:  ldloc.0
+    IL_0008:  ret
+  } // end of method CSharpFunctions::size
+
+  .method public hidebysig static string 
           concat(string str1,
                  string str2) cil managed
   {
@@ -620,22 +832,6 @@
     IL_000b:  ret
   } // end of method CSharpFunctions::length
 
-  .method public hidebysig static int32  size(bool[] arr) cil managed
-  {
-    // Размер кода:       9 (0x9)
-    .maxstack  1
-    .locals init ([0] int32 V_0)
-    IL_0000:  nop
-    IL_0001:  ldarg.0
-    IL_0002:  ldlen
-    IL_0003:  conv.i4
-    IL_0004:  stloc.0
-    IL_0005:  br.s       IL_0007
-
-    IL_0007:  ldloc.0
-    IL_0008:  ret
-  } // end of method CSharpFunctions::size
-  
   .method public hidebysig specialname rtspecialname 
           instance void  .ctor() cil managed
   {

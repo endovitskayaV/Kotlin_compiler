@@ -126,10 +126,31 @@ public class CSharpFunctions
          return Math.Sqrt(number);
     }
 
+    public static double sqrt(int number)
+    {
+             return Math.Sqrt(number);
+    }
+
     public static double power(double numberBase, double power)
     {
           return Math.Pow(numberBase, power);
     }
+
+     public static double power(int numberBase, int power)
+     {
+         return Math.Pow(numberBase, power);
+     }
+
+ public static double power(int numberBase, double power)
+     {
+         return Math.Pow(numberBase, power);
+     }
+
+ public static double power(double numberBase, int power)
+     {
+         return Math.Pow(numberBase, power);
+     }
+
 
     public static double e()
     {
@@ -156,6 +177,11 @@ public class CSharpFunctions
           return Math.Round(number);
     }
 
+    public static double round(double number, int numberPosition)
+        {
+            return Math.Round(number, numberPosition);
+        }
+
     public static double trunk(double number)
     {
          return Math.Truncate(number);
@@ -172,10 +198,26 @@ public class CSharpFunctions
          return Math.Exp(number);
     }
 
+ public static double exp(int number)
+    {
+        return Math.Exp(number);
+    }
+
     public static double cos(double number)
     {
          return Math.Cos(number);
     }
+
+ public static double cos(int number)
+    {
+        return Math.Cos(number);
+    }
+
+    public static double sin(int number)
+    {
+        return Math.Sin(number);
+    }
+
 
     public static double sin(double number)
     {
@@ -187,11 +229,23 @@ public class CSharpFunctions
           return Math.Tan(number);
     }
 
+ public static double tan(int number)
+    {
+        return Math.Tan(number);
+    }
+
     public static double factorial(double number)
     {
          if (number > 1) return number * factorial(number - 1);
          else return 1;
     }
+
+    public static int factorial(int number)
+        {
+            if (number > 1) return number * factorial(number - 1);
+            else return 1;
+        }
+
 
     //------------------------------------------------------//
 

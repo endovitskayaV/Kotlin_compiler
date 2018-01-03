@@ -25,19 +25,30 @@ external fun readlnChar ():Char
 external fun readlnBoolean ():Boolean
 
 external fun sqrt (number:Double):Double
+external fun sqrt (number:Int):Double
 external fun power (numberBase:Double, power:Double):Double
+external fun power (numberBase:Int, power:Int):Double
+external fun power (numberBase:Int, power:Double):Double
+external fun power (numberBase:Double, power:Int):Double
 external fun e ():Double
 external fun pi ():Double
 external fun abs (number:Double):Double
 external fun abs (number:Int):Int
+external fun round (number:Double, numberPosition:Int):Double
 external fun round (number:Double):Double
 external fun trunk (number:Double):Double
 external fun remainder(divider:Int, dividend:Int):Double
-external fun expr (number:Double):Double
+external fun exp (number:Double):Double
+external fun exp (number:Int):Double
 external fun cos (number:Double):Double
+external fun cos (number:Int):Double
 external fun sin (number:Double):Double
+external fun sin (number:Int):Double
 external fun tan (number:Double):Double
+external fun tan (number:Int):Double
 external fun factorial (number:Double):Double
+external fun factorial (number:Int):Int
+
 
 external fun size(arr: Array<Int>):Int
 external fun size(arr: Array<Double>):Int
