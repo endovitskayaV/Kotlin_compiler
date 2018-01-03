@@ -22,39 +22,57 @@ public class Main {
     static List<FunDeclaration> cSharpFunDeclarationList;
     private static File codeFile;
     private static CharStream funDeclLib;// = "CSharpFunDeclarations.vl";
+    public static File userFunLib = null;
 
     public static void main(String[] args) {
 
-            if(readCommand()) {
-                Program cSharpFunDeclProgram = null;
-                System.out.println("processing c# funs library...");
-                 cSharpFunDeclProgram = parse(funDeclLib);
+        if (readCommand()) {
+            Program cSharpFunDeclProgram = null;
+            System.out.println("processing c# funs library...");
+            cSharpFunDeclProgram = parse(funDeclLib);
 
-                if (cSharpFunDeclProgram != null) {
+
+            if (cSharpFunDeclProgram != null) {
                 cSharpFunDeclarationList = cSharpFunDeclProgram.getFunDeclarationList();
                 printAstTree(cSharpFunDeclProgram, "astCsharpFunDecl.txt");
-                PrintableErrors.setIsErrorOccurred(false);
 
-                System.out.println("processing "+codeFile.getName()+"...");
-                Program program = parse(codeFile.getName());
+                if (userFunLib != null) {
+                    Program userCSharpFunDeclProgram = null;
+                    System.out.println("processing user c# funs library...");
+                    userCSharpFunDeclProgram = parse(userFunLib);
 
-                if (program != null) {
-                    printAstTree(program, "astTree.txt");
 
-                    //if no errors -> generate code
-                    if (!PrintableErrors.isErrorOccurred()) {
-                        String byteCode = CodeGenerator.generateCode(program);
-                        String byteCodeFileName =codeFile.getName()
-                                .substring(0, codeFile.getName().length()-3)+ ".il";
-                        System.out.println("creating "+byteCodeFileName+"...");
-                        printInFile(byteCodeFileName, byteCode);
-                        System.out.println("creating "
-                                +byteCodeFileName.substring(0, codeFile.getName().length()-3)+".exe ...");
-                        createExe(codeFile.getName().substring(0, codeFile.getName().length()-3));
-                        System.out.println("\n***COMPILATION SUCCEEDED***\n");
-                    } else System.out.println("\n***COMPILATION FAILED***\n");
-
+                    if (userCSharpFunDeclProgram != null) {
+                        cSharpFunDeclarationList = userCSharpFunDeclProgram.getFunDeclarationList();
+                        printAstTree(userCSharpFunDeclProgram, "astUserCsharpFunDecl.txt");
+                    }
                 }
+
+                        PrintableErrors.setIsErrorOccurred(false);
+
+
+                        System.out.println("processing " + codeFile.getName() + "...");
+                        Program program = parse(codeFile);
+
+                        if (program != null) {
+                            printAstTree(program, "astTree.txt");
+
+                            //if no errors -> generate code
+                            if (!PrintableErrors.isErrorOccurred()) {
+                                String byteCode = CodeGenerator.generateCode(program);
+                                String byteCodeFileName = codeFile.getName()
+                                        .substring(0, codeFile.getName().length() - 3) + ".il";
+                                System.out.println("creating " + byteCodeFileName + "...");
+                                printInFile(byteCodeFileName, byteCode);
+                                System.out.println("creating "
+                                        + byteCodeFileName.substring(0, codeFile.getName().length() - 3) + ".exe ...");
+                                createExe(codeFile.getName().substring(0, codeFile.getName().length() - 3));
+                                System.out.println("\n***COMPILATION SUCCEEDED***\n");
+                            } else System.out.println("\n***COMPILATION FAILED***\n");
+
+                        }
+
+
             }
         } else System.out.println("wrong command");
         //new Scanner(System.in).nextLine();
@@ -63,82 +81,92 @@ public class Main {
     private static boolean readCommand() {
         System.out.print(">");
         String commandStr = new Scanner(System.in).useDelimiter("\n").nextLine();
-        List <String> splitList= Arrays.asList(commandStr.split("\\s+"));
+        List<String> splitList = Arrays.asList(commandStr.split("\\s+"));
 
 
         if ((splitList.size() >= 3) && (splitList.get(0).equals("kotlin-compiler"))
                 && (splitList.get(1).equals("compile")) &&
                 (Pattern.compile(".*\\.vl$").matcher(splitList.get(2)).matches())) {
 
-             codeFile =new File(splitList.get(2));
+            codeFile = new File(splitList.get(2));
 
             try {
-                InputStream i=Main.class.getResourceAsStream("/CSharpStandartFuns.vl");
-                funDeclLib=CharStreams.fromStream(i);
+                InputStream i = Main.class.getResourceAsStream("/CSharpStandartFuns.vl");
+                funDeclLib = CharStreams.fromStream(i);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            if (splitList.stream().anyMatch(x->x.equals("-lib"))
-                     && splitList.size()>splitList.lastIndexOf("-lib")+1
-                     &&  (Pattern.compile(".*\\.vl").matcher
-                     (splitList.get(splitList.lastIndexOf("-lib")+1)).matches())){
-                try {
-                    funDeclLib =CharStreams.fromFileName(
-                   new File(splitList.get(splitList.lastIndexOf("-lib")+1)).getName());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            if (splitList.stream().anyMatch(x -> x.equals("-lib"))
+                    && splitList.size() > splitList.lastIndexOf("-lib") + 1
+                    && (Pattern.compile(".*\\.vl").matcher
+                    (splitList.get(splitList.lastIndexOf("-lib") + 1)).matches()))
+
+                userFunLib = new File(splitList.get(splitList.lastIndexOf("-lib") + 1));
+
 
         } else return false;
 
         return true;
     }
 
-    private static void createExe(String name){
-       String cSharpToolsEnvVarPath= System.getenv("CSHARP_TOOLS");
-       String com="cd "+
-               cSharpToolsEnvVarPath+" && VsDevCmd.bat"+
-                "ilasm /exe "+
-                new File("").getAbsolutePath()+"\\"+name+".il"+
-                " /output="+ new File("").getAbsolutePath()+"\\"+name+".exe";
+    private static void createExe(String name) {
+        String cSharpToolsEnvVarPath = System.getenv("CSHARP_TOOLS");
+
+        String com = "cd " +
+                cSharpToolsEnvVarPath + " && VsDevCmd.bat &&" +
+                "ilasm /exe " +
+                new File("").getAbsolutePath() + "\\" + name + ".il" +
+                " /output=" + new File("").getAbsolutePath() + "\\" + name + ".exe";
 
         ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", com);
 
-        ProcessBuilder pB = new ProcessBuilder("cmd.exe", "/c",
-                "cd "+cSharpToolsEnvVarPath,"VsDevCmd.bat",
-                        "ilasm"," /exe "+
-                        new File("").getAbsolutePath()+"\\"+name+".il",
-                        " /output="+ new File("").getAbsolutePath()+"\\"+name+".exe");
+//        String firstArg = "/exe ";
+//        String exePath = new File("").getAbsolutePath()+"\\"+name+".il";
+////
+//        String secondArg =  " /output="+ new File("").getAbsolutePath()+"\\"+name+".exe";
+//
+//        System.out.println(firstArg + "\n" + secondArg);
+//
+//        ProcessBuilder vsTools = new ProcessBuilder("cmd.exe", "/c",
+//                "cd " +
+//             cSharpToolsEnvVarPath + " && VsDevCmd.bat && ilasm " + firstArg + exePath + secondArg
+//        );
 
+
+//
         try {
-            pB.redirectErrorStream(true);
-            Process process= pB.start();
+//            //pB.redirectErrorStream(true);
+//            vsTools.redirectOutput(new File("output3.txt"));
+//            Process vsToolsPr = vsTools.start();
+//            vsToolsPr.waitFor();
 
-            InputStream stdout =
-                    process.getInputStream();
-            InputStreamReader isrStdout = new InputStreamReader(stdout,"utf-8");
-            BufferedReader brStdout = new BufferedReader(isrStdout);
+            processBuilder.redirectOutput(new File("ilToExeResult.txt"));
+            Process process = processBuilder.start();
+            process.waitFor();
 
-            String line = null;
-            System.out.println("\uFEFF");
-            try (PrintWriter printWriter = new PrintWriter("bla.txt")) {
-                printWriter.write("\uFEFF");
-                printWriter.write(brStdout.readLine());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            while((line = brStdout.readLine()) != null) {
-                System.out.println(line);
-            }
 
-             process.waitFor();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+//
+//
+////            //println
+////            InputStream stdo
+////                    process.getInputStream();
+////            InputStreamReader isrStdout = new InputStreamReader(stdout,",");
+////            BufferedReader brStdout = new BufferedReader(isrStdout);
+////
+////            String line = null;
+////
+////            while((line = brStdout.readLine()) != null) {
+////                System.out.println(line);
+////            }
+////
+////             process.waitFor();
+        } catch (Exception e) {
             e.printStackTrace();
         }
+// catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
@@ -157,7 +185,7 @@ public class Main {
         //System.out.println("Printed in " + astTreeFileName + ":\n" + astTreeStr);
     }
 
-    private static Program parse(CharStream fileContent){
+    private static Program parse(CharStream fileContent) {
         com.end.compiler.KLexer kLexer = new com.end.compiler.KLexer(fileContent);
         TokenStream tokenStream = new CommonTokenStream(kLexer);
         com.end.compiler.KParser kParser = new com.end.compiler.KParser(tokenStream);
@@ -166,25 +194,26 @@ public class Main {
         //build astTree (root=program)
         Program program = ToAst.toAst((com.end.compiler.KParser.ProgramContext) tree);
 
-
         //analyze tree(recursively, start from root)
         Analysis.analyze(program);
         return program;
     }
 
-    private static Program parse(String fileName) {
+    private static Program parse(File file) {
 
         //read code from file
         CharStream charStream = null;
         try {
-            charStream = CharStreams.fromFileName(fileName);
+            String s=file.getCanonicalPath();
+            System.out.println(s);
+            charStream = CharStreams.fromFileName(file.getCanonicalPath());
         } catch (IOException e) {
             //  e.printStackTrace();
-            System.out.println("no such file");
+            System.out.println("no such file\n***COMPILATION FAILED***\n");
             return null;
         }
 
-       return parse(charStream);
+        return parse(charStream);
 
     }
 

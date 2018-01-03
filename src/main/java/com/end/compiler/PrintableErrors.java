@@ -21,12 +21,14 @@ public class PrintableErrors {
 
     private static void printError(String message) {
         isErrorOccurred = true;
-        System.out.print(ANSI_RED + message + ANSI_RESET);
+        //System.out.print(ANSI_RED + message + ANSI_RESET);
+        System.out.print(message);
     }
 
     private static void printlnError(String message) {
         isErrorOccurred = true;
-        System.out.println(ANSI_RED + message + ANSI_RESET);
+        //System.out.println(ANSI_RED + message + ANSI_RESET);
+        System.out.println(message);
     }
 
     public static void printDublicatesError(String name, Position position) {

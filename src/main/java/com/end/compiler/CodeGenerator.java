@@ -1,5 +1,6 @@
 package com.end.compiler;
 
+import org.antlr.v4.runtime.CharStreams;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,10 +61,19 @@ public class CodeGenerator {
 
 
         try {
-            resultStr.append(new String(Files.readAllBytes(Paths.get("CSharpStandartFuns.il"))));
+            resultStr.append(CharStreams.fromStream(Main.class.getResourceAsStream("/CSharpStandartFuns.il")).toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        if (Main.userFunLib!=null)
+            try {
+                resultStr.append("\n"+
+                        new String(Files.readAllBytes(Paths.get(
+                                Main.userFunLib.getAbsolutePath()+"\\"+Main.userFunLib.getName()))));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         resultStr.append("\n");
 
         //TODO: handle fun without class case
