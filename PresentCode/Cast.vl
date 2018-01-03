@@ -1,0 +1,7 @@
+external fun castToInt(variable:Char):Int
+external fun castToInt(variable:Double):Int
+external fun castToInt(variable:String):Int
+external fun castToDouble(variable:Int):Double
+external fun castToString(variable:Char):String
+external fun castToString(variable:Int):String
+external fun castToString(variable:Double):String

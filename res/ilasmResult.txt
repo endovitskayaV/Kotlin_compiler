@@ -1,0 +1,95 @@
+**********************************************************************
+** Visual Studio 2017 Developer Command Prompt v15.0.26430.15
+** Copyright (c) 2017 Microsoft Corporation
+**********************************************************************
+
+Microsoft (R) .NET Framework IL Assembler.  Version 4.7.2046.0
+Copyright (c) Microsoft Corporation.  All rights reserved.
+Assembling 'C:\Users\Valya\compiler\res\castEx.il'  to EXE --> 'C:\Users\Valya\compiler\castEx.exe'
+Source file is ANSI
+
+Assembled method CSharpStandartFunctions::readKey
+Assembled method CSharpStandartFunctions::print
+Assembled method CSharpStandartFunctions::print
+Assembled method CSharpStandartFunctions::print
+Assembled method CSharpStandartFunctions::print
+Assembled method CSharpStandartFunctions::print
+Assembled method CSharpStandartFunctions::println
+Assembled method CSharpStandartFunctions::println
+Assembled method CSharpStandartFunctions::println
+Assembled method CSharpStandartFunctions::println
+Assembled method CSharpStandartFunctions::println
+Assembled method CSharpStandartFunctions::readInt
+Assembled method CSharpStandartFunctions::readDouble
+Assembled method CSharpStandartFunctions::readChar
+Assembled method CSharpStandartFunctions::readString
+Assembled method CSharpStandartFunctions::readBoolean
+Assembled method CSharpStandartFunctions::readlnString
+Assembled method CSharpStandartFunctions::readlnInt
+Assembled method CSharpStandartFunctions::readlnDouble
+Assembled method CSharpStandartFunctions::readlnChar
+Assembled method CSharpStandartFunctions::readlnBoolean
+Assembled method CSharpStandartFunctions::sqrt
+Assembled method CSharpStandartFunctions::sqrt
+Assembled method CSharpStandartFunctions::power
+Assembled method CSharpStandartFunctions::power
+Assembled method CSharpStandartFunctions::power
+Assembled method CSharpStandartFunctions::power
+Assembled method CSharpStandartFunctions::e
+Assembled method CSharpStandartFunctions::pi
+Assembled method CSharpStandartFunctions::abs
+Assembled method CSharpStandartFunctions::abs
+Assembled method CSharpStandartFunctions::round
+Assembled method CSharpStandartFunctions::round
+Assembled method CSharpStandartFunctions::trunk
+Assembled method CSharpStandartFunctions::remainder
+Assembled method CSharpStandartFunctions::exp
+Assembled method CSharpStandartFunctions::exp
+Assembled method CSharpStandartFunctions::cos
+Assembled method CSharpStandartFunctions::cos
+Assembled method CSharpStandartFunctions::sin
+Assembled method CSharpStandartFunctions::sin
+Assembled method CSharpStandartFunctions::tan
+Assembled method CSharpStandartFunctions::tan
+Assembled method CSharpStandartFunctions::factorial
+Assembled method CSharpStandartFunctions::factorial
+Assembled method CSharpStandartFunctions::size
+Assembled method CSharpStandartFunctions::size
+Assembled method CSharpStandartFunctions::size
+Assembled method CSharpStandartFunctions::size
+Assembled method CSharpStandartFunctions::size
+Assembled method CSharpStandartFunctions::concat
+Assembled method CSharpStandartFunctions::length
+Assembled method CSharpStandartFunctions::.ctor
+Assembled method Cast::castToInt
+Assembled method Cast::castToInt
+Assembled method Cast::castToInt
+Assembled method Cast::castToDouble
+Assembled method Cast::castToString
+Assembled method Cast::castToString
+Assembled method Cast::castToString
+Assembled method Cast::.ctor
+Assembled method Program::main
+Assembled method Program::.ctor
+Creating PE file
+
+Emitting classes:
+Class 1:	CSharpStandartFunctions
+Class 2:	Cast
+Class 3:	Program
+
+Emitting fields and methods:
+Global 	
+Class 1	Methods: 53;	
+Class 2	Methods: 8;	
+Class 3	Methods: 2;	
+Resolving local member refs: 46 -> 46 defs, 0 refs, 0 unresolved
+
+Emitting events and properties:
+Global 	
+Class 1	
+Class 2	
+Class 3	
+Resolving local member refs: 0 -> 0 defs, 0 refs, 0 unresolved
+Writing PE file
+Operation completed successfully

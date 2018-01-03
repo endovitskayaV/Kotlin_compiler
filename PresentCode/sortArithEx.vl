@@ -1,0 +1,140 @@
+class Program{
+fun main(args:Array<String>): Unit {
+    sortExample()
+    arithmExample()
+
+    println("Press any key to exit...")
+    readKey()
+    }
+
+
+fun arithmExample():Unit{
+    println("ARITHM EXAMPLE")
+    print("e=")
+    println(e())
+    print("pi=")
+    println(pi())
+    println("enter int number")
+    var number:Int=readlnInt()
+    print("sqrt: ")
+    println(sqrt(number))
+    print("power: ")
+    println(power(number, number))
+    print("abs: ")
+    println(abs(number))
+    print("remainder: ")
+    println(remainder(number, number))
+    print("exp: ")
+    println(exp(number))
+    print("cos: ")
+    println(cos(number))
+    print("sin: ")
+    println(sin(number))
+    print("tan: ")
+    println(tan(number))
+    print("factorial: ")
+    println(factorial(number))
+
+     println("enter double number")
+     var number2:Double=readlnDouble()
+     print("trunk: ")
+     println(trunk(number2))
+     print("round: ")
+     println(round(number2))
+     print("round after , till ")
+     var num:Int=readlnInt()
+     println(round(number2,num))
+
+}
+
+fun enterArr(arr:Array<Int>, sortType:String):Unit{
+println(concat("Enter  array (10 numbers)\nArray sort:", sortType))
+    var i:Int=0
+    while(i < 10){
+        arr[i]=readlnInt()
+        i=i + 1
+    }
+    }
+
+    fun printResult(arr:Array<Int>):Unit{
+    println("Result")
+     for (variable in arr){
+            print(variable)
+            println(" ")
+    }
+}
+
+fun sortExample():Unit{
+   println("SORT EXAMPLE")
+   var arr: Array<Int> =  Array<Int>(10)
+   enterArr(arr, "bubble")
+   bubleSort(arr)
+   printResult(arr)
+
+   enterArr(arr, "quick")
+   quickSort(arr, 0, size(arr) - 1)
+   printResult(arr)
+
+    println("")
+}
+
+fun bubleSort(arr:  Array<Int>): Unit {
+var i:Int= size(arr) - 1
+var j:Int=0
+  while(i>0){
+  while (j<i){
+
+            if( arr[j] > arr[j+1] ){
+               var tmp:Int = arr[j]
+                arr[j] = arr[j+1]
+                arr[j+1] = tmp
+            }
+       j=j+1
+       }
+       j=0
+   i=i - 1
+   }
+
+}
+
+fun quickSort( mass: Array<Int>, low:Int, high:Int):Unit {
+        if (size(mass) != 0){
+ 
+        if (low < high){
+           
+ 
+        // выбрать опорный элемент
+        var middle:Int = low + (high - low) / 2
+        var opora:Int =  mass[middle]
+ 
+        // разделить на подмассивы, который больше и меньше опорного элемента
+        var i:Int = low
+         var j:Int = high
+        while (i <= j) {
+            while ( mass[i] < opora) {
+                i=i+1
+            }
+ 
+            while ( mass[j] > opora) {
+                j=j - 1
+            }
+ 
+            if (i <= j) {//меняем местами
+               var temp:Int =  mass[i] 
+                 mass[i] =  mass[j] 
+                 mass[j] = temp 
+                i=i+1
+                j=j - 1
+            }
+        }
+ 
+        // вызов рекурсии для сортировки левой и правой части
+        if (low < j)
+            quickSort( mass, low, j) 
+ 
+        if (high > i)
+            quickSort( mass, i, high) 
+    }
+}
+}
+}

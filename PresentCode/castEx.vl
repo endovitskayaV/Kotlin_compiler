@@ -1,0 +1,62 @@
+class Program{
+fun main(args:Array<String>): Unit {
+    var charVar:Char='a'
+	var intVar:Int=castToInt(charVar)
+	print("charVar:")
+	print(charVar)
+	print(" intVar:")
+	println(intVar)
+	println("")
+	
+	var doubleVar:Double=1+0.0
+	intVar=castToInt(doubleVar)
+	print("doubleVar:")
+	print(doubleVar)
+	print(" intVar:")
+	println(intVar)
+	println("")
+	
+	var stringVar:String="1"
+	intVar=castToInt(stringVar)
+	print("stringVar:")
+	print(stringVar)
+	print(" intVar:")
+	println(intVar)
+	println("")
+
+	intVar=1
+	doubleVar=castToDouble(intVar)
+	print("intVar:")
+	print(intVar)
+	print(" doubleVar:")
+	println(doubleVar)
+	println("")
+	
+	stringVar=castToString(charVar)
+	print("charVar:")
+	print(charVar)
+	print(" stringVar:")
+	println(stringVar)
+	println("")
+	
+	intVar=1
+	stringVar=castToString(intVar)
+	print("intVar:")
+	print(intVar)
+	print(" stringVar:")
+	println(stringVar)
+	println("")
+	
+	doubleVar=7.8
+	stringVar=castToString(doubleVar)
+	print("doubleVar:")
+	print(doubleVar)
+	print(" stringVar:")
+	println(stringVar)
+	println("")
+
+    println("Press any key to exit...")
+    readKey()
+    }
+
+}
