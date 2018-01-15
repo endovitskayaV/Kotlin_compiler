@@ -1,2 +1,5 @@
-IN CMD
+IN CMD:
 compiler.bat kotlin-compiler compile (.\PresentCode\sortArithEx.vl)+ [-lib .\PresentCode\Cast]
+
+where + means one or more
+      [] optional parameter
