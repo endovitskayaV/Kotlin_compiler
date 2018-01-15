@@ -11,6 +11,7 @@ import org.apache.tools.ant.taskdefs.optional.*;
 
 import java.io.*;
 import javax.swing.JFrame;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -19,16 +20,17 @@ import java.util.regex.Pattern;
 
 public class Main {
 
+    //TODO: enable multi lib function (so that compiler can process any number of user`s libs)
     static List<FunDeclaration> cSharpFunDeclarationList;
     static List<FunDeclaration> userFunDeclList;
     static File userFunLib = null;
-    private static File codeFile;
+    private static List<File> codeFile = new ArrayList<>();
     private static CharStream funDeclLib;
     private static String resPath = ".\\res\\";
 
     public static void main(String[] args) {
 
-        if (readCommand()) {
+        if (readCommand(args)) {
             Program cSharpFunDeclProgram = null;
             System.out.println("processing c sharp functions library...");
             cSharpFunDeclProgram = parse(funDeclLib);
@@ -49,57 +51,62 @@ public class Main {
                     }
                 }
 
+                for (File file:codeFile) {
+                    Program program = parse(file);
+                    if (program != null) {
+                        printAstTree(program, "astTree");
 
-                Program program = parse(codeFile);
-                if (program != null) {
-                    printAstTree(program, "astTree");
+                        //if no errors -> generate code
+                        if (!PrintableErrors.isErrorOccurred()) {
+                            String byteCode = CodeGenerator.generateCode(program);
+                            String byteCodeFileName = file.getName()
+                                    .substring(0, file.getName().length() - 3) + ".il";
+                            System.out.println("creating " + byteCodeFileName + "...");
+                            printInFile(byteCodeFileName, byteCode);
+                            System.out.println("creating "
+                                    + byteCodeFileName.substring(0, file.getName().length() - 3) + ".exe ...");
+                            if (createExe(file.getName().substring(0, file.getName().length() - 3)))
+                                System.out.println("\n***COMPILATION SUCCEEDED***\n");
+                            else System.out.println("creating exe failed!\n" +
+                                    " more information in \\res\\ilasmResult.txt " +
+                                    "\n***COMPILATION FAILED***\n");
+                        } else System.out.println("\n***COMPILATION FAILED***\n");
 
-                    //if no errors -> generate code
-                    if (!PrintableErrors.isErrorOccurred()) {
-                        String byteCode = CodeGenerator.generateCode(program);
-                        String byteCodeFileName = codeFile.getName()
-                                .substring(0, codeFile.getName().length() - 3) + ".il";
-                        System.out.println("creating " + byteCodeFileName + "...");
-                        printInFile(byteCodeFileName, byteCode);
-                        System.out.println("creating "
-                                + byteCodeFileName.substring(0, codeFile.getName().length() - 3) + ".exe ...");
-                        if (createExe(codeFile.getName().substring(0, codeFile.getName().length() - 3)))
-                            System.out.println("\n***COMPILATION SUCCEEDED***\n");
-                        else System.out.println("creating exe failed!\n" +
-                                " more information in \\res\\ilasmResult.txt " +
-                                "\n***COMPILATION FAILED***\n");
-                    } else System.out.println("\n***COMPILATION FAILED***\n");
-
+                    }
                 }
-
 
             }
         } else System.out.println("wrong command");
         //new Scanner(System.in).nextLine();
     }
 
-    private static boolean readCommand() {
-        System.out.print(">");
-        String commandStr = new Scanner(System.in).useDelimiter("\n").nextLine();
-        List<String> splitList = Arrays.asList(commandStr.split("\\s+"));
+    private static boolean readCommand(String[] args) {
+        List<String> splitList = Arrays.asList(args);
+//        System.out.print(">");
+//        String commandStr = new Scanner(System.in).useDelimiter("\n").nextLine();
+//        List<String> splitList = Arrays.asList(commandStr.split("\\s+"));
 
 
         if ((splitList.size() >= 3) && (splitList.get(0).equals("kotlin-compiler"))
-                && (splitList.get(1).equals("compile")) &&
-                (Pattern.compile(".*\\.vl$").matcher(splitList.get(2)).matches())) {
+                && (splitList.get(1).equals("compile"))) {
+            for (int i = 2; i < args.length; i++) {
+                if (Pattern.compile(".*\\.vl$").matcher(splitList.get(i)).matches()) {
 
-            codeFile = new File(splitList.get(2));
-
-            try {
-                InputStream i = Main.class.getResourceAsStream("/CSharpStandartFunctions.vl");
-                funDeclLib = CharStreams.fromStream(i);
-            } catch (IOException e) {
-                e.printStackTrace();
+                    codeFile.add(new File(splitList.get(i)));
+                } else break;
             }
 
-            if (splitList.stream().anyMatch(x -> x.equals("-lib"))
-                    && splitList.size() > splitList.lastIndexOf("-lib") + 1)
-                userFunLib = new File(splitList.get(splitList.lastIndexOf("-lib") + 1) + ".vl");
+                try {
+                    InputStream i1 = Main.class.getResourceAsStream("/CSharpStandartFunctions.vl");
+                    funDeclLib = CharStreams.fromStream(i1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if (splitList.stream().anyMatch(x -> x.equals("-lib"))
+                        && splitList.size() > splitList.lastIndexOf("-lib") + 1)
+                    userFunLib = new File(splitList.get(splitList.lastIndexOf("-lib") + 1) + ".vl");
+
 
 
         } else return false;
@@ -123,7 +130,7 @@ public class Main {
             processBuilder.redirectOutput(new File(resPath + "ilasmResult.txt"));
             Process process = processBuilder.start();
             process.waitFor();
-            return process.exitValue()==0;
+            return process.exitValue() == 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

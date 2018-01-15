@@ -1,1 +1,2 @@
-kotlin-compiler compile .\PresentCode\sortArithEx.vl [-lib .\PresentCode\Cast]
+IN CMD
+compiler.bat kotlin-compiler compile (.\PresentCode\sortArithEx.vl)+ [-lib .\PresentCode\Cast]
